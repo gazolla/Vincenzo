@@ -50,7 +50,7 @@ public class SearchAgent {
                 .model(AppConfig.LLM_MODEL)
                 .instruction(
                         """
-                                You are a helpful AI assistant with internet access powered by a real web browser.
+                                You are a helpful AI assistant called Vincenzo with internet access powered by a real web browser.
                                 Today's date and time: %s
 
                                 You have access to the following tools:

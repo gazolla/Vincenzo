@@ -45,10 +45,10 @@ public class ExtractSkill {
                 LOG.timing("ExtractSkill", "Navigation", System.currentTimeMillis() - start);
 
                 // Build and run a JavaScript extraction script using the provided selectors.
-                // The selectors Map is passed as the safe Playwright 'arg' — never interpolated.
+                // Playwright passes the selectorsMap as the arrow-function parameter (sels).
                 // maxItems is a Java constant (not user data), so it is safely interpolated.
                 String extractScript = """
-                        (function(sels) {
+                        sels => {
                             try {
                                 var maxItems = %d;
                                 var fields = Object.keys(sels);
@@ -77,7 +77,7 @@ public class ExtractSkill {
                             } catch(e) {
                                 return JSON.stringify({error: e.message});
                             }
-                        })(arg)
+                        }
                         """.formatted(AppConfig.EXTRACT_MAX_ITEMS);
 
                 // Pass only the selectors Map as arg — Playwright serializes Maps safely

@@ -25,7 +25,7 @@ class ExtractSkillTest {
     private static String runExtractionScript(com.microsoft.playwright.Page page,
                                                Map<String, String> selectors) {
         String script = """
-                (function(sels) {
+                sels => {
                     try {
                         var maxItems = %d;
                         var fields = Object.keys(sels);
@@ -51,7 +51,7 @@ class ExtractSkillTest {
                     } catch(e) {
                         return JSON.stringify({error: e.message});
                     }
-                })(arg)
+                }
                 """.formatted(MAX_ITEMS);
         Object raw = page.evaluate(script, selectors);
         return raw != null ? raw.toString() : "[]";
