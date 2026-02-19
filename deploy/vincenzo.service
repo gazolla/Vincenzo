@@ -1,0 +1,64 @@
+# =============================================================================
+#  Vincenzo — systemd unit file
+#  For VPS deployment WITHOUT Docker (bare JAR + systemd)
+#
+#  Install:
+#    sudo cp deploy/vincenzo.service /etc/systemd/system/
+#    sudo systemctl daemon-reload
+#    sudo systemctl enable --now vincenzo
+#
+#  Monitor:
+#    sudo systemctl status vincenzo
+#    sudo journalctl -u vincenzo -f
+#
+#  Prerequisites:
+#    - Java 21 JRE installed (openjdk-21-jre-headless)
+#    - Chromium system libs installed (see README / deploy guide)
+#    - Fat JAR at /opt/vincenzo/app.jar
+#    - /opt/vincenzo/.env with GOOGLE_API_KEY and TELEGRAM_BOT_TOKEN
+#    - /opt/vincenzo/application.properties (production config)
+#    - Playwright Chromium installed:
+#        java -cp /opt/vincenzo/app.jar com.microsoft.playwright.CLI install chromium
+# =============================================================================
+
+[Unit]
+Description=Vincenzo AI Search Bot
+Documentation=https://github.com/your-org/vincenzo
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=vincenzo
+Group=vincenzo
+
+# Working directory — application.properties placed here overrides the bundled one
+WorkingDirectory=/opt/vincenzo
+
+# Load GOOGLE_API_KEY and TELEGRAM_BOT_TOKEN from this file (chmod 600)
+EnvironmentFile=/opt/vincenzo/.env
+
+# Playwright browser path (adjust if installed elsewhere)
+Environment=PLAYWRIGHT_BROWSERS_PATH=/opt/vincenzo/.playwright
+
+ExecStart=/usr/bin/java \
+    -Xmx512m \
+    -jar /opt/vincenzo/app.jar
+
+# Restart policy
+Restart=on-failure
+RestartSec=15
+StartLimitIntervalSec=120
+StartLimitBurst=3
+
+# Logging — view with: journalctl -u vincenzo -f
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=vincenzo
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

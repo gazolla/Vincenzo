@@ -1,0 +1,43 @@
+# =============================================================================
+#  Vincenzo — docker-compose.yml
+#
+#  Quick start:
+#    1. cp .env.example .env && nano .env          (fill in your API keys)
+#    2. cp src/main/resources/application.properties application.properties
+#       (set interface.mode=telegram and telegram.mode=polling)
+#    3. docker compose up -d
+#    4. docker compose logs -f
+#
+#  Stop:   docker compose down
+#  Rebuild: docker compose up -d --build
+# =============================================================================
+
+services:
+  vincenzo:
+    build: .
+    restart: unless-stopped
+
+    environment:
+      # Loaded from .env file (never commit .env to git)
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+
+    volumes:
+      # Persist logs outside the container
+      - ./logs:/app/logs
+      # Persist Playwright downloads and screenshots
+      - ./work:/app/work
+      # Mount production application.properties (read-only)
+      # The external file overrides the one bundled in the JAR
+      - ./application.properties:/app/application.properties:ro
+
+    # Limit memory to match Cloud Run sizing (adjust for your VPS RAM)
+    mem_limit: 2g
+
+    # Healthcheck: verify the process is still alive
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'java.*app.jar' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s

@@ -10,3 +10,10 @@ work/
 
 # Build artifacts
 target/
+
+# Secrets — NEVER commit these
+.env
+
+# Production application.properties (external override — contains no secrets but is deployment-specific)
+# Uncomment the line below if you want to exclude it from git too:
+# application.properties

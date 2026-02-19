@@ -118,6 +118,44 @@
                     <excludedGroups>browser</excludedGroups>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <!-- Creates a self-contained fat/uber JAR with all dependencies bundled.
+                     Run:  mvn clean package -DskipTests
+                     Then: java -jar target/ai-internet-search-1.0.0-SNAPSHOT.jar
+                     Note: mvn exec:java and mvn test are NOT affected by this plugin. -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.gazapps.Main</mainClass>
+                                </transformer>
+                                <!-- Merge META-INF/services entries (required for SLF4J and Playwright) -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <!-- Remove digital signatures that cause errors when repackaging -->
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
