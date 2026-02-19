@@ -104,6 +104,12 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.2</version>
+                <configuration>
+                    <!-- Exclude browser-based integration tests by default.
+                         Run with: mvn test -Dgroups=browser
+                         Prerequisite: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args=install -->
+                    <excludedGroups>browser</excludedGroups>
+                </configuration>
             </plugin>
         </plugins>
     </build>

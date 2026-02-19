@@ -30,13 +30,13 @@ public class FormSkill {
             such as bus/flight ticket search, government portals, or CEP lookup.
             The fields parameter is a JSON object mapping CSS selectors to values.
             The submitSelector is the CSS selector for the submit button.
-            Example fields: {"#origin": "Brasilia", "#destination": "São Paulo", "#date": "20/03/2026"}
+            Example fields: {"#origin": "Chicago", "#destination": "New York", "#date": "03/20/2026"}
             Example submitSelector: "button[type=submit]" or "#search-btn"
             Returns the result page content after form submission.
             """)
     public static Map<String, String> fillFormAndSubmit(
             @Schema(name = "url", description = "The full URL of the page containing the form") String url,
-            @Schema(name = "fields", description = "JSON object mapping CSS selectors to values, e.g. {\"#name\":\"João\",\"#city\":\"SP\"}") String fields,
+            @Schema(name = "fields", description = "JSON object mapping CSS selectors to values, e.g. {\"#name\":\"Alice\",\"#city\":\"NY\"}") String fields,
             @Schema(name = "submitSelector", description = "CSS selector of the submit button, e.g. 'button[type=submit]' or '#search-btn'") String submitSelector) {
 
         LOG.section("TOOL CALL: fillFormAndSubmit");

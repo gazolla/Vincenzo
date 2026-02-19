@@ -1,6 +1,7 @@
 package com.gazapps.util;
 
 import com.gazapps.logging.LogService;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -11,7 +12,26 @@ public final class RetryUtils {
 
     private static final LogService LOG = LogService.getInstance();
 
+    /**
+     * Optional global listener called whenever a retry is about to happen.
+     * Receives a human-readable message describing the retry context.
+     * Set once at startup (e.g. by ChatInterface) to show feedback in the UI.
+     * Defaults to a no-op so all existing call-sites require no change.
+     */
+    private static volatile Consumer<String> retryListener = msg -> {};
+
     private RetryUtils() {}
+
+    /**
+     * Registers a global callback invoked before each retry delay.
+     * The message passed to the consumer is suitable for display to the user.
+     *
+     * @param listener consumer that receives a user-visible retry message; pass
+     *                 {@code msg -> {}} to clear the listener
+     */
+    public static void setRetryListener(Consumer<String> listener) {
+        retryListener = listener != null ? listener : msg -> {};
+    }
 
     /**
      * Functional interface equivalent to {@link java.util.function.Supplier} but
@@ -34,6 +54,9 @@ public final class RetryUtils {
      * {@code false}. If every attempt either throws or returns a failure result,
      * the last exception is re-thrown (if any); otherwise the last failure result
      * is returned so the caller's existing error-map handling still works.
+     *
+     * <p>When a retry is scheduled, the global {@link #setRetryListener listener}
+     * is called with a user-visible message before the delay begins.
      *
      * @param context        label used in log output (e.g. "DuckDuckGo.fetchInstantAnswer")
      * @param maxAttempts    total attempts allowed (must be &ge; 1)
@@ -63,20 +86,22 @@ public final class RetryUtils {
                     return result;   // success — exit immediately
                 }
                 lastResult = result;
-                LOG.warn("RetryUtils", "[" + context + "] tentativa " + attempt + "/"
-                        + maxAttempts + " — resultado é falha");
+                LOG.warn("RetryUtils", "[" + context + "] attempt " + attempt + "/"
+                        + maxAttempts + " — result is a failure");
             } catch (InterruptedException ie) {
                 // Always restore the interrupt flag before re-throwing
                 Thread.currentThread().interrupt();
                 throw ie;
             } catch (Exception e) {
                 lastException = e;
-                LOG.warn("RetryUtils", "[" + context + "] tentativa " + attempt + "/"
-                        + maxAttempts + " — exceção: " + e.getMessage());
+                LOG.warn("RetryUtils", "[" + context + "] attempt " + attempt + "/"
+                        + maxAttempts + " — exception: " + e.getMessage());
             }
 
             if (attempt < maxAttempts) {
                 long delay = initialDelayMs * (1L << (attempt - 1)); // 500, 1000, 2000 …
+                retryListener.accept(
+                        "Still working... (retrying, attempt " + (attempt + 1) + "/" + maxAttempts + ")");
                 try {
                     Thread.sleep(delay);
                 } catch (InterruptedException ie) {

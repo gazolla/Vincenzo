@@ -40,11 +40,11 @@ public class WebOrchestrator {
             String cacheKey = SearchCache.normalize(query);
             Map<String, String> cached = SearchCache.get(cacheKey);
             if (cached != null) {
-                LOG.info("WebOrchestrator", "Cache HIT para: \"" + query + "\"");
+                LOG.info("WebOrchestrator", "Cache HIT for: \"" + query + "\"");
                 LOG.timing("WebOrchestrator", "searchWeb (cache hit)", System.currentTimeMillis() - start);
                 return cached;
             }
-            LOG.debug("WebOrchestrator", "Cache MISS para: \"" + query + "\"");
+            LOG.debug("WebOrchestrator", "Cache MISS for: \"" + query + "\"");
         }
 
         // ── Step 1: DDG Instant Answer JSON (fast, no browser) ────────────
@@ -75,10 +75,10 @@ public class WebOrchestrator {
             webResults.put("instant_answer", instantJson);
         }
 
-        // ── Armazenar no cache (somente sucessos) ───────────────────────────
+        // ── Store in cache (successes only) ────────────────────────────────
         if (AppConfig.SEARCH_CACHE_ENABLED && "success".equals(webResults.get("status"))) {
             SearchCache.put(SearchCache.normalize(query), webResults);
-            LOG.debug("WebOrchestrator", "Resultado cacheado. Stats: " + SearchCache.stats());
+            LOG.debug("WebOrchestrator", "Result cached. Stats: " + SearchCache.stats());
         }
 
         LOG.timing("WebOrchestrator", "searchWeb total", System.currentTimeMillis() - start);

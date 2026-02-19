@@ -2,6 +2,7 @@ package com.gazapps.ui;
 
 import com.gazapps.agent.SearchAgent;
 import com.gazapps.logging.LogService;
+import com.gazapps.util.RetryUtils;
 
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,6 +23,10 @@ public class ChatInterface {
     public ChatInterface(SearchAgent agent) {
         this.scanner = new Scanner(System.in);
         this.agent   = agent;
+        RetryUtils.setRetryListener(msg -> {
+            System.out.print("\033[2K\rAssistant: [" + msg + "]");
+            System.out.flush();
+        });
         LOG.info("ChatInterface", "ChatInterface instantiated");
     }
 

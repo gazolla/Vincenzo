@@ -9,15 +9,14 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Cache em memória de resultados de busca, baseado em Guava Cache.
+ * In-memory cache for search results, backed by Guava Cache.
  *
- * <p>Chaves são queries normalizadas (lowercase, espaços colapsados).
- * O cache é configurável via {@code AppConfig}: tamanho máximo (LRU eviction),
- * TTL e flag de habilitação.
+ * <p>Keys are normalized queries (lowercase, collapsed spaces).
+ * The cache is configurable via {@code AppConfig}: maximum size (LRU eviction),
+ * TTL, and enable flag.
  *
- * <p>Guava ({@code com.google.guava:guava}) está disponível como dependência
- * transitiva do {@code google-adk} — nenhuma entrada adicional no pom.xml
- * é necessária.
+ * <p>Guava ({@code com.google.guava:guava}) is available as a transitive
+ * dependency of {@code google-adk} — no additional pom.xml entry is required.
  */
 public final class SearchCache {
 
@@ -26,8 +25,8 @@ public final class SearchCache {
     private SearchCache() {}
 
     /**
-     * Constrói o cache com os parâmetros lidos do AppConfig.
-     * Método separado do campo para facilitar testes que precisam de TTL customizado.
+     * Builds the cache with parameters read from AppConfig.
+     * Kept as a separate method to facilitate tests that need a custom TTL.
      */
     static Cache<String, Map<String, String>> buildCache() {
         return CacheBuilder.newBuilder()
@@ -38,9 +37,9 @@ public final class SearchCache {
     }
 
     /**
-     * Normaliza a query para uso como chave de cache.
-     * Lowercase + trim + colapso de espaços múltiplos.
-     * Nunca lança exceção.
+     * Normalizes the query for use as a cache key.
+     * Lowercase + trim + multiple-space collapse.
+     * Never throws.
      */
     public static String normalize(String query) {
         if (query == null) return "";
@@ -48,37 +47,37 @@ public final class SearchCache {
     }
 
     /**
-     * Retorna o resultado cacheado para a query normalizada,
-     * ou {@code null} se ausente ou expirado.
+     * Returns the cached result for the normalized query,
+     * or {@code null} if absent or expired.
      */
     public static Map<String, String> get(String normalizedQuery) {
         return CACHE.getIfPresent(normalizedQuery);
     }
 
     /**
-     * Armazena o resultado no cache com a query normalizada como chave.
+     * Stores the result in the cache with the normalized query as the key.
      */
     public static void put(String normalizedQuery, Map<String, String> result) {
         CACHE.put(normalizedQuery, result);
     }
 
     /**
-     * Remove uma entrada específica do cache (invalidação manual).
+     * Removes a specific entry from the cache (manual invalidation).
      */
     public static void invalidate(String normalizedQuery) {
         CACHE.invalidate(normalizedQuery);
     }
 
     /**
-     * Remove todas as entradas do cache.
+     * Removes all entries from the cache.
      */
     public static void clear() {
         CACHE.invalidateAll();
     }
 
     /**
-     * Retorna uma string com as estatísticas do cache
-     * (hits, misses, hitRate, tamanho atual).
+     * Returns a string with cache statistics
+     * (hits, misses, hitRate, current size).
      */
     public static String stats() {
         CacheStats s = CACHE.stats();

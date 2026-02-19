@@ -128,32 +128,36 @@ public final class AppConfig {
     public static final int PDF_MAX_CHARS =
             intVal("pdf.max.chars", 10_000);
 
+    // ── LLM / Model ────────────────────────────────────────────────────────────
+    /** Gemini model name passed to LlmAgent. Override via {@code llm.model} property. */
+    public static final String LLM_MODEL = str("llm.model", "gemini-2.5-flash");
+
     // ── Retry ──────────────────────────────────────────────────────────────────
-    /** Número total de tentativas para operações com retry (1 = sem retry). */
+    /** Total number of attempts for retry operations (1 = no retry). */
     public static final int RETRY_MAX_ATTEMPTS =
             intVal("retry.max.attempts", 3);
 
-    /** Delay inicial antes da segunda tentativa (ms). Dobra a cada tentativa. */
+    /** Initial delay before the second attempt (ms). Doubles on each retry. */
     public static final long RETRY_INITIAL_DELAY_MS =
             intVal("retry.initial.delay.ms", 500);
 
     // ── Locale / Region ────────────────────────────────────────────────────────
-    /** Tag de locale BCP 47 para o contexto do browser (ex: pt-BR, en-US). */
+    /** BCP 47 locale tag for the browser context (e.g. pt-BR, en-US). */
     public static final String LOCALE = str("browser.locale", "pt-BR");
 
-    /** Código de região do DuckDuckGo para o parâmetro kl= (ex: br-pt, us-en). */
+    /** DuckDuckGo region code for the kl= parameter (e.g. br-pt, us-en). */
     public static final String DDG_REGION = str("ddg.region", "br-pt");
 
-    // ── Cache de busca ──────────────────────────────────────────────────────────
-    /** Habilita o cache em memória de resultados de searchWeb. */
+    // ── Search Cache ───────────────────────────────────────────────────────────
+    /** Enables the in-memory cache for searchWeb results. */
     public static final boolean SEARCH_CACHE_ENABLED =
             boolVal("search.cache.enabled", true);
 
-    /** Número máximo de queries no cache (LRU eviction quando atingido). */
+    /** Maximum number of queries in the cache (LRU eviction when reached). */
     public static final int SEARCH_CACHE_MAX_SIZE =
             intVal("search.cache.max.size", 500);
 
-    /** Tempo de vida de cada entrada do cache em minutos. */
+    /** Time-to-live for each cache entry in minutes. */
     public static final int SEARCH_CACHE_TTL_MINUTES =
             intVal("search.cache.ttl.minutes", 60);
 }

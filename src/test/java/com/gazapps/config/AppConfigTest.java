@@ -169,4 +169,12 @@ class AppConfigTest {
     void searchCacheTtlMinutes_isPositive() {
         assertTrue(AppConfig.SEARCH_CACHE_TTL_MINUTES > 0);
     }
+
+    // ── LLM / Model ───────────────────────────────────────────────────────────
+
+    @Test
+    void llmModel_isNonBlank() {
+        assertNotNull(AppConfig.LLM_MODEL);
+        assertFalse(AppConfig.LLM_MODEL.isBlank());
+    }
 }

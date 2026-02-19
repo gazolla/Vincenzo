@@ -1,5 +1,6 @@
 package com.gazapps.agent;
 
+import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.skills.WebOrchestrator;
 import com.google.adk.agents.BaseAgent;
@@ -18,7 +19,6 @@ import io.reactivex.rxjava3.core.Flowable;
  */
 public class SearchAgent {
 
-    private static final String MODEL = "gemini-2.5-flash";
     private static final String USER_ID = "local-user";
 
     private static final LogService LOG = LogService.getInstance();
@@ -29,7 +29,7 @@ public class SearchAgent {
 
     public SearchAgent() {
         LOG.section("AGENT INIT");
-        LOG.info("SearchAgent", "Building LlmAgent with model: " + MODEL);
+        LOG.info("SearchAgent", "Building LlmAgent with model: " + AppConfig.LLM_MODEL);
 
         BaseAgent agent = buildAgent();
         this.runner = new InMemoryRunner(agent);
@@ -47,7 +47,7 @@ public class SearchAgent {
         return LlmAgent.builder()
                 .name("internet-search-assistant")
                 .description("A helpful assistant that can search the internet and read web pages")
-                .model(MODEL)
+                .model(AppConfig.LLM_MODEL)
                 .instruction(
                         """
                                 You are a helpful AI assistant with internet access powered by a real web browser.
