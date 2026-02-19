@@ -1,0 +1,8 @@
+
+══════════════════════════════════════════════════════════════════════
+  SESSION START  2026-02-18 23:20:35.181
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 23:20:35.182] [INFO ] [LogService        ] Log file: /Users/gazolla/Projects/Vincenzo/logs/session-20260218_232035.log
+[2026-02-18 23:20:35.191] [WARN ] [FormSkill         ] Failed to parse fields JSON: Not a JSON Object: ["a","b"]
+[2026-02-18 23:20:35.193] [WARN ] [FormSkill         ] Failed to parse fields JSON: com.google.gson.stream.MalformedJsonException: Expected ':' at line 1 column 7 path $.bad
+See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json

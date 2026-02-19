@@ -65,7 +65,7 @@ public class BrowserService {
 
         Browser.NewContextOptions contextOptions = new Browser.NewContextOptions()
                 .setUserAgent(AppConfig.USER_AGENT)
-                .setLocale("pt-BR")
+                .setLocale(AppConfig.LOCALE)
                 .setExtraHTTPHeaders(Map.of(
                         "Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8",
                         "Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",

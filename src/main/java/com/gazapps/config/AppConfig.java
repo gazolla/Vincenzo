@@ -121,4 +121,20 @@ public final class AppConfig {
     /** Max chars of extracted PDF text returned. */
     public static final int PDF_MAX_CHARS =
             intVal("pdf.max.chars", 10_000);
+
+    // ── Retry ──────────────────────────────────────────────────────────────────
+    /** Número total de tentativas para operações com retry (1 = sem retry). */
+    public static final int RETRY_MAX_ATTEMPTS =
+            intVal("retry.max.attempts", 3);
+
+    /** Delay inicial antes da segunda tentativa (ms). Dobra a cada tentativa. */
+    public static final long RETRY_INITIAL_DELAY_MS =
+            intVal("retry.initial.delay.ms", 500);
+
+    // ── Locale / Region ────────────────────────────────────────────────────────
+    /** Tag de locale BCP 47 para o contexto do browser (ex: pt-BR, en-US). */
+    public static final String LOCALE = str("browser.locale", "pt-BR");
+
+    /** Código de região do DuckDuckGo para o parâmetro kl= (ex: br-pt, us-en). */
+    public static final String DDG_REGION = str("ddg.region", "br-pt");
 }

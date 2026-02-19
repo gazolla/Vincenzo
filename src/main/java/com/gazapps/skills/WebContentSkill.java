@@ -3,6 +3,7 @@ package com.gazapps.skills;
 import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.services.BrowserService;
+import com.gazapps.util.RetryUtils;
 import com.gazapps.util.UrlValidator;
 import com.google.adk.tools.Annotations.Schema;
 import com.microsoft.playwright.Page;
@@ -34,51 +35,66 @@ public class WebContentSkill {
             return error;
         }
 
-        return BrowserService.execute(page -> {
-            try {
-                page.navigate(url, new Page.NavigateOptions().setTimeout(AppConfig.FETCH_PAGE_NAVIGATE_TIMEOUT_MS));
-                page.waitForLoadState(LoadState.DOMCONTENTLOADED);
-                LOG.timing("WebContentSkill", "Navigation", System.currentTimeMillis() - start);
+        try {
+            return RetryUtils.withRetry(
+                    "WebContentSkill.fetchPageContent",
+                    AppConfig.RETRY_MAX_ATTEMPTS,
+                    AppConfig.RETRY_INITIAL_DELAY_MS,
+                    () -> BrowserService.execute(page -> {
+                        try {
+                            page.navigate(url, new Page.NavigateOptions().setTimeout(AppConfig.FETCH_PAGE_NAVIGATE_TIMEOUT_MS));
+                            page.waitForLoadState(LoadState.DOMCONTENTLOADED);
+                            LOG.timing("WebContentSkill", "Navigation", System.currentTimeMillis() - start);
 
-                // Remove noise before text extraction
-                page.evaluate("""
-                        document.querySelectorAll(
-                            'script,style,nav,footer,header,aside,iframe,' +
-                            '[aria-hidden="true"],[class*="cookie"],[class*="banner"],[class*="popup"]'
-                        ).forEach(el => el.remove());
-                        """);
+                            // Remove noise before text extraction
+                            page.evaluate("""
+                                    document.querySelectorAll(
+                                        'script,style,nav,footer,header,aside,iframe,' +
+                                        '[aria-hidden="true"],[class*="cookie"],[class*="banner"],[class*="popup"]'
+                                    ).forEach(el => el.remove());
+                                    """);
 
-                String title = page.title();
-                String bodyText = page.innerText("body");
-                int rawLen = bodyText.length();
+                            String title = page.title();
+                            String bodyText = page.innerText("body");
+                            int rawLen = bodyText.length();
 
-                LOG.info("WebContentSkill", "Page title: \"" + title + "\"");
-                LOG.info("WebContentSkill", "Raw body text length: " + rawLen + " chars");
+                            LOG.info("WebContentSkill", "Page title: \"" + title + "\"");
+                            LOG.info("WebContentSkill", "Raw body text length: " + rawLen + " chars");
 
-                if (bodyText.length() > AppConfig.FETCH_PAGE_MAX_CHARS) {
-                    bodyText = bodyText.substring(0, AppConfig.FETCH_PAGE_MAX_CHARS) + "... [content truncated]";
-                    LOG.debug("WebContentSkill", "Body text truncated to " + AppConfig.FETCH_PAGE_MAX_CHARS + " chars");
-                }
+                            if (bodyText.length() > AppConfig.FETCH_PAGE_MAX_CHARS) {
+                                bodyText = bodyText.substring(0, AppConfig.FETCH_PAGE_MAX_CHARS) + "... [content truncated]";
+                                LOG.debug("WebContentSkill", "Body text truncated to " + AppConfig.FETCH_PAGE_MAX_CHARS + " chars");
+                            }
 
-                Map<String, String> result = new HashMap<>();
-                result.put("status", "success");
-                result.put("url", url);
-                result.put("title", title);
-                result.put("content", bodyText);
+                            Map<String, String> result = new HashMap<>();
+                            result.put("status", "success");
+                            result.put("url", url);
+                            result.put("title", title);
+                            result.put("content", bodyText);
 
-                LOG.timing("WebContentSkill", "Total execution", System.currentTimeMillis() - start);
-                LOG.toolResult("fetchPageContent", result);
-                return result;
+                            LOG.timing("WebContentSkill", "Total execution", System.currentTimeMillis() - start);
+                            LOG.toolResult("fetchPageContent", result);
+                            return result;
 
-            } catch (Exception e) {
-                LOG.error("WebContentSkill", "Failed for " + url, e);
-                Map<String, String> error = new HashMap<>();
-                error.put("status", "error");
-                error.put("url", url);
-                error.put("message", "Failed to fetch page: " + e.getMessage());
-                return error;
-            }
-        });
+                        } catch (Exception e) {
+                            LOG.error("WebContentSkill", "Failed for " + url, e);
+                            Map<String, String> error = new HashMap<>();
+                            error.put("status", "error");
+                            error.put("url", url);
+                            error.put("message", "Failed to fetch page: " + e.getMessage());
+                            return error;
+                        }
+                    }),
+                    result -> "error".equals(result.get("status"))
+            );
+        } catch (Exception e) {
+            LOG.error("WebContentSkill", "Failed for " + url + " after retries", e);
+            Map<String, String> error = new HashMap<>();
+            error.put("status", "error");
+            error.put("url", url);
+            error.put("message", "Failed to fetch page: " + e.getMessage());
+            return error;
+        }
     }
 
     @Schema(description = "Take a screenshot of a web page and save it locally. Returns the saved file path.")

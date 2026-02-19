@@ -2,6 +2,7 @@ package com.gazapps.skills;
 
 import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
+import com.gazapps.util.RetryUtils;
 import com.gazapps.util.UrlValidator;
 import com.google.adk.tools.Annotations.Schema;
 import org.apache.pdfbox.Loader;
@@ -55,27 +56,30 @@ public class PdfSkill {
         }
 
         try {
-            // Download PDF bytes via HTTP
+            // Build request once — HttpRequest is immutable and safe to reuse across retries
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
-                    .header("User-Agent", com.gazapps.config.AppConfig.USER_AGENT)
+                    .header("User-Agent", AppConfig.USER_AGENT)
                     .header("Accept", "application/pdf,*/*")
                     .GET()
                     .build();
 
-            HttpResponse<byte[]> response = HTTP.send(request, HttpResponse.BodyHandlers.ofByteArray());
-            LOG.timing("PdfSkill", "HTTP download", System.currentTimeMillis() - start);
-
-            if (response.statusCode() != 200) {
-                LOG.warn("PdfSkill", "HTTP " + response.statusCode() + " for " + url);
-                Map<String, String> error = new HashMap<>();
-                error.put("status", "error");
-                error.put("url", url);
-                error.put("message", "HTTP " + response.statusCode() + " — could not download PDF");
-                return error;
-            }
-
-            byte[] pdfBytes = response.body();
+            // Retry the HTTP download step only (PDFBox extraction is CPU-local, no retry needed)
+            byte[] pdfBytes = RetryUtils.withRetry(
+                    "PdfSkill.download",
+                    AppConfig.RETRY_MAX_ATTEMPTS,
+                    AppConfig.RETRY_INITIAL_DELAY_MS,
+                    () -> {
+                        HttpResponse<byte[]> response = HTTP.send(request, HttpResponse.BodyHandlers.ofByteArray());
+                        LOG.timing("PdfSkill", "HTTP download", System.currentTimeMillis() - start);
+                        if (response.statusCode() != 200) {
+                            LOG.warn("PdfSkill", "HTTP " + response.statusCode() + " for " + url);
+                            throw new java.io.IOException("HTTP " + response.statusCode()); // → retry
+                        }
+                        return response.body();
+                    },
+                    bytes -> bytes == null || bytes.length == 0
+            );
             LOG.info("PdfSkill", "Downloaded " + pdfBytes.length + " bytes");
 
             // Extract text using PDFBox 3.x API
