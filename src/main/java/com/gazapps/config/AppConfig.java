@@ -57,6 +57,16 @@ public final class AppConfig {
         }
     }
 
+    // ── SLF4J SimpleLogger ─────────────────────────────────────────────────────
+    /** Default log level for SLF4J SimpleLogger (suppresses ADK/gRPC/Netty noise). */
+    public static final String SLF4J_DEFAULT_LOG_LEVEL  = str("slf4j.defaultLogLevel",  "warn");
+    /** Whether SLF4J should print the date/time on each log line. */
+    public static final String SLF4J_SHOW_DATE_TIME     = str("slf4j.showDateTime",     "false");
+    /** Whether SLF4J should print the thread name on each log line. */
+    public static final String SLF4J_SHOW_THREAD_NAME   = str("slf4j.showThreadName",   "false");
+    /** Whether SLF4J should print the logger name on each log line. */
+    public static final String SLF4J_SHOW_LOG_NAME      = str("slf4j.showLogName",      "false");
+
     // ── Work directories ───────────────────────────────────────────────────────
     /** Directory for browser screenshots (created on startup if absent). */
     public static final String SCREENSHOTS_DIR = str("work.screenshots.dir", "work/screenshots");

@@ -1,6 +1,7 @@
 package com.gazapps;
 
 import com.gazapps.agent.SearchAgent;
+import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.ui.ChatInterface;
 
@@ -18,7 +19,14 @@ import com.gazapps.ui.ChatInterface;
 public class Main {
 
     public static void main(String[] args) {
-        // Initialize logger first — creates the log file
+        // Apply SLF4J SimpleLogger settings from application.properties BEFORE
+        // the first LogService call triggers SLF4J initialization.
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", AppConfig.SLF4J_DEFAULT_LOG_LEVEL);
+        System.setProperty("org.slf4j.simpleLogger.showDateTime",    AppConfig.SLF4J_SHOW_DATE_TIME);
+        System.setProperty("org.slf4j.simpleLogger.showThreadName",  AppConfig.SLF4J_SHOW_THREAD_NAME);
+        System.setProperty("org.slf4j.simpleLogger.showLogName",     AppConfig.SLF4J_SHOW_LOG_NAME);
+
+        // Initialize logger — creates the session log file
         LogService log = LogService.getInstance();
         log.info("Main", "Application starting");
         log.info("Main", "Java version : " + System.getProperty("java.version"));
