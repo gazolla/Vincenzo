@@ -4,6 +4,10 @@ import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.microsoft.playwright.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -54,8 +58,11 @@ public class BrowserService {
     }
 
     private static BrowserContext launchStealthContext(Playwright playwright) {
+        Path downloadsDir = ensureDir(AppConfig.DOWNLOADS_DIR);
+
         BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions()
                 .setHeadless(true)
+                .setDownloadsPath(downloadsDir)
                 .setArgs(java.util.List.of(
                         "--disable-blink-features=AutomationControlled",
                         "--no-sandbox",
@@ -66,6 +73,7 @@ public class BrowserService {
         Browser.NewContextOptions contextOptions = new Browser.NewContextOptions()
                 .setUserAgent(AppConfig.USER_AGENT)
                 .setLocale(AppConfig.LOCALE)
+                .setAcceptDownloads(true)
                 .setExtraHTTPHeaders(Map.of(
                         "Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8",
                         "Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -80,5 +88,19 @@ public class BrowserService {
         context.addInitScript("Object.defineProperty(navigator, 'webdriver', {get: () => undefined});");
 
         return context;
+    }
+
+    /**
+     * Creates the directory at {@code dirPath} if it does not exist and returns its {@link Path}.
+     * Logs a warning to stderr if creation fails (non-fatal — Playwright will fall back to a temp dir).
+     */
+    public static Path ensureDir(String dirPath) {
+        Path dir = Paths.get(dirPath);
+        try {
+            Files.createDirectories(dir);
+        } catch (IOException e) {
+            System.err.println("[BrowserService] Could not create directory " + dirPath + ": " + e.getMessage());
+        }
+        return dir;
     }
 }

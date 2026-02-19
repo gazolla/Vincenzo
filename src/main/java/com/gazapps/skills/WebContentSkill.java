@@ -128,7 +128,7 @@ public class WebContentSkill {
                 if (!safeFile.endsWith(".png"))
                     safeFile += ".png";
 
-                java.nio.file.Path outputPath = java.nio.file.Paths.get(System.getProperty("user.home"), safeFile);
+                java.nio.file.Path outputPath = com.gazapps.services.BrowserService.ensureDir(AppConfig.SCREENSHOTS_DIR).resolve(safeFile);
                 page.screenshot(new Page.ScreenshotOptions().setPath(outputPath).setFullPage(false));
 
                 LOG.info("WebContentSkill", "Screenshot saved: " + outputPath.toAbsolutePath());

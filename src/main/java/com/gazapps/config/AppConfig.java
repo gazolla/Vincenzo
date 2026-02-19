@@ -57,6 +57,13 @@ public final class AppConfig {
         }
     }
 
+    // ── Work directories ───────────────────────────────────────────────────────
+    /** Directory for browser screenshots (created on startup if absent). */
+    public static final String SCREENSHOTS_DIR = str("work.screenshots.dir", "work/screenshots");
+
+    /** Directory for browser downloads (created on startup if absent). */
+    public static final String DOWNLOADS_DIR = str("work.downloads.dir", "work/downloads");
+
     // ── HTTP / Browser User-Agent ──────────────────────────────────────────────
     public static final String USER_AGENT = str("browser.user-agent",
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " +
