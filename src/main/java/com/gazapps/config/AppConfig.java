@@ -148,6 +148,13 @@ public final class AppConfig {
     /** DuckDuckGo region code for the kl= parameter (e.g. br-pt, us-en). */
     public static final String DDG_REGION = str("ddg.region", "br-pt");
 
+    // ── Log management ─────────────────────────────────────────────────────────
+    /** Maximum number of session log files to keep (oldest deleted when exceeded). */
+    public static final int LOG_MAX_FILES = intVal("log.max.files", 10);
+
+    /** Maximum size of a single log file in KB before rotation (0 = disabled). */
+    public static final int LOG_MAX_SIZE_KB = intVal("log.max.size.kb", 512);
+
     // ── Search Cache ───────────────────────────────────────────────────────────
     /** Enables the in-memory cache for searchWeb results. */
     public static final boolean SEARCH_CACHE_ENABLED =

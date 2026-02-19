@@ -170,6 +170,18 @@ class AppConfigTest {
         assertTrue(AppConfig.SEARCH_CACHE_TTL_MINUTES > 0);
     }
 
+    // ── Log management ────────────────────────────────────────────────────────
+
+    @Test
+    void logMaxFiles_isPositive() {
+        assertTrue(AppConfig.LOG_MAX_FILES > 0);
+    }
+
+    @Test
+    void logMaxSizeKb_isNonNegative() {
+        assertTrue(AppConfig.LOG_MAX_SIZE_KB >= 0);
+    }
+
     // ── LLM / Model ───────────────────────────────────────────────────────────
 
     @Test

@@ -1,5 +1,7 @@
 package com.gazapps.logging;
 
+import com.gazapps.config.AppConfig;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -10,8 +12,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 
 /**
  * Centralized logging service.
@@ -20,6 +25,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * - Each log line: [TIMESTAMP] [LEVEL] [COMPONENT] message
  * - Sections delimited by banners for easy reading
  * - Thread-safe (AtomicLong counter + synchronized file write)
+ * - Log rotation: opens a new file when the current one exceeds {@code log.max.size.kb}
+ * - Log retention: deletes oldest files when the count exceeds {@code log.max.files}
  */
 public class LogService {
 
@@ -39,22 +46,23 @@ public class LogService {
     }
 
     // ── State ─────────────────────────────────────────────────────────────────
-    private final Path logFile;
-    private final DateTimeFormatter ts = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    private Path logFile;
+    private final Path logsDir;
+    private final DateTimeFormatter ts     = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private final DateTimeFormatter fileTs = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-    private final AtomicLong eventCounter = new AtomicLong(0);
-    private Level minLevel = Level.DEBUG;   // log everything by default
+    private final AtomicLong eventCounter  = new AtomicLong(0);
+    private Level minLevel = Level.DEBUG;
 
     // ── Constructor ───────────────────────────────────────────────────────────
     private LogService() {
-        Path logsDir = Paths.get("logs");
+        logsDir = Paths.get("logs");
         try {
             Files.createDirectories(logsDir);
         } catch (IOException e) {
             System.err.println("[LogService] Could not create logs dir: " + e.getMessage());
         }
-        String fileName = "session-" + LocalDateTime.now().format(fileTs) + ".log";
-        logFile = logsDir.resolve(fileName);
+        logFile = newLogFile();
+        enforceRetention();
         writeRaw(banner("SESSION START  " + LocalDateTime.now().format(ts)));
         writeRaw(line(Level.INFO, "LogService", "Log file: " + logFile.toAbsolutePath()));
     }
@@ -144,6 +152,55 @@ public class LogService {
 
     // ── Private helpers ───────────────────────────────────────────────────────
 
+    private Path newLogFile() {
+        String fileName = "session-" + LocalDateTime.now().format(fileTs) + ".log";
+        return logsDir.resolve(fileName);
+    }
+
+    /**
+     * Rotates the current log file: writes a continuation marker to the current file,
+     * then switches to a new file and applies retention. Called inside a synchronized block.
+     */
+    private void rotate() {
+        writeRaw(banner("LOG ROTATED — continued in next file"));
+        logFile = newLogFile();
+        enforceRetention();
+        writeRaw(banner("SESSION CONTINUED  " + LocalDateTime.now().format(ts)));
+        writeRaw(line(Level.INFO, "LogService", "Log file: " + logFile.toAbsolutePath()));
+    }
+
+    /**
+     * Deletes the oldest session log files so that at most {@code LOG_MAX_FILES}
+     * files remain in the logs directory (counting the file about to be created).
+     * Silently skips files that cannot be deleted.
+     */
+    private void enforceRetention() {
+        int maxFiles = AppConfig.LOG_MAX_FILES;
+        if (maxFiles <= 0) return;
+        try (Stream<Path> stream = Files.list(logsDir)) {
+            List<Path> files = stream
+                    .filter(p -> p.getFileName().toString().startsWith("session-")
+                              && p.getFileName().toString().endsWith(".log"))
+                    .sorted(Comparator.comparing(p -> p.getFileName().toString()))
+                    .toList();
+
+            // +1 because logFile was just assigned but not yet written (counts as one slot)
+            int toDelete = files.size() - (maxFiles - 1);
+            for (int i = 0; i < toDelete; i++) {
+                Path old = files.get(i);
+                try {
+                    Files.deleteIfExists(old);
+                    System.err.println("[LogService] Deleted old log: " + old.getFileName());
+                } catch (IOException e) {
+                    System.err.println("[LogService] Could not delete " + old.getFileName()
+                            + ": " + e.getMessage());
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("[LogService] Could not list logs dir: " + e.getMessage());
+        }
+    }
+
     private String line(Level level, String component, String message) {
         String now = LocalDateTime.now().format(ts);
         String lvl = String.format("%-5s", level.name());
@@ -171,6 +228,14 @@ public class LogService {
 
     private synchronized void writeRaw(String text) {
         try {
+            // Check size limit before writing (0 = disabled)
+            int maxKb = AppConfig.LOG_MAX_SIZE_KB;
+            if (maxKb > 0 && Files.exists(logFile)) {
+                long currentBytes = Files.size(logFile);
+                if (currentBytes >= (long) maxKb * 1024) {
+                    rotate();
+                }
+            }
             Files.writeString(logFile, text,
                     StandardCharsets.UTF_8,
                     StandardOpenOption.CREATE,
