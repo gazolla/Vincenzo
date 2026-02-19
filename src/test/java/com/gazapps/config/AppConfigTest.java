@@ -151,4 +151,22 @@ class AppConfigTest {
     void retryInitialDelayMs_equals500() {
         assertEquals(500L, AppConfig.RETRY_INITIAL_DELAY_MS);
     }
+
+    // ── Novos campos da Fase 3 (cache de busca) ───────────────────────────────
+
+    @Test
+    void searchCacheEnabled_isBoolean() {
+        // apenas acessa o campo — se compilar e não lançar exceção, está correto
+        boolean ignored = AppConfig.SEARCH_CACHE_ENABLED;
+    }
+
+    @Test
+    void searchCacheMaxSize_isPositive() {
+        assertTrue(AppConfig.SEARCH_CACHE_MAX_SIZE > 0);
+    }
+
+    @Test
+    void searchCacheTtlMinutes_isPositive() {
+        assertTrue(AppConfig.SEARCH_CACHE_TTL_MINUTES > 0);
+    }
 }

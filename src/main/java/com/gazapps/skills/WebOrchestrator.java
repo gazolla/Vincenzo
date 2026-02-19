@@ -1,6 +1,8 @@
 package com.gazapps.skills;
 
+import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
+import com.gazapps.util.SearchCache;
 import com.gazapps.util.StringUtils;
 
 import com.google.adk.tools.Annotations.Schema;
@@ -33,6 +35,18 @@ public class WebOrchestrator {
         LOG.info("WebOrchestrator", "Query: \"" + query + "\"");
         long start = System.currentTimeMillis();
 
+        // ── Cache lookup ────────────────────────────────────────────────────
+        if (AppConfig.SEARCH_CACHE_ENABLED) {
+            String cacheKey = SearchCache.normalize(query);
+            Map<String, String> cached = SearchCache.get(cacheKey);
+            if (cached != null) {
+                LOG.info("WebOrchestrator", "Cache HIT para: \"" + query + "\"");
+                LOG.timing("WebOrchestrator", "searchWeb (cache hit)", System.currentTimeMillis() - start);
+                return cached;
+            }
+            LOG.debug("WebOrchestrator", "Cache MISS para: \"" + query + "\"");
+        }
+
         // ── Step 1: DDG Instant Answer JSON (fast, no browser) ────────────
         LOG.info("WebOrchestrator", "Step 1 — DDG Instant Answer JSON API");
         String instantJson = com.gazapps.services.DuckDuckGoService.fetchInstantAnswer(query);
@@ -59,6 +73,12 @@ public class WebOrchestrator {
         // ── Merge instant answer into final result ─────────────────────────
         if (instantJson != null && !instantJson.isBlank() && !instantJson.equals("{}")) {
             webResults.put("instant_answer", instantJson);
+        }
+
+        // ── Armazenar no cache (somente sucessos) ───────────────────────────
+        if (AppConfig.SEARCH_CACHE_ENABLED && "success".equals(webResults.get("status"))) {
+            SearchCache.put(SearchCache.normalize(query), webResults);
+            LOG.debug("WebOrchestrator", "Resultado cacheado. Stats: " + SearchCache.stats());
         }
 
         LOG.timing("WebOrchestrator", "searchWeb total", System.currentTimeMillis() - start);

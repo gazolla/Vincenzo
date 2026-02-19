@@ -1,0 +1,9 @@
+# IDE / Tools
+.claude
+
+# Logs
+logs/
+*.log
+
+# Build artifacts
+target/

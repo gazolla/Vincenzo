@@ -39,6 +39,12 @@ public final class AppConfig {
         return PROPS.getProperty(key, defaultVal);
     }
 
+    private static boolean boolVal(String key, boolean defaultVal) {
+        String val = PROPS.getProperty(key);
+        if (val == null) return defaultVal;
+        return Boolean.parseBoolean(val.trim());
+    }
+
     private static int intVal(String key, int defaultVal) {
         String val = PROPS.getProperty(key);
         if (val == null) return defaultVal;
@@ -137,4 +143,17 @@ public final class AppConfig {
 
     /** Código de região do DuckDuckGo para o parâmetro kl= (ex: br-pt, us-en). */
     public static final String DDG_REGION = str("ddg.region", "br-pt");
+
+    // ── Cache de busca ──────────────────────────────────────────────────────────
+    /** Habilita o cache em memória de resultados de searchWeb. */
+    public static final boolean SEARCH_CACHE_ENABLED =
+            boolVal("search.cache.enabled", true);
+
+    /** Número máximo de queries no cache (LRU eviction quando atingido). */
+    public static final int SEARCH_CACHE_MAX_SIZE =
+            intVal("search.cache.max.size", 500);
+
+    /** Tempo de vida de cada entrada do cache em minutos. */
+    public static final int SEARCH_CACHE_TTL_MINUTES =
+            intVal("search.cache.ttl.minutes", 60);
 }
