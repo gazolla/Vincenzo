@@ -4,6 +4,7 @@ import com.gazapps.agent.SearchAgent;
 import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.ui.ChatInterface;
+import com.gazapps.ui.TelegramInterface;
 
 /**
  * Entry point for the AI Internet Search Assistant.
@@ -39,9 +40,16 @@ public class Main {
         log.info("Main", "GOOGLE_API_KEY is set (length: "
                 + System.getenv("GOOGLE_API_KEY").length() + ")");
 
-        SearchAgent    agent = new SearchAgent();
-        ChatInterface  chat  = new ChatInterface(agent);
-        chat.startChat();
+        SearchAgent agent = new SearchAgent();
+
+        if ("telegram".equalsIgnoreCase(AppConfig.INTERFACE_MODE)) {
+            validateTelegramConfig(log);
+            TelegramInterface telegram = new TelegramInterface(agent);
+            telegram.start();
+        } else {
+            ChatInterface chat = new ChatInterface(agent);
+            chat.startChat();
+        }
 
         log.info("Main", "Application exiting normally");
         // Force JVM exit to stop lingering OkHttp/gRPC daemon threads
@@ -59,5 +67,20 @@ public class Main {
                     """);
             System.exit(1);
         }
+    }
+
+    private static void validateTelegramConfig(LogService log) {
+        if (AppConfig.TELEGRAM_BOT_TOKEN.isBlank()) {
+            log.error("Main", "TELEGRAM_BOT_TOKEN not set — aborting");
+            System.err.println("""
+                    ERROR: Telegram bot token is not configured.
+                    Set it in application.properties:  telegram.bot.token=<token>
+                    Or via environment variable:        export TELEGRAM_BOT_TOKEN="<token>"
+                    Get a token from @BotFather on Telegram.
+                    """);
+            System.exit(1);
+        }
+        log.info("Main", "TELEGRAM_BOT_TOKEN is set (length: " + AppConfig.TELEGRAM_BOT_TOKEN.length() + ")");
+        log.info("Main", "Telegram mode: " + AppConfig.TELEGRAM_MODE);
     }
 }

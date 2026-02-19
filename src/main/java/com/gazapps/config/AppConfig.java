@@ -184,4 +184,36 @@ public final class AppConfig {
     /** Time-to-live for each cache entry in minutes. */
     public static final int SEARCH_CACHE_TTL_MINUTES =
             intVal("search.cache.ttl.minutes", 60);
+
+    // ── Telegram ───────────────────────────────────────────────────────────────
+    /** Interface mode: "cli" (default) or "telegram". */
+    public static final String INTERFACE_MODE =
+            str("interface.mode", "cli");
+
+    /**
+     * Telegram Bot Token from @BotFather.
+     * Falls back to the {@code TELEGRAM_BOT_TOKEN} environment variable so the
+     * token is never committed to source control.
+     * Required when {@code INTERFACE_MODE} is {@code "telegram"}.
+     */
+    public static final String TELEGRAM_BOT_TOKEN = resolveTelegramToken();
+
+    /** Telegram update mode: "polling" (default, no server needed) or "webhook". */
+    public static final String TELEGRAM_MODE =
+            str("telegram.mode", "polling");
+
+    /** Port for the JDK HttpServer in webhook mode. */
+    public static final int TELEGRAM_WEBHOOK_PORT =
+            intVal("telegram.webhook.port", 8443);
+
+    /** Public HTTPS URL Telegram POSTs updates to (webhook mode only). */
+    public static final String TELEGRAM_WEBHOOK_URL =
+            str("telegram.webhook.url", "");
+
+    private static String resolveTelegramToken() {
+        String prop = PROPS.getProperty("telegram.bot.token", "").trim();
+        if (!prop.isEmpty()) return prop;
+        String env = System.getenv("TELEGRAM_BOT_TOKEN");
+        return (env != null) ? env.trim() : "";
+    }
 }

@@ -58,6 +58,13 @@
             <version>3.0.1</version>
         </dependency>
 
+        <!-- Telegram Bot API — polling and webhook support (GSON + OkHttp 4.12.0, zero conflict with ADK) -->
+        <dependency>
+            <groupId>com.github.pengrad</groupId>
+            <artifactId>java-telegram-bot-api</artifactId>
+            <version>9.4.0</version>
+        </dependency>
+
         <!-- ── Test ───────────────────────────────────────────────────────── -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
