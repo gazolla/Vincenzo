@@ -2,6 +2,7 @@ package com.gazapps.skills;
 
 import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
+import com.gazapps.util.UrlValidator;
 import com.google.adk.tools.Annotations.Schema;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -41,6 +42,17 @@ public class PdfSkill {
         LOG.section("TOOL CALL: readPdf");
         LOG.info("PdfSkill", "URL: " + url);
         long start = System.currentTimeMillis();
+
+        try {
+            UrlValidator.validate(url);
+        } catch (IllegalArgumentException e) {
+            LOG.warn("PdfSkill", "Blocked unsafe URL: " + e.getMessage());
+            Map<String, String> error = new HashMap<>();
+            error.put("status", "error");
+            error.put("url", url);
+            error.put("message", "URL blocked for security reasons: " + e.getMessage());
+            return error;
+        }
 
         try {
             // Download PDF bytes via HTTP

@@ -1,0 +1,1363 @@
+
+══════════════════════════════════════════════════════════════════════
+  SESSION START  2026-02-18 22:38:15.936
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:38:15.938] [INFO ] [LogService        ] Log file: /Users/gazolla/Projects/Vincenzo/logs/session-20260218_223815.log
+[2026-02-18 22:38:15.938] [INFO ] [Main              ] Application starting
+[2026-02-18 22:38:15.938] [INFO ] [Main              ] Java version : 21.0.2
+[2026-02-18 22:38:15.939] [INFO ] [Main              ] OS           : Mac OS X 26.3
+[2026-02-18 22:38:15.939] [INFO ] [Main              ] Working dir  : /Users/gazolla/Projects/Vincenzo
+[2026-02-18 22:38:15.940] [INFO ] [Main              ] GOOGLE_API_KEY is set (length: 39)
+
+══════════════════════════════════════════════════════════════════════
+  AGENT INIT
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:38:15.942] [INFO ] [SearchAgent       ] Building LlmAgent with model: gemini-2.5-flash
+[2026-02-18 22:38:16.142] [INFO ] [SearchAgent       ] Session created — id: da0af0c7-7668-4acd-a08d-d0b75bc8f73b  userId: local-user  app: internet-search-assistant
+[2026-02-18 22:38:16.143] [INFO ] [ChatInterface     ] ChatInterface instantiated
+
+══════════════════════════════════════════════════════════════════════
+  CHAT SESSION START
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:38:16.143] [INFO ] [ChatInterface     ] AI service initialized
+
+  ──────────────────────────── USER INPUT ────────────────────────────
+[2026-02-18 22:38:53.163] [INFO ] [ChatInterface     ] User  ▶  pesquise o preco do mac mini 16gb/256gb na amazon.com.br
+
+  ────────────────────────────── TURN #1 ─────────────────────────────
+
+══════════════════════════════════════════════════════════════════════
+  AGENT TURN
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:38:53.164] [INFO ] [SearchAgent       ] Processing query: "pesquise o preco do mac mini 16gb/256gb na amazon.com.br"
+
+══════════════════════════════════════════════════════════════════════
+  TOOL CALL: searchWeb
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:38:55.444] [INFO ] [WebOrchestrator   ] Query: "mac mini 16gb/256gb amazon.com.br preço"
+[2026-02-18 22:38:55.444] [INFO ] [WebOrchestrator   ] Step 1 — DDG Instant Answer JSON API
+[2026-02-18 22:38:55.462] [DEBUG] [DuckDuckGoService ] JSON URL: https://api.duckduckgo.com/?q=mac+mini+16gb%2F256gb+amazon.com.br+pre%C3%A7o&format=json&no_html=1&skip_disambig=1
+[2026-02-18 22:38:55.759] [INFO ] [DuckDuckGoService ] ⏱  JSON API call completed in 295 ms
+[2026-02-18 22:38:55.759] [DEBUG] [WebOrchestrator   ] DDG instant answer: {"Abstract":"","AbstractSource":"","AbstractText":"","AbstractURL":"","Answer":"","AnswerType":"","Definition":"","DefinitionSource":"","DefinitionURL":"","Entity":"","Heading":"","Image":"","ImageHeight":"","ImageIsLogo":"","ImageWidth":"","Infobox":"","Redirect":"","RelatedTopics":[],"Results":[],...
+[2026-02-18 22:38:55.759] [INFO ] [WebOrchestrator   ] Step 2 — DDG HTML search (Playwright)
+[2026-02-18 22:38:55.759] [DEBUG] [DuckDuckGoService ] HTML URL: https://html.duckduckgo.com/html/?q=mac+mini+16gb%2F256gb+amazon.com.br+pre%C3%A7o&kl=br-pt
+[2026-02-18 22:38:57.919] [DEBUG] [BrowserService    ] [NAV→] GET https://html.duckduckgo.com/html/?q=mac+mini+16gb%2F256gb+amazon.com.br+pre%C3%A7o&kl=br-pt
+[2026-02-18 22:38:58.953] [DEBUG] [BrowserService    ] [NAV←] HTTP 200 https://html.duckduckgo.com/html/?q=mac+mini+16gb%2F256gb+amazon.com.br+pre%C3%A7o&kl=br-pt
+[2026-02-18 22:38:59.203] [INFO ] [DuckDuckGoService ] ⏱  HTML page load completed in 1.287 ms
+[2026-02-18 22:38:59.218] [DEBUG] [DuckDuckGoService ] HTML structured results: [{"title":"Compre MAC Cosmetics - Compre no Site Oficial da MAC","url":"https://duckduckgo.com/l/?uddg=https%3A%2F%2Fduckduckgo.com%2Fy.js%3Fad_domain%3Dmaccosmetics.com.br%26ad_provider%3Dbingv7aa%26ad_type%3Dtxad%26click_metadata%3D13MruALk_UFCosei__nLYU4byeoKxR2PrefM6_U66Xx8TcY0aenMNCrwe8P7I0KH4ZUdMWIdbL3fQ_MLH1_16O%252DPGe0ZChtYDSvu8q1nboKLCo1E9jR0IKY5IVG8vLdb8UxLrLpj4GqlwU4sZV8ybkBaQAN1jaxCdK...
+[2026-02-18 22:38:59.237] [INFO ] [DuckDuckGoService ] HTML page_text length: 4366 chars
+[2026-02-18 22:38:59.258] [INFO ] [WebOrchestrator   ] DDG HTML returned results — skipping Bing
+[2026-02-18 22:38:59.258] [INFO ] [WebOrchestrator   ] ⏱  searchWeb total completed in 3.814 ms
+[2026-02-18 22:38:59.258] [INFO ] [searchWeb         ] ── Tool result #1 ──
+            page_text     : All Regions
+            Argentina
+            Australia
+            Austria
+            Belgium (fr)
+            Belgium (nl)
+            Brazil
+            Bulgaria
+            Canada (en)
+            Canada (fr)
+            Catalonia
+            Chile
+            China
+            Colombia
+            Croatia
+            Czech Republic
+            Denmark
+            Estonia
+            Finland
+            France
+            Germany
+            Greece
+            Hong Kong
+            Hungary
+            Iceland
+            India (en)
+            Indonesia (en)
+            Ireland
+            Israel (en)
+            Italy
+            Japan
+            Korea
+            Latvia
+            Lithuania
+            Malaysia (en)
+            Mexico
+            Netherlands
+            New Zealand
+            Norway
+            Pakistan (en)
+            Peru
+            Philippines (en)
+            Poland
+            Portugal
+            Romania
+            Russia
+            Saudi Arabia
+            Singapore
+            Slovakia
+            Slovenia
+            South Africa
+            Spain (ca)
+            Spain (es)
+            Sweden
+            Switzerland (de)
+            Switzerland (fr)
+            Taiwan
+            Thailand (en)
+            Turkey
+            US (English)
+            US (Spanish)
+            Ukraine
+            United Kingdom
+            Vietnam (en)
+             
+            Any Time
+            Past Day
+            Past Week
+            Past Month
+            Past Year
+            Compre MAC Cosmetics - Compre no Site Oficial da MAC AD
+            maccosmetics.com.br
+            Descubra a beleza sem limites com nossa maquiagem profissional MAC. Compre os Mais Desejados MAC Cosmetics e Ganhe Mimos Exclusivos*. Aproveite Agora
+            Mac Min Sold Direct - Mac Min On eBay AD
+            ebay.com  Vast selection and free shipping ... [+3366 chars truncated]
+            engine        : DuckDuckGo
+            query         : mac mini 16gb/256gb amazon.com.br preço
+            instant_answer: {"Abstract":"","AbstractSource":"","AbstractText":"","AbstractURL":"","Answer":"","AnswerType":"","Definition":"","DefinitionSource":"","DefinitionURL":"","Entity":"","Heading":"","Image":"","ImageHeight":"","ImageIsLogo":"","ImageWidth":"","Infobox":"","Redirect":"","RelatedTopics":[],"Results":[],"Type":"","meta":{"attribution":null,"blockgroup":null,"created_date":"2021-03-24","description":"testing","designer":null,"dev_date":"2021-03-24","dev_milestone":"development","developer":[{"name":"zt","type":"duck.co","url":"https://duck.co/user/zt"}],"example_query":"","id":"just_another_test","is_stackexchange":0,"js_callback_name":"another_test","live_date":null,"maintainer":{"github":""},"name":"Just Another Test","perl_module":"DDG::Lontail::AnotherTest","producer":null,"production_state":"offline","repo":"fathead","signal_from":"just_another_test","src_domain":"how about there","src_id":null,"src_name":"hi there","src_options":{"directory":"","is_fanon":0,"is_mediawiki":0,"is_wikiped... [+252 chars truncated]
+            results       : [{"title":"Compre MAC Cosmetics - Compre no Site Oficial da MAC","url":"https://duckduckgo.com/l/?uddg=https%3A%2F%2Fduckduckgo.com%2Fy.js%3Fad_domain%3Dmaccosmetics.com.br%26ad_provider%3Dbingv7aa%26ad_type%3Dtxad%26click_metadata%3D13MruALk_UFCosei__nLYU4byeoKxR2PrefM6_U66Xx8TcY0aenMNCrwe8P7I0KH4ZUdMWIdbL3fQ_MLH1_16O%252DPGe0ZChtYDSvu8q1nboKLCo1E9jR0IKY5IVG8vLdb8UxLrLpj4GqlwU4sZV8ybkBaQAN1jaxCdK78JgKeQ_A.3PJpE6Q75K3N%252Dy6RbwLCHA%26rut%3D25042fde51c12c439a713b13e40f96abef24e571ac1c6e820cf812a960751bdb%26u3%3Dhttps%253A%252F%252Fwww.bing.com%252Faclick%253Fld%253De87g6%252DsfSWeIGqaZfP78EZcDVUCUyWZLxcBuZZ%252DOKb31wWoJCU7hdV9vcbyQmTbEqUqoLDgz5QukLq%252D2cJfS9num_QfO9DHGfleQ9www7DVpRHLVvxRIb%252DbAHzzgJiDsz7oaNVNxJHkP56Zspye8I26JZWOr5INczXKWW5GU6Hh3CJ_q6A9SwCjnrQ3S7fLUG8AjMLWbf0duDzOWp9eTzGYgLg8WU%2526u%253DaHR0cCUzYSUyZiUyZmNsaWNrc2VydmUuZGFydHNlYXJjaC5uZXQlMmZsaW5rJTJmY2xpY2slM2ZsaWQlM2Q0MzcwMDA3NDMxOTMwNzE1MiUyNmRzX3Nfa3dnaWQlM2Q1ODcwMDAwODA2NTk3NjgwOSUyNiUyNmRzX2VfYWRpZCUzZCUyNmRz... [+5822 chars truncated]
+            status        : success
+
+══════════════════════════════════════════════════════════════════════
+  TOOL CALL: fetchPageContent
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:39:00.952] [INFO ] [WebContentSkill   ] URL: https://www.amazon.com.br/Apple-2024-núcleos-Memória-unificada/dp/B0DLCJXRQV
+[2026-02-18 22:39:01.244] [DEBUG] [BrowserService    ] [NAV→] GET https://www.amazon.com.br/Apple-2024-n%C3%BAcleos-Mem%C3%B3ria-unificada/dp/B0DLCJXRQV
+[2026-02-18 22:39:01.624] [DEBUG] [BrowserService    ] [NAV←] HTTP 200 https://www.amazon.com.br/Apple-2024-n%C3%BAcleos-Mem%C3%B3ria-unificada/dp/B0DLCJXRQV
+[2026-02-18 22:39:02.929] [INFO ] [WebContentSkill   ] ⏱  Navigation completed in 1.977 ms
+[2026-02-18 22:39:02.937] [DEBUG] [BrowserService    ] [NAV→] GET https://s.amazon-adsystem.com/iu3?d=amazon.com.br&slot=navFooter&a2=010107d39ec82e47619a337310c5f589c716f36407a546a6425287e650ea43934f34&old_oo=0&ts=1771465141965&s=Af-PmWEqhzQRaA5PqDqK0t5srOdmNMwPoweYRja_1o-K&gdpr_consent=&gdpr_consent_avl=&cb=1771465141965
+[2026-02-18 22:39:02.958] [INFO ] [WebContentSkill   ] Page title: "Apple 2024 Mac mini (Com chip M4 chip da Apple com CPU de 10 núcleos e GPU de 10 núcleos, 16GB Memória unificada, 256 GB) - Prateado | Amazon.com.br"
+[2026-02-18 22:39:02.959] [INFO ] [WebContentSkill   ] Raw body text length: 3992 chars
+[2026-02-18 22:39:02.959] [INFO ] [WebContentSkill   ] ⏱  Total execution completed in 2.007 ms
+[2026-02-18 22:39:02.959] [INFO ] [fetchPageContent  ] ── Tool result #2 ──
+            title         : Apple 2024 Mac mini (Com chip M4 chip da Apple com CPU de 10 núcleos e GPU de 10 núcleos, 16GB Memória unificada, 256 GB) - Prateado | Amazon.com.br
+            url           : https://www.amazon.com.br/Apple-2024-núcleos-Memória-unificada/dp/B0DLCJXRQV
+            content       : MacBook Pro 14" (M3)
+            
+            MacBook Pro 14" (M3)
+            
+            MacBook Air 13" (M1)
+            
+            MacBook Air 13" (M1)
+            
+            MacBook Air 13" (M2)
+            
+            MacBook Air 13" (M2)
+            
+            MacBook Air 13" (M3)
+            
+            MacBook Air 13" (M3)
+            
+            MacBook Air 15" (M4)
+            
+            MacBook Air 15" (M4)
+            
+            MacBook Air 13" (M4)
+            
+            MacBook Air 13" (M4)
+            
+            Acessórios Mac
+            
+            Acessórios Mac
+            R$6.698,99
+            à vista
+            Ou em até 10x de R$ 761,25/mês
+            Entrega GRÁTIS: Domingo, 22 de Fevereiro. Se pedir dentro de 12 hrs 35 mins
+            Somente 2 em estoque.
+            
+            Quantidade:
+            1
+            2
+            Enviado / Vendido
+            Amazon.com.br
+            Devolução
+            Elegível para Devolução, Reembolso em até 30 dias após o recebimento
+            Pagamento
+            Transação segura
+            Adicionar plano de seguro ou garantia:
+            Garantia Estendida contra falhas e defeitos de 12 meses por R$ 161,60
+            Garantia Estendida contra falhas e defeitos de 24 meses por R$ 202,00
+            Comprar este item como presente
+            Adicionar à Lista
+            VÍDEO
+            Clique para ver a imagem completa
+            Apple 2024 Mac mini (Com chip M4 chip da Apple com CPU de 10 núcleos e GPU de 10 núcleos, 16GB Memória unificada, 256 GB) - Prateado
+            ... [+2992 chars truncated]
+            status        : success
+[2026-02-18 22:39:05.295] [DEBUG] [SearchAgent       ] Event #1  type=TOOL_CALL              final=false  content_preview=Function Call: FunctionCall{id=Optional[adk-9e204992-b889-4200-958d-851c64884b06], args=Optional[{query=mac mini 16gb/25...
+[2026-02-18 22:39:05.298] [DEBUG] [SearchAgent       ] Event #2  type=TOOL_RESPONSE          final=false  content_preview=Function Response: FunctionResponse{willContinue=Optional.empty, scheduling=Optional.empty, parts=Optional.empty, id=Opt...
+[2026-02-18 22:39:05.298] [DEBUG] [SearchAgent       ] Event #3  type=TOOL_CALL              final=false  content_preview=Function Call: FunctionCall{id=Optional[adk-2894a666-e16f-4441-ac8f-33f454be373a], args=Optional[{url=https://www.amazon...
+[2026-02-18 22:39:05.299] [DEBUG] [SearchAgent       ] Event #4  type=TOOL_RESPONSE          final=false  content_preview=Function Response: FunctionResponse{willContinue=Optional.empty, scheduling=Optional.empty, parts=Optional.empty, id=Opt...
+[2026-02-18 22:39:05.299] [DEBUG] [SearchAgent       ] Event #5  type=FINAL_RESPONSE         final=true   content_preview=O preço do Mac mini Apple 2024 (com chip M4, 16GB de memória unificada e 256 GB de armazenamento) na Amazon.com.br é de ...
+
+  ────────────────────── FINAL RESPONSE EVENT #5 ─────────────────────
+[2026-02-18 22:39:05.300] [INFO ] [SearchAgent       ] Response text length: 429 chars
+[2026-02-18 22:39:05.300] [INFO ] [SearchAgent       ] ⏱  processQuery total completed in 12.136 ms
+[2026-02-18 22:39:05.300] [INFO ] [SearchAgent       ] Total ADK events received: 5
+
+  ────────────────────────── AGENT RESPONSE ──────────────────────────
+[2026-02-18 22:39:05.301] [INFO ] [SearchAgent       ] Agent ◀  O preço do Mac mini Apple 2024 (com chip M4, 16GB de memória unificada e 256 GB de armazenamento) na Amazon.com.br é de **R$ 6.698,99 à vista** (com 12% de desconto) ou **R$ 7.612,50 em até 10x de R$ 761,25 sem juros**.
+
+Você pode encontrar mais detalhes no seguinte link:
+[https://www.amazon.com.br/Apple-2024-núcleos-Memória-unificada/dp/B0DLCJXRQV](https://www.amazon.com.br/Apple-2024-núcleos-Memória-unificada/dp/B0DLCJXRQV)
+[2026-02-18 22:39:05.301] [INFO ] [ChatInterface     ] ⏱  Turn #1 end-to-end completed in 12.136 ms
+
+  ──────────────────────────── USER INPUT ────────────────────────────
+[2026-02-18 22:39:59.309] [INFO ] [ChatInterface     ] User  ▶  Quem é elon musk?
+
+  ────────────────────────────── TURN #2 ─────────────────────────────
+
+══════════════════════════════════════════════════════════════════════
+  AGENT TURN
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:39:59.310] [INFO ] [SearchAgent       ] Processing query: "Quem é elon musk?"
+[2026-02-18 22:40:01.579] [DEBUG] [SearchAgent       ] Event #1  type=FINAL_RESPONSE         final=true   content_preview=Elon Musk é um empresário, investidor e filantropo sul-africano, canadense e americano. Ele é o CEO da Tesla, SpaceX, Ne...
+
+  ────────────────────── FINAL RESPONSE EVENT #1 ─────────────────────
+[2026-02-18 22:40:01.580] [INFO ] [SearchAgent       ] Response text length: 381 chars
+[2026-02-18 22:40:01.580] [INFO ] [SearchAgent       ] ⏱  processQuery total completed in 2.270 ms
+[2026-02-18 22:40:01.581] [INFO ] [SearchAgent       ] Total ADK events received: 1
+
+  ────────────────────────── AGENT RESPONSE ──────────────────────────
+[2026-02-18 22:40:01.581] [INFO ] [SearchAgent       ] Agent ◀  Elon Musk é um empresário, investidor e filantropo sul-africano, canadense e americano. Ele é o CEO da Tesla, SpaceX, Neuralink e The Boring Company, e também é dono do X (anteriormente Twitter). Ele é conhecido por seus papéis nessas empresas e por suas visões futuristas sobre transporte (carros elétricos, foguetes reutilizáveis), inteligência artificial e colonização de Marte.
+[2026-02-18 22:40:01.581] [INFO ] [ChatInterface     ] ⏱  Turn #2 end-to-end completed in 2.271 ms
+
+  ──────────────────────────── USER INPUT ────────────────────────────
+[2026-02-18 22:40:09.839] [INFO ] [ChatInterface     ] User  ▶  Qual a idade dele?
+
+  ────────────────────────────── TURN #3 ─────────────────────────────
+
+══════════════════════════════════════════════════════════════════════
+  AGENT TURN
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:40:09.840] [INFO ] [SearchAgent       ] Processing query: "Qual a idade dele?"
+
+══════════════════════════════════════════════════════════════════════
+  TOOL CALL: searchWeb
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:40:10.996] [INFO ] [WebOrchestrator   ] Query: "data de nascimento elon musk"
+[2026-02-18 22:40:10.996] [INFO ] [WebOrchestrator   ] Step 1 — DDG Instant Answer JSON API
+[2026-02-18 22:40:10.996] [DEBUG] [DuckDuckGoService ] JSON URL: https://api.duckduckgo.com/?q=data+de+nascimento+elon+musk&format=json&no_html=1&skip_disambig=1
+[2026-02-18 22:40:11.196] [INFO ] [DuckDuckGoService ] ⏱  JSON API call completed in 200 ms
+[2026-02-18 22:40:11.196] [DEBUG] [WebOrchestrator   ] DDG instant answer: {"Abstract":"","AbstractSource":"","AbstractText":"","AbstractURL":"","Answer":"","AnswerType":"","Definition":"","DefinitionSource":"","DefinitionURL":"","Entity":"","Heading":"","Image":"","ImageHeight":"","ImageIsLogo":"","ImageWidth":"","Infobox":"","Redirect":"","RelatedTopics":[],"Results":[],...
+[2026-02-18 22:40:11.197] [INFO ] [WebOrchestrator   ] Step 2 — DDG HTML search (Playwright)
+[2026-02-18 22:40:11.197] [DEBUG] [DuckDuckGoService ] HTML URL: https://html.duckduckgo.com/html/?q=data+de+nascimento+elon+musk&kl=br-pt
+[2026-02-18 22:40:11.846] [DEBUG] [BrowserService    ] [NAV→] GET https://html.duckduckgo.com/html/?q=data+de+nascimento+elon+musk&kl=br-pt
+[2026-02-18 22:40:12.893] [DEBUG] [BrowserService    ] [NAV←] HTTP 200 https://html.duckduckgo.com/html/?q=data+de+nascimento+elon+musk&kl=br-pt
+[2026-02-18 22:40:13.098] [INFO ] [DuckDuckGoService ] ⏱  HTML page load completed in 1.255 ms
+[2026-02-18 22:40:13.109] [DEBUG] [DuckDuckGoService ] HTML structured results: [{"title":"Registro de Nascimento - Preenchível Disponível","url":"https://duckduckgo.com/l/?uddg=https%3A%2F%2Fduckduckgo.com%2Fy.js%3Fad_domain%3Dpdffiller.com%26ad_provider%3Dbingv7aa%26ad_type%3Dtxad%26click_metadata%3DzAcT2YHRCkU5LPmOpn9c4lehv8md%252DCfcVzM9VdHayV%252D8X8F2dRMBQGvJhT2IelnzqyfbngOVXtt5J5jodoMbVDdKVA%252DADdJ4uglEEQA3SHcSmcKxkIVwxoxTVgPtQj39wIzl05IlEiH9rab7KRU4pC4h8Hjj6_UuXGdcG...
+[2026-02-18 22:40:13.126] [INFO ] [DuckDuckGoService ] HTML page_text length: 4756 chars
+[2026-02-18 22:40:13.146] [INFO ] [WebOrchestrator   ] DDG HTML returned results — skipping Bing
+[2026-02-18 22:40:13.147] [INFO ] [WebOrchestrator   ] ⏱  searchWeb total completed in 2.151 ms
+[2026-02-18 22:40:13.147] [INFO ] [searchWeb         ] ── Tool result #3 ──
+            page_text     : All Regions
+            Argentina
+            Australia
+            Austria
+            Belgium (fr)
+            Belgium (nl)
+            Brazil
+            Bulgaria
+            Canada (en)
+            Canada (fr)
+            Catalonia
+            Chile
+            China
+            Colombia
+            Croatia
+            Czech Republic
+            Denmark
+            Estonia
+            Finland
+            France
+            Germany
+            Greece
+            Hong Kong
+            Hungary
+            Iceland
+            India (en)
+            Indonesia (en)
+            Ireland
+            Israel (en)
+            Italy
+            Japan
+            Korea
+            Latvia
+            Lithuania
+            Malaysia (en)
+            Mexico
+            Netherlands
+            New Zealand
+            Norway
+            Pakistan (en)
+            Peru
+            Philippines (en)
+            Poland
+            Portugal
+            Romania
+            Russia
+            Saudi Arabia
+            Singapore
+            Slovakia
+            Slovenia
+            South Africa
+            Spain (ca)
+            Spain (es)
+            Sweden
+            Switzerland (de)
+            Switzerland (fr)
+            Taiwan
+            Thailand (en)
+            Turkey
+            US (English)
+            US (Spanish)
+            Ukraine
+            United Kingdom
+            Vietnam (en)
+             
+            Any Time
+            Past Day
+            Past Week
+            Past Month
+            Past Year
+            Registro de Nascimento - Preenchível Disponível AD
+            pdffiller.com
+            Editor de PDF mais confiável. Preencha e Assine PDF Online. Tente agora! Automatize, gerencie e otimize facilmente o fluxo de trabalho de documentos. Tente agora!
+            Compre Elom musk - Amazon.com.br AD
+            amazon.com.br  Aqui você encontra uma grande v... [+3756 chars truncated]
+            engine        : DuckDuckGo
+            query         : data de nascimento elon musk
+            instant_answer: {"Abstract":"","AbstractSource":"","AbstractText":"","AbstractURL":"","Answer":"","AnswerType":"","Definition":"","DefinitionSource":"","DefinitionURL":"","Entity":"","Heading":"","Image":"","ImageHeight":"","ImageIsLogo":"","ImageWidth":"","Infobox":"","Redirect":"","RelatedTopics":[],"Results":[],"Type":"","meta":{"attribution":null,"blockgroup":null,"created_date":"2021-03-24","description":"testing","designer":null,"dev_date":"2021-03-24","dev_milestone":"development","developer":[{"name":"zt","type":"duck.co","url":"https://duck.co/user/zt"}],"example_query":"","id":"just_another_test","is_stackexchange":0,"js_callback_name":"another_test","live_date":null,"maintainer":{"github":""},"name":"Just Another Test","perl_module":"DDG::Lontail::AnotherTest","producer":null,"production_state":"offline","repo":"fathead","signal_from":"just_another_test","src_domain":"how about there","src_id":null,"src_name":"hi there","src_options":{"directory":"","is_fanon":0,"is_mediawiki":0,"is_wikiped... [+252 chars truncated]
+            results       : [{"title":"Registro de Nascimento - Preenchível Disponível","url":"https://duckduckgo.com/l/?uddg=https%3A%2F%2Fduckduckgo.com%2Fy.js%3Fad_domain%3Dpdffiller.com%26ad_provider%3Dbingv7aa%26ad_type%3Dtxad%26click_metadata%3DzAcT2YHRCkU5LPmOpn9c4lehv8md%252DCfcVzM9VdHayV%252D8X8F2dRMBQGvJhT2IelnzqyfbngOVXtt5J5jodoMbVDdKVA%252DADdJ4uglEEQA3SHcSmcKxkIVwxoxTVgPtQj39wIzl05IlEiH9rab7KRU4pC4h8Hjj6_UuXGdcGLP4rXA.NANKtdmtaoZnmF6FctleTA%26rut%3D23b70637488548cc256cb9eedbf03d7416b5adf71999c125b266e8279ebac456%26u3%3Dhttps%253A%252F%252Fwww.bing.com%252Faclick%253Fld%253De8rCkVi5KLEpXVoApHk4W0DzVUCUzt1qpEtnlSF4PH1giSgDsh7cYXI9L8JEisLq5hq4%252D6%252DuVcg5pKnGVFd0fmlvXj%252D1UXGEORLfmghH4rL2p0R5duGhfksMBuiMhivDOM1vrl4QrTNUW7PBnQ_9k2ik6sIU_JGjxn0Q6AcDo7YkPvYnHe7WMvZKrRq_IBdlDOKnPyMDiQnbg5nMY%252Dhx5OPOKvMFc%2526u%253DaHR0cHMlM2ElMmYlMmZ3d3cucGRmZmlsbGVyLmNvbSUyZjEwMDQzMTU3Mi1Gb3JtMjBSZWdpc3RybzIwTmFzY2ltZW50b3BkZi1SRUdJU1RSTy1ERS1OQVNDSU1FTlRPLSUzZm1zY2xraWQlM2QwNzQ5ZjNkMjE5ZTAxZDQwYmQyYjlhNDQ3MDFjZWJ... [+5645 chars truncated]
+            status        : success
+[2026-02-18 22:40:14.108] [DEBUG] [SearchAgent       ] Event #1  type=TOOL_CALL              final=false  content_preview=Function Call: FunctionCall{id=Optional[adk-4296f8b4-391f-4fe8-b137-c7b94925e86b], args=Optional[{query=data de nascimen...
+[2026-02-18 22:40:14.111] [DEBUG] [SearchAgent       ] Event #2  type=TOOL_RESPONSE          final=false  content_preview=Function Response: FunctionResponse{willContinue=Optional.empty, scheduling=Optional.empty, parts=Optional.empty, id=Opt...
+[2026-02-18 22:40:14.111] [DEBUG] [SearchAgent       ] Event #3  type=FINAL_RESPONSE         final=true   content_preview=Elon Musk nasceu em 28 de junho de 1971.
+
+Considerando que a data de hoje é 18 de fevereiro de 2026, ele tem **54 anos**...
+
+  ────────────────────── FINAL RESPONSE EVENT #3 ─────────────────────
+[2026-02-18 22:40:14.112] [INFO ] [SearchAgent       ] Response text length: 121 chars
+[2026-02-18 22:40:14.112] [INFO ] [SearchAgent       ] ⏱  processQuery total completed in 4.271 ms
+[2026-02-18 22:40:14.112] [INFO ] [SearchAgent       ] Total ADK events received: 3
+
+  ────────────────────────── AGENT RESPONSE ──────────────────────────
+[2026-02-18 22:40:14.112] [INFO ] [SearchAgent       ] Agent ◀  Elon Musk nasceu em 28 de junho de 1971.
+
+Considerando que a data de hoje é 18 de fevereiro de 2026, ele tem **54 anos**.
+[2026-02-18 22:40:14.112] [INFO ] [ChatInterface     ] ⏱  Turn #3 end-to-end completed in 4.272 ms
+
+  ──────────────────────────── USER INPUT ────────────────────────────
+[2026-02-18 22:40:38.760] [INFO ] [ChatInterface     ] User  ▶  Qual a noticia mais recente sobre ele?
+
+  ────────────────────────────── TURN #4 ─────────────────────────────
+
+══════════════════════════════════════════════════════════════════════
+  AGENT TURN
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:40:38.760] [INFO ] [SearchAgent       ] Processing query: "Qual a noticia mais recente sobre ele?"
+
+══════════════════════════════════════════════════════════════════════
+  TOOL CALL: searchWeb
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:40:40.610] [INFO ] [WebOrchestrator   ] Query: "notícias recentes Elon Musk"
+[2026-02-18 22:40:40.611] [INFO ] [WebOrchestrator   ] Step 1 — DDG Instant Answer JSON API
+[2026-02-18 22:40:40.611] [DEBUG] [DuckDuckGoService ] JSON URL: https://api.duckduckgo.com/?q=not%C3%ADcias+recentes+Elon+Musk&format=json&no_html=1&skip_disambig=1
+[2026-02-18 22:40:40.821] [INFO ] [DuckDuckGoService ] ⏱  JSON API call completed in 209 ms
+[2026-02-18 22:40:40.822] [DEBUG] [WebOrchestrator   ] DDG instant answer: {"Abstract":"","AbstractSource":"","AbstractText":"","AbstractURL":"","Answer":"","AnswerType":"","Definition":"","DefinitionSource":"","DefinitionURL":"","Entity":"","Heading":"","Image":"","ImageHeight":"","ImageIsLogo":"","ImageWidth":"","Infobox":"","Redirect":"","RelatedTopics":[],"Results":[],...
+[2026-02-18 22:40:40.822] [INFO ] [WebOrchestrator   ] Step 2 — DDG HTML search (Playwright)
+[2026-02-18 22:40:40.823] [DEBUG] [DuckDuckGoService ] HTML URL: https://html.duckduckgo.com/html/?q=not%C3%ADcias+recentes+Elon+Musk&kl=br-pt
+[2026-02-18 22:40:41.174] [DEBUG] [BrowserService    ] [NAV→] GET https://html.duckduckgo.com/html/?q=not%C3%ADcias+recentes+Elon+Musk&kl=br-pt
+[2026-02-18 22:40:42.133] [DEBUG] [BrowserService    ] [NAV←] HTTP 200 https://html.duckduckgo.com/html/?q=not%C3%ADcias+recentes+Elon+Musk&kl=br-pt
+[2026-02-18 22:40:42.373] [INFO ] [DuckDuckGoService ] ⏱  HTML page load completed in 1.201 ms
+[2026-02-18 22:40:42.381] [DEBUG] [DuckDuckGoService ] HTML structured results: [{"title":"Ofertas em musk+ - Amazon.com.br","url":"https://duckduckgo.com/l/?uddg=https%3A%2F%2Fduckduckgo.com%2Fy.js%3Fad_domain%3Damazon.com.br%26ad_provider%3Dbingv7aa%26ad_type%3Dtxad%26click_metadata%3D4tqaN4%252DXEVdQWTGQTWwg66vopFOcGkffSWXNcZXpYuuQEzWW2iWbRPKJnJr03O3_DKhs64E7M1D6Qt7y6QEEyWDWtWIrTRYliVq3MHJSgCkGDDg0cUNK56lveZCRSZ6lIKRKEqHOrqqMEAzr%252DIuQhzeCpiWAp2gwbFkzG1n4TdA.Ca5yknTQs9GN...
+[2026-02-18 22:40:42.401] [INFO ] [DuckDuckGoService ] HTML page_text length: 3693 chars
+[2026-02-18 22:40:42.422] [INFO ] [WebOrchestrator   ] DDG HTML returned results — skipping Bing
+[2026-02-18 22:40:42.422] [INFO ] [WebOrchestrator   ] ⏱  searchWeb total completed in 1.811 ms
+[2026-02-18 22:40:42.422] [INFO ] [searchWeb         ] ── Tool result #4 ──
+            page_text     : All Regions
+            Argentina
+            Australia
+            Austria
+            Belgium (fr)
+            Belgium (nl)
+            Brazil
+            Bulgaria
+            Canada (en)
+            Canada (fr)
+            Catalonia
+            Chile
+            China
+            Colombia
+            Croatia
+            Czech Republic
+            Denmark
+            Estonia
+            Finland
+            France
+            Germany
+            Greece
+            Hong Kong
+            Hungary
+            Iceland
+            India (en)
+            Indonesia (en)
+            Ireland
+            Israel (en)
+            Italy
+            Japan
+            Korea
+            Latvia
+            Lithuania
+            Malaysia (en)
+            Mexico
+            Netherlands
+            New Zealand
+            Norway
+            Pakistan (en)
+            Peru
+            Philippines (en)
+            Poland
+            Portugal
+            Romania
+            Russia
+            Saudi Arabia
+            Singapore
+            Slovakia
+            Slovenia
+            South Africa
+            Spain (ca)
+            Spain (es)
+            Sweden
+            Switzerland (de)
+            Switzerland (fr)
+            Taiwan
+            Thailand (en)
+            Turkey
+            US (English)
+            US (Spanish)
+            Ukraine
+            United Kingdom
+            Vietnam (en)
+             
+            Any Time
+            Past Day
+            Past Week
+            Past Month
+            Past Year
+            Ofertas em musk+ - Amazon.com.br AD
+            amazon.com.br
+            Encontre produtos para você se cuidar no dia a dia. Compre em até 10x sem juros. Encontre mais ofertas em diversas categorias na Amazon.com.br
+            Musk no Mercado Livre - Black Friday: Musk AD
+            mercadolivre.com.br  A Black Friday começou! Milhares de ofertas com at... [+2693 chars truncated]
+            engine        : DuckDuckGo
+            query         : notícias recentes Elon Musk
+            instant_answer: {"Abstract":"","AbstractSource":"","AbstractText":"","AbstractURL":"","Answer":"","AnswerType":"","Definition":"","DefinitionSource":"","DefinitionURL":"","Entity":"","Heading":"","Image":"","ImageHeight":"","ImageIsLogo":"","ImageWidth":"","Infobox":"","Redirect":"","RelatedTopics":[],"Results":[],"Type":"","meta":{"attribution":null,"blockgroup":null,"created_date":"2021-03-24","description":"testing","designer":null,"dev_date":"2021-03-24","dev_milestone":"development","developer":[{"name":"zt","type":"duck.co","url":"https://duck.co/user/zt"}],"example_query":"","id":"just_another_test","is_stackexchange":0,"js_callback_name":"another_test","live_date":null,"maintainer":{"github":""},"name":"Just Another Test","perl_module":"DDG::Lontail::AnotherTest","producer":null,"production_state":"offline","repo":"fathead","signal_from":"just_another_test","src_domain":"how about there","src_id":null,"src_name":"hi there","src_options":{"directory":"","is_fanon":0,"is_mediawiki":0,"is_wikiped... [+252 chars truncated]
+            results       : [{"title":"Ofertas em musk+ - Amazon.com.br","url":"https://duckduckgo.com/l/?uddg=https%3A%2F%2Fduckduckgo.com%2Fy.js%3Fad_domain%3Damazon.com.br%26ad_provider%3Dbingv7aa%26ad_type%3Dtxad%26click_metadata%3D4tqaN4%252DXEVdQWTGQTWwg66vopFOcGkffSWXNcZXpYuuQEzWW2iWbRPKJnJr03O3_DKhs64E7M1D6Qt7y6QEEyWDWtWIrTRYliVq3MHJSgCkGDDg0cUNK56lveZCRSZ6lIKRKEqHOrqqMEAzr%252DIuQhzeCpiWAp2gwbFkzG1n4TdA.Ca5yknTQs9GNLLYIm_RSHQ%26rut%3D472ff2a6220fdfbf0ba0b52632fcd3f2381c76739ec60021f8187f23aa68f4e6%26u3%3Dhttps%253A%252F%252Fwww.bing.com%252Faclick%253Fld%253De8uDmEPKbLC8z7TZGwKGhcjTVUCUwe5Pfnvl7H6ROxa9vaak2Uyr3iqy9EDTZBdDzqKADFtlOM6E8w4zQGc2lwYmOMsgEAXY1NznlvTbHd0p9g1fxiqgAeNyNtg7qkCVkjnskVA5NG0ZsWsBSpUIzWk7959Pj65_BKno3jIRxZfQJcqaYC%252DpWrQbfSxbnlba%252DhwV8R1dh8gYTWyDqbtXe%252DjMISATo%2526u%253DaHR0cHMlM2ElMmYlMmZ3d3cuYW1hem9uLmNvbS5iciUyZnMlMmYlM2ZpZSUzZFVURjglMjZrZXl3b3JkcyUzZG11c2slMjUyQiUyNmluZGV4JTNkYXBzJTI2dGFnJTNkbXNuZGVza3RvcHN0YS0yMCUyNnJlZiUzZHBkX3NsXzd5bDJ1dXJkYTdfcCUyNmFkZ3JwaWQlM2QxMTQ2Nz... [+5206 chars truncated]
+            status        : success
+
+══════════════════════════════════════════════════════════════════════
+  TOOL CALL: fetchPageContent
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:40:43.980] [INFO ] [WebContentSkill   ] URL: https://www.msn.com/pt-br/noticias/ciencia-e-tecnologia/elon-musk-quer-base-na-lua-para-impulsionar-ia-da-xai/ar-AA1WbVHm
+[2026-02-18 22:40:44.304] [DEBUG] [BrowserService    ] [NAV→] GET https://www.msn.com/pt-br/noticias/ciencia-e-tecnologia/elon-musk-quer-base-na-lua-para-impulsionar-ia-da-xai/ar-AA1WbVHm
+[2026-02-18 22:40:44.827] [DEBUG] [BrowserService    ] [NAV←] HTTP 200 https://www.msn.com/pt-br/noticias/ciencia-e-tecnologia/elon-musk-quer-base-na-lua-para-impulsionar-ia-da-xai/ar-AA1WbVHm
+[2026-02-18 22:40:45.839] [INFO ] [WebContentSkill   ] ⏱  Navigation completed in 1.858 ms
+[2026-02-18 22:40:45.857] [INFO ] [WebContentSkill   ] Page title: "MSN"
+[2026-02-18 22:40:45.857] [INFO ] [WebContentSkill   ] Raw body text length: 0 chars
+[2026-02-18 22:40:45.857] [INFO ] [WebContentSkill   ] ⏱  Total execution completed in 1.877 ms
+[2026-02-18 22:40:45.857] [INFO ] [fetchPageContent  ] ── Tool result #5 ──
+            title         : MSN
+            url           : https://www.msn.com/pt-br/noticias/ciencia-e-tecnologia/elon-musk-quer-base-na-lua-para-impulsionar-ia-da-xai/ar-AA1WbVHm
+            content       : 
+            status        : success
+
+══════════════════════════════════════════════════════════════════════
+  TOOL CALL: fetchPageContent
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:40:47.186] [INFO ] [WebContentSkill   ] URL: https://pt.euronews.com/tag/elon-musk
+[2026-02-18 22:40:47.515] [DEBUG] [BrowserService    ] [NAV→] GET https://pt.euronews.com/tag/elon-musk
+[2026-02-18 22:40:48.307] [DEBUG] [BrowserService    ] [NAV←] HTTP 200 https://pt.euronews.com/tag/elon-musk
+[2026-02-18 22:40:49.000] [DEBUG] [BrowserService    ] [NAV→] GET https://euronewsgroup.demdex.net/dest5.html?d_nsid=0
+[2026-02-18 22:40:49.191] [DEBUG] [BrowserService    ] [NAV←] HTTP 200 https://euronewsgroup.demdex.net/dest5.html?d_nsid=0
+[2026-02-18 22:40:50.886] [DEBUG] [BrowserService    ] [NAV→] GET https://www.googletagmanager.com/static/service_worker/6240/sw_iframe.html?origin=https%3A%2F%2Fpt.euronews.com
+[2026-02-18 22:40:50.917] [DEBUG] [BrowserService    ] [NAV←] HTTP 200 https://www.googletagmanager.com/static/service_worker/6240/sw_iframe.html?origin=https%3A%2F%2Fpt.euronews.com
+[2026-02-18 22:40:51.090] [INFO ] [WebContentSkill   ] ⏱  Navigation completed in 3.904 ms
+[2026-02-18 22:41:21.121] [ERROR] [WebContentSkill   ] Failed for https://pt.euronews.com/tag/elon-musk
+com.microsoft.playwright.TimeoutError: Error {
+  message='Timeout 30000ms exceeded.
+  name='TimeoutError
+  stack='TimeoutError: Timeout 30000ms exceeded.
+    at ProgressController.run (/private/var/folders/d5/qfypktkn5ml81qvzxhh_140h0000gn/T/playwright-java-5535688727527178829/package/lib/server/progress.js:86:28)
+    at FrameDispatcher._runCommand (/private/var/folders/d5/qfypktkn5ml81qvzxhh_140h0000gn/T/playwright-java-5535688727527178829/package/lib/server/dispatchers/dispatcher.js:91:31)
+    at DispatcherConnection.dispatch (/private/var/folders/d5/qfypktkn5ml81qvzxhh_140h0000gn/T/playwright-java-5535688727527178829/package/lib/server/dispatchers/dispatcher.js:325:39)
+}
+Call log:
+-   - waiting for locator("body")
+
+	at com.microsoft.playwright.impl.WaitableResult.get(WaitableResult.java:52)
+	at com.microsoft.playwright.impl.ChannelOwner.runUntil(ChannelOwner.java:138)
+	at com.microsoft.playwright.impl.Connection.sendMessage(Connection.java:131)
+	at com.microsoft.playwright.impl.ChannelOwner.sendMessage(ChannelOwner.java:124)
+	at com.microsoft.playwright.impl.FrameImpl.innerTextImpl(FrameImpl.java:495)
+	at com.microsoft.playwright.impl.PageImpl.innerText(PageImpl.java:952)
+	at com.microsoft.playwright.Page.innerText(Page.java:5596)
+	at com.gazapps.skills.WebContentSkill.lambda$fetchPageContent$0(WebContentSkill.java:52)
+	at com.gazapps.services.BrowserService.execute(BrowserService.java:48)
+	at com.gazapps.skills.WebContentSkill.fetchPageContent(WebContentSkill.java:37)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.google.adk.tools.FunctionTool.call(FunctionTool.java:238)
+	at com.google.adk.tools.FunctionTool.runAsync(FunctionTool.java:227)
+	at com.google.adk.flows.llmflows.Functions.lambda$callTool$0(Functions.java:547)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeDefer.subscribeActual(MaybeDefer.java:41)
+	at io.reactivex.rxjava3.core.Maybe.subscribe(Maybe.java:5375)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeDefer.subscribeActual(MaybeDefer.java:48)
+	at io.reactivex.rxjava3.core.Maybe.subscribe(Maybe.java:5375)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeSwitchIfEmpty$SwitchIfEmptyMaybeObserver.onComplete(MaybeSwitchIfEmpty.java:88)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableElementAtMaybe$ElementAtSubscriber.onComplete(FlowableElementAtMaybe.java:102)
+	at io.reactivex.rxjava3.internal.util.AtomicThrowable.tryTerminateConsumer(AtomicThrowable.java:92)
+	at io.reactivex.rxjava3.internal.operators.mixed.FlowableConcatMapMaybe$ConcatMapMaybeSubscriber.drain(FlowableConcatMapMaybe.java:198)
+	at io.reactivex.rxjava3.internal.operators.mixed.ConcatMapXMainSubscriber.onComplete(ConcatMapXMainSubscriber.java:123)
+	at io.reactivex.rxjava3.internal.subscriptions.EmptySubscription.complete(EmptySubscription.java:69)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable.subscribe(FlowableFromIterable.java:61)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable.subscribeActual(FlowableFromIterable.java:47)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.mixed.FlowableConcatMapMaybe.subscribeActual(FlowableConcatMapMaybe.java:59)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableElementAtMaybe.subscribeActual(FlowableElementAtMaybe.java:36)
+	at io.reactivex.rxjava3.core.Maybe.subscribe(Maybe.java:5375)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeSwitchIfEmpty.subscribeActual(MaybeSwitchIfEmpty.java:38)
+	at io.reactivex.rxjava3.core.Maybe.subscribe(Maybe.java:5375)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeMap.subscribeActual(MaybeMap.java:41)
+	at io.reactivex.rxjava3.core.Maybe.subscribe(Maybe.java:5375)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeToSingle.subscribeActual(MaybeToSingle.java:46)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleResumeNext.subscribeActual(SingleResumeNext.java:39)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapMaybe.subscribeActual(SingleFlatMapMaybe.java:38)
+	at io.reactivex.rxjava3.core.Maybe.subscribe(Maybe.java:5375)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFlatMapMaybe$FlatMapMaybeSubscriber.onNext(FlowableFlatMapMaybe.java:131)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable$IteratorSubscription.fastPath(FlowableFromIterable.java:185)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable$BaseRangeSubscription.request(FlowableFromIterable.java:129)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFlatMapMaybe$FlatMapMaybeSubscriber.onSubscribe(FlowableFlatMapMaybe.java:106)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable.subscribe(FlowableFromIterable.java:69)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable.subscribeActual(FlowableFromIterable.java:47)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFlatMapMaybe.subscribeActual(FlowableFlatMapMaybe.java:53)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableToListSingle.subscribeActual(FlowableToListSingle.java:56)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapMaybe.subscribeActual(SingleFlatMapMaybe.java:38)
+	at io.reactivex.rxjava3.core.Maybe.subscribe(Maybe.java:5375)
+	at io.reactivex.rxjava3.internal.operators.mixed.MaybeFlatMapPublisher.subscribeActual(MaybeFlatMapPublisher.java:50)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatArray$ConcatArraySubscriber.onComplete(FlowableConcatArray.java:141)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatArray.subscribeActual(FlowableConcatArray.java:41)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher$SingleFlatMapPublisherObserver.onSuccess(SingleFlatMapPublisher.java:96)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap$MapSingleObserver.onSuccess(SingleMap.java:65)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDoOnSuccess$DoOnSuccess.onSuccess(SingleDoOnSuccess.java:60)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback$FlatMapSingleObserver.onSuccess(SingleFlatMap.java:112)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap$MapSingleObserver.onSuccess(SingleMap.java:65)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableToListSingle$ToListSubscriber.onComplete(FlowableToListSingle.java:102)
+	at io.reactivex.rxjava3.internal.subscriptions.EmptySubscription.complete(EmptySubscription.java:69)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableEmpty.subscribeActual(FlowableEmpty.java:34)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableToListSingle.subscribeActual(FlowableToListSingle.java:56)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap.subscribeActual(SingleMap.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback.onSuccess(SingleFlatMap.java:85)
+	at io.reactivex.rxjava3.internal.operators.single.SingleJust.subscribeActual(SingleJust.java:30)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap.subscribeActual(SingleFlatMap.java:37)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDoOnSuccess.subscribeActual(SingleDoOnSuccess.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap.subscribeActual(SingleMap.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher.subscribeActual(SingleFlatMapPublisher.java:59)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableDoFinally.subscribeActual(FlowableDoFinally.java:47)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatMap$ConcatMapImmediate.drain(FlowableConcatMap.java:318)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatMap$BaseConcatMapSubscriber.onNext(FlowableConcatMap.java:159)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher$SingleFlatMapPublisherObserver.onNext(SingleFlatMapPublisher.java:107)
+	at io.reactivex.rxjava3.internal.util.HalfSerializer.onNext(HalfSerializer.java:46)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatMap$ConcatMapImmediate.innerNext(FlowableConcatMap.java:206)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatMap$ConcatMapInner.onNext(FlowableConcatMap.java:563)
+	at io.reactivex.rxjava3.internal.subscriptions.DeferredScalarSubscription.complete(DeferredScalarSubscription.java:133)
+	at io.reactivex.rxjava3.internal.operators.single.SingleToFlowable$SingleToFlowableObserver.onSuccess(SingleToFlowable.java:63)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeToSingle$ToSingleMaybeSubscriber.onComplete(MaybeToSingle.java:96)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableElementAtMaybe$ElementAtSubscriber.onComplete(FlowableElementAtMaybe.java:102)
+	at io.reactivex.rxjava3.internal.util.AtomicThrowable.tryTerminateConsumer(AtomicThrowable.java:92)
+	at io.reactivex.rxjava3.internal.operators.mixed.FlowableConcatMapMaybe$ConcatMapMaybeSubscriber.drain(FlowableConcatMapMaybe.java:198)
+	at io.reactivex.rxjava3.internal.operators.mixed.ConcatMapXMainSubscriber.onComplete(ConcatMapXMainSubscriber.java:123)
+	at io.reactivex.rxjava3.internal.subscriptions.EmptySubscription.complete(EmptySubscription.java:69)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable.subscribe(FlowableFromIterable.java:61)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable.subscribeActual(FlowableFromIterable.java:47)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.mixed.FlowableConcatMapMaybe.subscribeActual(FlowableConcatMapMaybe.java:59)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableElementAtMaybe.subscribeActual(FlowableElementAtMaybe.java:36)
+	at io.reactivex.rxjava3.core.Maybe.subscribe(Maybe.java:5375)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeToSingle.subscribeActual(MaybeToSingle.java:46)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleToFlowable.subscribeActual(SingleToFlowable.java:38)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatMap$ConcatMapImmediate.drain(FlowableConcatMap.java:318)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatMap$BaseConcatMapSubscriber.onNext(FlowableConcatMap.java:159)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableDoFinally$DoFinallySubscriber.onNext(FlowableDoFinally.java:85)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableDoOnEach$DoOnEachSubscriber.onNext(FlowableDoOnEach.java:92)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableDoOnEach$DoOnEachSubscriber.onNext(FlowableDoOnEach.java:92)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableOnErrorNext$OnErrorNextSubscriber.onNext(FlowableOnErrorNext.java:76)
+	at io.reactivex.rxjava3.internal.subscriptions.DeferredScalarSubscription.complete(DeferredScalarSubscription.java:133)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromFuture.subscribeActual(FlowableFromFuture.java:54)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableOnErrorNext.subscribeActual(FlowableOnErrorNext.java:39)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableDoOnEach.subscribeActual(FlowableDoOnEach.java:50)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableDoOnEach.subscribeActual(FlowableDoOnEach.java:50)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableDoFinally.subscribeActual(FlowableDoFinally.java:47)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableDefer.subscribeActual(FlowableDefer.java:42)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatMap.subscribeActual(FlowableConcatMap.java:66)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher$SingleFlatMapPublisherObserver.onSuccess(SingleFlatMapPublisher.java:96)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeToSingle$ToSingleMaybeSubscriber.onComplete(MaybeToSingle.java:96)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeMap$MapMaybeObserver.onComplete(MaybeMap.java:100)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableElementAtMaybe$ElementAtSubscriber.onComplete(FlowableElementAtMaybe.java:102)
+	at io.reactivex.rxjava3.internal.util.AtomicThrowable.tryTerminateConsumer(AtomicThrowable.java:92)
+	at io.reactivex.rxjava3.internal.operators.mixed.FlowableConcatMapMaybe$ConcatMapMaybeSubscriber.drain(FlowableConcatMapMaybe.java:198)
+	at io.reactivex.rxjava3.internal.operators.mixed.ConcatMapXMainSubscriber.onComplete(ConcatMapXMainSubscriber.java:123)
+	at io.reactivex.rxjava3.internal.subscriptions.EmptySubscription.complete(EmptySubscription.java:69)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable.subscribe(FlowableFromIterable.java:61)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable.subscribeActual(FlowableFromIterable.java:47)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.mixed.FlowableConcatMapMaybe.subscribeActual(FlowableConcatMapMaybe.java:59)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableElementAtMaybe.subscribeActual(FlowableElementAtMaybe.java:36)
+	at io.reactivex.rxjava3.core.Maybe.subscribe(Maybe.java:5375)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeMap.subscribeActual(MaybeMap.java:41)
+	at io.reactivex.rxjava3.core.Maybe.subscribe(Maybe.java:5375)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeToSingle.subscribeActual(MaybeToSingle.java:46)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher.subscribeActual(SingleFlatMapPublisher.java:59)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatMap.subscribeActual(FlowableConcatMap.java:66)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatMap.subscribeActual(FlowableConcatMap.java:66)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatArray$ConcatArraySubscriber.onComplete(FlowableConcatArray.java:141)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatArray.subscribeActual(FlowableConcatArray.java:41)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher$SingleFlatMapPublisherObserver.onSuccess(SingleFlatMapPublisher.java:96)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback$FlatMapSingleObserver.onSuccess(SingleFlatMap.java:112)
+	at io.reactivex.rxjava3.internal.observers.ResumeSingleObserver.onSuccess(ResumeSingleObserver.java:46)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFromCallable.subscribeActual(SingleFromCallable.java:55)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDelayWithCompletable$OtherObserver.onComplete(SingleDelayWithCompletable.java:69)
+	at io.reactivex.rxjava3.internal.util.AtomicThrowable.tryTerminateConsumer(AtomicThrowable.java:154)
+	at io.reactivex.rxjava3.internal.operators.mixed.FlowableConcatMapCompletable$ConcatMapCompletableObserver.drain(FlowableConcatMapCompletable.java:166)
+	at io.reactivex.rxjava3.internal.operators.mixed.ConcatMapXMainSubscriber.onComplete(ConcatMapXMainSubscriber.java:123)
+	at io.reactivex.rxjava3.internal.util.AtomicThrowable.tryTerminateConsumer(AtomicThrowable.java:92)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatMap$ConcatMapDelayed.drain(FlowableConcatMap.java:458)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatMap$BaseConcatMapSubscriber.onSubscribe(FlowableConcatMap.java:124)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable.subscribe(FlowableFromIterable.java:69)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable.subscribeActual(FlowableFromIterable.java:47)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatMap.subscribeActual(FlowableConcatMap.java:66)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.mixed.FlowableConcatMapCompletable.subscribeActual(FlowableConcatMapCompletable.java:56)
+	at io.reactivex.rxjava3.core.Completable.subscribe(Completable.java:2859)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDelayWithCompletable.subscribeActual(SingleDelayWithCompletable.java:36)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback.onSuccess(SingleFlatMap.java:85)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap$MapSingleObserver.onSuccess(SingleMap.java:65)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDoOnSuccess$DoOnSuccess.onSuccess(SingleDoOnSuccess.java:60)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback$FlatMapSingleObserver.onSuccess(SingleFlatMap.java:112)
+	at io.reactivex.rxjava3.internal.operators.single.SingleJust.subscribeActual(SingleJust.java:30)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback.onSuccess(SingleFlatMap.java:85)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap$MapSingleObserver.onSuccess(SingleMap.java:65)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDoOnSuccess$DoOnSuccess.onSuccess(SingleDoOnSuccess.java:60)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback$FlatMapSingleObserver.onSuccess(SingleFlatMap.java:112)
+	at io.reactivex.rxjava3.internal.operators.single.SingleJust.subscribeActual(SingleJust.java:30)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback.onSuccess(SingleFlatMap.java:85)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap$MapSingleObserver.onSuccess(SingleMap.java:65)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDoOnSuccess$DoOnSuccess.onSuccess(SingleDoOnSuccess.java:60)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback$FlatMapSingleObserver.onSuccess(SingleFlatMap.java:112)
+	at io.reactivex.rxjava3.internal.operators.single.SingleJust.subscribeActual(SingleJust.java:30)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback.onSuccess(SingleFlatMap.java:85)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap$MapSingleObserver.onSuccess(SingleMap.java:65)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDoOnSuccess$DoOnSuccess.onSuccess(SingleDoOnSuccess.java:60)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback$FlatMapSingleObserver.onSuccess(SingleFlatMap.java:112)
+	at io.reactivex.rxjava3.internal.operators.single.SingleJust.subscribeActual(SingleJust.java:30)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback.onSuccess(SingleFlatMap.java:85)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap$MapSingleObserver.onSuccess(SingleMap.java:65)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDoOnSuccess$DoOnSuccess.onSuccess(SingleDoOnSuccess.java:60)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback$FlatMapSingleObserver.onSuccess(SingleFlatMap.java:112)
+	at io.reactivex.rxjava3.internal.operators.single.SingleJust.subscribeActual(SingleJust.java:30)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback.onSuccess(SingleFlatMap.java:85)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap$MapSingleObserver.onSuccess(SingleMap.java:65)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDoOnSuccess$DoOnSuccess.onSuccess(SingleDoOnSuccess.java:60)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback$FlatMapSingleObserver.onSuccess(SingleFlatMap.java:112)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap$MapSingleObserver.onSuccess(SingleMap.java:65)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback$FlatMapSingleObserver.onSuccess(SingleFlatMap.java:112)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback$FlatMapSingleObserver.onSuccess(SingleFlatMap.java:112)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap$MapSingleObserver.onSuccess(SingleMap.java:65)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap$MapSingleObserver.onSuccess(SingleMap.java:65)
+	at io.reactivex.rxjava3.internal.operators.single.SingleJust.subscribeActual(SingleJust.java:30)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleZipIterable.subscribeActual(SingleZipIterable.java:64)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap.subscribeActual(SingleMap.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback.onSuccess(SingleFlatMap.java:85)
+	at io.reactivex.rxjava3.internal.operators.single.SingleJust.subscribeActual(SingleJust.java:30)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap.subscribeActual(SingleFlatMap.java:37)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback.onSuccess(SingleFlatMap.java:85)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback$FlatMapSingleObserver.onSuccess(SingleFlatMap.java:112)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback$FlatMapSingleObserver.onSuccess(SingleFlatMap.java:112)
+	at io.reactivex.rxjava3.internal.operators.single.SingleJust.subscribeActual(SingleJust.java:30)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback.onSuccess(SingleFlatMap.java:85)
+	at io.reactivex.rxjava3.internal.operators.single.SingleJust.subscribeActual(SingleJust.java:30)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap.subscribeActual(SingleFlatMap.java:37)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback.onSuccess(SingleFlatMap.java:85)
+	at io.reactivex.rxjava3.internal.operators.single.SingleJust.subscribeActual(SingleJust.java:30)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap.subscribeActual(SingleFlatMap.java:37)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap.subscribeActual(SingleFlatMap.java:37)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap.subscribeActual(SingleMap.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback.onSuccess(SingleFlatMap.java:85)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap$MapSingleObserver.onSuccess(SingleMap.java:65)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDoOnSuccess$DoOnSuccess.onSuccess(SingleDoOnSuccess.java:60)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback$FlatMapSingleObserver.onSuccess(SingleFlatMap.java:112)
+	at io.reactivex.rxjava3.internal.operators.single.SingleJust.subscribeActual(SingleJust.java:30)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback.onSuccess(SingleFlatMap.java:85)
+	at io.reactivex.rxjava3.internal.operators.single.SingleJust.subscribeActual(SingleJust.java:30)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap.subscribeActual(SingleFlatMap.java:37)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDoOnSuccess.subscribeActual(SingleDoOnSuccess.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap.subscribeActual(SingleMap.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap.subscribeActual(SingleFlatMap.java:37)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDoOnSuccess.subscribeActual(SingleDoOnSuccess.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap.subscribeActual(SingleMap.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap.subscribeActual(SingleFlatMap.java:37)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDoOnSuccess.subscribeActual(SingleDoOnSuccess.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap.subscribeActual(SingleMap.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap.subscribeActual(SingleFlatMap.java:37)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDoOnSuccess.subscribeActual(SingleDoOnSuccess.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap.subscribeActual(SingleMap.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap.subscribeActual(SingleFlatMap.java:37)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDoOnSuccess.subscribeActual(SingleDoOnSuccess.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap.subscribeActual(SingleMap.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap.subscribeActual(SingleFlatMap.java:37)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDoOnSuccess.subscribeActual(SingleDoOnSuccess.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap.subscribeActual(SingleMap.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap.subscribeActual(SingleFlatMap.java:37)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDoOnSuccess.subscribeActual(SingleDoOnSuccess.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleMap.subscribeActual(SingleMap.java:35)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap.subscribeActual(SingleFlatMap.java:37)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher.subscribeActual(SingleFlatMapPublisher.java:59)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableCache.subscribeActual(FlowableCache.java:115)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatArray$ConcatArraySubscriber.onComplete(FlowableConcatArray.java:141)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatArray.subscribeActual(FlowableConcatArray.java:41)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableDefer.subscribeActual(FlowableDefer.java:42)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher$SingleFlatMapPublisherObserver.onSuccess(SingleFlatMapPublisher.java:96)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableToListSingle$ToListSubscriber.onComplete(FlowableToListSingle.java:102)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableCache.replay(FlowableCache.java:245)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableCache$CacheSubscription.request(FlowableCache.java:383)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableToListSingle$ToListSubscriber.onSubscribe(FlowableToListSingle.java:83)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableCache.subscribeActual(FlowableCache.java:111)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableToListSingle.subscribeActual(FlowableToListSingle.java:56)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher.subscribeActual(SingleFlatMapPublisher.java:59)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatArray$ConcatArraySubscriber.onComplete(FlowableConcatArray.java:141)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatArray.subscribeActual(FlowableConcatArray.java:41)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableDefer.subscribeActual(FlowableDefer.java:42)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher$SingleFlatMapPublisherObserver.onSuccess(SingleFlatMapPublisher.java:96)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableToListSingle$ToListSubscriber.onComplete(FlowableToListSingle.java:102)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableCache.replay(FlowableCache.java:245)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableCache$CacheSubscription.request(FlowableCache.java:383)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableToListSingle$ToListSubscriber.onSubscribe(FlowableToListSingle.java:83)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableCache.subscribeActual(FlowableCache.java:111)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableToListSingle.subscribeActual(FlowableToListSingle.java:56)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher.subscribeActual(SingleFlatMapPublisher.java:59)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatArray$ConcatArraySubscriber.onComplete(FlowableConcatArray.java:141)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatArray.subscribeActual(FlowableConcatArray.java:41)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatMap.subscribeActual(FlowableConcatMap.java:66)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableDefer.subscribeActual(FlowableDefer.java:42)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatArray$ConcatArraySubscriber.onComplete(FlowableConcatArray.java:141)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatArray.subscribeActual(FlowableConcatArray.java:41)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher$SingleFlatMapPublisherObserver.onSuccess(SingleFlatMapPublisher.java:96)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeSwitchIfEmptySingle$SwitchIfEmptyMaybeObserver$OtherSingleObserver.onSuccess(MaybeSwitchIfEmptySingle.java:117)
+	at io.reactivex.rxjava3.internal.operators.single.SingleJust.subscribeActual(SingleJust.java:30)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleDefer.subscribeActual(SingleDefer.java:43)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeSwitchIfEmptySingle$SwitchIfEmptyMaybeObserver.onComplete(MaybeSwitchIfEmptySingle.java:95)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableElementAtMaybe$ElementAtSubscriber.onComplete(FlowableElementAtMaybe.java:102)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatMap$ConcatMapImmediate.drain(FlowableConcatMap.java:258)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatMap$BaseConcatMapSubscriber.onSubscribe(FlowableConcatMap.java:124)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable.subscribe(FlowableFromIterable.java:69)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable.subscribeActual(FlowableFromIterable.java:47)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatMap.subscribeActual(FlowableConcatMap.java:66)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableElementAtMaybe.subscribeActual(FlowableElementAtMaybe.java:36)
+	at io.reactivex.rxjava3.core.Maybe.subscribe(Maybe.java:5375)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeSwitchIfEmptySingle.subscribeActual(MaybeSwitchIfEmptySingle.java:45)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher.subscribeActual(SingleFlatMapPublisher.java:59)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableDoFinally.subscribeActual(FlowableDoFinally.java:47)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableDefer.subscribeActual(FlowableDefer.java:42)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFlatMap.subscribeActual(FlowableFlatMap.java:51)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableSwitchIfEmpty$SwitchIfEmptySubscriber.onComplete(FlowableSwitchIfEmpty.java:71)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeToFlowable$MaybeToFlowableSubscriber.onComplete(MaybeToFlowable.java:80)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeMap$MapMaybeObserver.onComplete(MaybeMap.java:100)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableElementAtMaybe$ElementAtSubscriber.onComplete(FlowableElementAtMaybe.java:102)
+	at io.reactivex.rxjava3.internal.util.AtomicThrowable.tryTerminateConsumer(AtomicThrowable.java:92)
+	at io.reactivex.rxjava3.internal.operators.mixed.FlowableConcatMapMaybe$ConcatMapMaybeSubscriber.drain(FlowableConcatMapMaybe.java:198)
+	at io.reactivex.rxjava3.internal.operators.mixed.ConcatMapXMainSubscriber.onComplete(ConcatMapXMainSubscriber.java:123)
+	at io.reactivex.rxjava3.internal.subscriptions.EmptySubscription.complete(EmptySubscription.java:69)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable.subscribe(FlowableFromIterable.java:61)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable.subscribeActual(FlowableFromIterable.java:47)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.mixed.FlowableConcatMapMaybe.subscribeActual(FlowableConcatMapMaybe.java:59)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableElementAtMaybe.subscribeActual(FlowableElementAtMaybe.java:36)
+	at io.reactivex.rxjava3.core.Maybe.subscribe(Maybe.java:5375)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeMap.subscribeActual(MaybeMap.java:41)
+	at io.reactivex.rxjava3.core.Maybe.subscribe(Maybe.java:5375)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeToFlowable.subscribeActual(MaybeToFlowable.java:45)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableSwitchIfEmpty.subscribeActual(FlowableSwitchIfEmpty.java:32)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableConcatWithCompletable.subscribeActual(FlowableConcatWithCompletable.java:43)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.mixed.MaybeFlatMapPublisher$FlatMapPublisherSubscriber.onSuccess(MaybeFlatMapPublisher.java:120)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeJust.subscribeActual(MaybeJust.java:36)
+	at io.reactivex.rxjava3.core.Maybe.subscribe(Maybe.java:5375)
+	at io.reactivex.rxjava3.internal.operators.mixed.MaybeFlatMapPublisher.subscribeActual(MaybeFlatMapPublisher.java:50)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher$SingleFlatMapPublisherObserver.onSuccess(SingleFlatMapPublisher.java:96)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback$FlatMapSingleObserver.onSuccess(SingleFlatMap.java:112)
+	at io.reactivex.rxjava3.internal.operators.single.SingleJust.subscribeActual(SingleJust.java:30)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap$SingleFlatMapCallback.onSuccess(SingleFlatMap.java:85)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeSwitchIfEmptySingle$SwitchIfEmptyMaybeObserver$OtherSingleObserver.onSuccess(MaybeSwitchIfEmptySingle.java:117)
+	at io.reactivex.rxjava3.internal.operators.single.SingleJust.subscribeActual(SingleJust.java:30)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeSwitchIfEmptySingle$SwitchIfEmptyMaybeObserver.onComplete(MaybeSwitchIfEmptySingle.java:95)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableElementAtMaybe$ElementAtSubscriber.onComplete(FlowableElementAtMaybe.java:102)
+	at io.reactivex.rxjava3.internal.util.AtomicThrowable.tryTerminateConsumer(AtomicThrowable.java:92)
+	at io.reactivex.rxjava3.internal.operators.mixed.FlowableConcatMapMaybe$ConcatMapMaybeSubscriber.drain(FlowableConcatMapMaybe.java:198)
+	at io.reactivex.rxjava3.internal.operators.mixed.ConcatMapXMainSubscriber.onComplete(ConcatMapXMainSubscriber.java:123)
+	at io.reactivex.rxjava3.internal.subscriptions.EmptySubscription.complete(EmptySubscription.java:69)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable.subscribe(FlowableFromIterable.java:61)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableFromIterable.subscribeActual(FlowableFromIterable.java:47)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.mixed.FlowableConcatMapMaybe.subscribeActual(FlowableConcatMapMaybe.java:59)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableElementAtMaybe.subscribeActual(FlowableElementAtMaybe.java:36)
+	at io.reactivex.rxjava3.core.Maybe.subscribe(Maybe.java:5375)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeSwitchIfEmptySingle.subscribeActual(MaybeSwitchIfEmptySingle.java:45)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMap.subscribeActual(SingleFlatMap.java:37)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher.subscribeActual(SingleFlatMapPublisher.java:59)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableDefer.subscribeActual(FlowableDefer.java:42)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableDoOnEach.subscribeActual(FlowableDoOnEach.java:50)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.FlowableDoFinally.subscribeActual(FlowableDoFinally.java:47)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15863)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher$SingleFlatMapPublisherObserver.onSuccess(SingleFlatMapPublisher.java:96)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeSwitchIfEmptySingle$SwitchIfEmptyMaybeObserver.onSuccess(MaybeSwitchIfEmptySingle.java:82)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeJust.subscribeActual(MaybeJust.java:36)
+	at io.reactivex.rxjava3.core.Maybe.subscribe(Maybe.java:5375)
+	at io.reactivex.rxjava3.internal.operators.maybe.MaybeSwitchIfEmptySingle.subscribeActual(MaybeSwitchIfEmptySingle.java:45)
+	at io.reactivex.rxjava3.core.Single.subscribe(Single.java:4855)
+	at io.reactivex.rxjava3.internal.operators.single.SingleFlatMapPublisher.subscribeActual(SingleFlatMapPublisher.java:59)
+	at io.reactivex.rxjava3.core.Flowable.subscribe(Flowable.java:15917)
+	at io.reactivex.rxjava3.internal.operators.flowable.BlockingFlowableIterable.iterator(BlockingFlowableIterable.java:42)
+	at io.reactivex.rxjava3.core.Flowable.blockingForEach(Flowable.java:6162)
+	at io.reactivex.rxjava3.core.Flowable.blockingForEach(Flowable.java:6118)
+	at com.gazapps.agent.SearchAgent.processQuery(SearchAgent.java:125)
+	at com.gazapps.ui.ChatInterface.processUserQuery(ChatInterface.java:102)
+	at com.gazapps.ui.ChatInterface.startChat(ChatInterface.java:42)
+	at com.gazapps.Main.main(Main.java:36)
+	at org.codehaus.mojo.exec.ExecJavaMojo.doMain(ExecJavaMojo.java:385)
+	at org.codehaus.mojo.exec.ExecJavaMojo.doExec(ExecJavaMojo.java:374)
+	at org.codehaus.mojo.exec.ExecJavaMojo.lambda$execute$0(ExecJavaMojo.java:296)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: com.microsoft.playwright.TimeoutError: Error {
+  message='Timeout 30000ms exceeded.
+  name='TimeoutError
+  stack='TimeoutError: Timeout 30000ms exceeded.
+    at ProgressController.run (/private/var/folders/d5/qfypktkn5ml81qvzxhh_140h0000gn/T/playwright-java-5535688727527178829/package/lib/server/progress.js:86:28)
+    at FrameDispatcher._runCommand (/private/var/folders/d5/qfypktkn5ml81qvzxhh_140h0000gn/T/playwright-java-5535688727527178829/package/lib/server/dispatchers/dispatcher.js:91:31)
+    at DispatcherConnection.dispatch (/private/var/folders/d5/qfypktkn5ml81qvzxhh_140h0000gn/T/playwright-java-5535688727527178829/package/lib/server/dispatchers/dispatcher.js:325:39)
+}
+Call log:
+-   - waiting for locator("body")
+
+	at com.microsoft.playwright.impl.Connection.dispatch(Connection.java:257)
+	at com.microsoft.playwright.impl.Connection.processOneMessage(Connection.java:214)
+	at com.microsoft.playwright.impl.ChannelOwner.runUntil(ChannelOwner.java:136)
+	... 484 more
+
+
+══════════════════════════════════════════════════════════════════════
+  TOOL CALL: fetchPageContent
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:41:22.618] [INFO ] [WebContentSkill   ] URL: https://www.cnnbrasil.com.br/tudo-sobre/elon-musk/
+[2026-02-18 22:41:23.026] [DEBUG] [BrowserService    ] [NAV→] GET https://www.cnnbrasil.com.br/tudo-sobre/elon-musk/
+[2026-02-18 22:41:23.765] [DEBUG] [BrowserService    ] [NAV←] HTTP 200 https://www.cnnbrasil.com.br/tudo-sobre/elon-musk/
+[2026-02-18 22:41:24.012] [INFO ] [WebContentSkill   ] ⏱  Navigation completed in 1.394 ms
+[2026-02-18 22:41:24.028] [INFO ] [WebContentSkill   ] Page title: "Elon Musk | CNN Brasil"
+[2026-02-18 22:41:24.029] [INFO ] [WebContentSkill   ] Raw body text length: 1449 chars
+[2026-02-18 22:41:24.029] [INFO ] [WebContentSkill   ] ⏱  Total execution completed in 1.411 ms
+[2026-02-18 22:41:24.029] [INFO ] [fetchPageContent  ] ── Tool result #6 ──
+            title         : Elon Musk | CNN Brasil
+            url           : https://www.cnnbrasil.com.br/tudo-sobre/elon-musk/
+            content       : Você está em
+            Tudo sobre
+            Elon Musk
+            Ciência
+            Musk e Bezos fortalecem empresas, mas ambos competem com a China pela Lua
+            13/02/2026 | 18:52
+            Tecnologia
+            Grokipedia: por que Elon Musk criou uma concorrente da Wikipédia com IA?
+            12/02/2026 | 17:05
+            Ciência
+            Foguete da China dá “ré no mar” em resposta a Musk por corrida para a Lua
+            11/02/2026 | 16:03
+            Ciência
+            Musk agora quer “cidade” na Lua, mas EUA têm forte concorrência da China
+            09/02/2026 | 18:24
+            Ciência
+            Musk põe colonização de Marte de lado e agora quer construir cidade na Lua
+            09/02/2026 | 16:44
+            Internacional
+            Musk chama premiê da Espanha de "traidor" após regras para redes sociais
+            04/02/2026 | 23:22
+            Tecnologia
+            Futuro da IA está no espaço? Plano de Musk para datacenters indica que sim
+            04/02/2026 | 13:47
+            Tecnologia
+            SpaceX, de Elon Musk, faz investimento em computação no espaço; entenda
+            03/02/2026 | 15:33
+            Internacional
+            Escritórios do X em Paris são alvo de buscas; Musk é intimado a depor
+            03/02/2026 | 08:46
+            Negócios
+            Registros de carros da Tesla na Eu... [+449 chars truncated]
+            status        : success
+[2026-02-18 22:41:26.683] [DEBUG] [SearchAgent       ] Event #1  type=TOOL_CALL              final=false  content_preview=Function Call: FunctionCall{id=Optional[adk-071f6cfc-33b5-4a95-b7a4-fce54be2ce6f], args=Optional[{query=notícias recente...
+[2026-02-18 22:41:26.683] [DEBUG] [SearchAgent       ] Event #2  type=TOOL_RESPONSE          final=false  content_preview=Function Response: FunctionResponse{willContinue=Optional.empty, scheduling=Optional.empty, parts=Optional.empty, id=Opt...
+[2026-02-18 22:41:26.684] [DEBUG] [SearchAgent       ] Event #3  type=TOOL_CALL              final=false  content_preview=Function Call: FunctionCall{id=Optional[adk-0a8f0291-8b77-49f4-8644-5904d5383a7c], args=Optional[{url=https://www.msn.co...
+[2026-02-18 22:41:26.684] [DEBUG] [SearchAgent       ] Event #4  type=TOOL_RESPONSE          final=false  content_preview=Function Response: FunctionResponse{willContinue=Optional.empty, scheduling=Optional.empty, parts=Optional.empty, id=Opt...
+[2026-02-18 22:41:26.684] [DEBUG] [SearchAgent       ] Event #5  type=TOOL_CALL              final=false  content_preview=Function Call: FunctionCall{id=Optional[adk-425a5672-d6ee-4c07-87e9-2b9cab4fadaa], args=Optional[{url=https://pt.euronew...
+[2026-02-18 22:41:26.684] [DEBUG] [SearchAgent       ] Event #6  type=TOOL_RESPONSE          final=false  content_preview=Function Response: FunctionResponse{willContinue=Optional.empty, scheduling=Optional.empty, parts=Optional.empty, id=Opt...
+[2026-02-18 22:41:26.684] [DEBUG] [SearchAgent       ] Event #7  type=TOOL_CALL              final=false  content_preview=Function Call: FunctionCall{id=Optional[adk-9bba0cad-1ba0-4dba-a8ce-395d130cb3bf], args=Optional[{url=https://www.cnnbra...
+[2026-02-18 22:41:26.684] [DEBUG] [SearchAgent       ] Event #8  type=TOOL_RESPONSE          final=false  content_preview=Function Response: FunctionResponse{willContinue=Optional.empty, scheduling=Optional.empty, parts=Optional.empty, id=Opt...
+[2026-02-18 22:41:26.685] [DEBUG] [SearchAgent       ] Event #9  type=FINAL_RESPONSE         final=true   content_preview=A notícia mais recente sobre Elon Musk, de acordo com a CNN Brasil (publicada em 13 de fevereiro de 2026 às 18:52), é so...
+
+  ────────────────────── FINAL RESPONSE EVENT #9 ─────────────────────
+[2026-02-18 22:41:26.685] [INFO ] [SearchAgent       ] Response text length: 1039 chars
+[2026-02-18 22:41:26.685] [INFO ] [SearchAgent       ] ⏱  processQuery total completed in 47.924 ms
+[2026-02-18 22:41:26.685] [INFO ] [SearchAgent       ] Total ADK events received: 9
+
+  ────────────────────────── AGENT RESPONSE ──────────────────────────
+[2026-02-18 22:41:26.685] [INFO ] [SearchAgent       ] Agent ◀  A notícia mais recente sobre Elon Musk, de acordo com a CNN Brasil (publicada em 13 de fevereiro de 2026 às 18:52), é sobre a competição pela Lua:
+
+*   **"Musk e Bezos fortalecem empresas, mas ambos competem com a China pela Lua"**
+
+Outras notícias recentes incluem:
+
+*   **"Grokipedia: por que Elon Musk criou uma concorrente da Wikipédia com IA?"** (12 de fevereiro de 2026)
+*   **"Foguete da China dá “ré no mar” em resposta a Musk por corrida para a Lua"** (11 de fevereiro de 2026)
+*   **"Musk agora quer “cidade” na Lua, mas EUA têm forte concorrência da China"** (09 de fevereiro de 2026)
+*   **"Musk põe colonização de Marte de lado e agora quer construir cidade na Lua"** (09 de fevereiro de 2026)
+*   **"Musk chama premiê da Espanha de "traidor" após regras para redes sociais"** (04 de fevereiro de 2026)
+*   **"Futuro da IA está no espaço? Plano de Musk para datacenters indica que sim"** (04 de fevereiro de 2026)
+
+Fonte: [https://www.cnnbrasil.com.br/tudo-sobre/elon-musk/](https://www.cnnbrasil.com.br/tudo-sobre/elon-musk/)
+[2026-02-18 22:41:26.685] [INFO ] [ChatInterface     ] ⏱  Turn #4 end-to-end completed in 47.925 ms
+
+  ──────────────────────────── USER INPUT ────────────────────────────
+[2026-02-18 22:42:52.917] [INFO ] [ChatInterface     ] User  ▶  pequise preco de passagem bsb->sp para 20 de marco no buses.
+
+  ────────────────────────────── TURN #5 ─────────────────────────────
+
+══════════════════════════════════════════════════════════════════════
+  AGENT TURN
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:42:52.917] [INFO ] [SearchAgent       ] Processing query: "pequise preco de passagem bsb->sp para 20 de marco no buses."
+
+══════════════════════════════════════════════════════════════════════
+  TOOL CALL: searchWeb
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:42:54.414] [INFO ] [WebOrchestrator   ] Query: "passagem de ônibus BSB para SP 20 de março buses.com.br"
+[2026-02-18 22:42:54.414] [INFO ] [WebOrchestrator   ] Step 1 — DDG Instant Answer JSON API
+[2026-02-18 22:42:54.414] [DEBUG] [DuckDuckGoService ] JSON URL: https://api.duckduckgo.com/?q=passagem+de+%C3%B4nibus+BSB+para+SP+20+de+mar%C3%A7o+buses.com.br&format=json&no_html=1&skip_disambig=1
+[2026-02-18 22:42:54.617] [INFO ] [DuckDuckGoService ] ⏱  JSON API call completed in 202 ms
+[2026-02-18 22:42:54.617] [DEBUG] [WebOrchestrator   ] DDG instant answer: {"Abstract":"","AbstractSource":"","AbstractText":"","AbstractURL":"","Answer":"","AnswerType":"","Definition":"","DefinitionSource":"","DefinitionURL":"","Entity":"","Heading":"","Image":"","ImageHeight":"","ImageIsLogo":"","ImageWidth":"","Infobox":"","Redirect":"","RelatedTopics":[],"Results":[],...
+[2026-02-18 22:42:54.617] [INFO ] [WebOrchestrator   ] Step 2 — DDG HTML search (Playwright)
+[2026-02-18 22:42:54.617] [DEBUG] [DuckDuckGoService ] HTML URL: https://html.duckduckgo.com/html/?q=passagem+de+%C3%B4nibus+BSB+para+SP+20+de+mar%C3%A7o+buses.com.br&kl=br-pt
+[2026-02-18 22:42:55.320] [DEBUG] [BrowserService    ] [NAV→] GET https://html.duckduckgo.com/html/?q=passagem+de+%C3%B4nibus+BSB+para+SP+20+de+mar%C3%A7o+buses.com.br&kl=br-pt
+[2026-02-18 22:42:56.240] [DEBUG] [BrowserService    ] [NAV←] HTTP 200 https://html.duckduckgo.com/html/?q=passagem+de+%C3%B4nibus+BSB+para+SP+20+de+mar%C3%A7o+buses.com.br&kl=br-pt
+[2026-02-18 22:42:57.353] [INFO ] [DuckDuckGoService ] ⏱  HTML page load completed in 2.035 ms
+[2026-02-18 22:42:57.372] [DEBUG] [DuckDuckGoService ] HTML structured results: [{"title":"Ônibus São Paulo x Brasília - Compre sua Passagem Online","url":"https://duckduckgo.com/l/?uddg=https%3A%2F%2Fduckduckgo.com%2Fy.js%3Fad_domain%3Dbuson.com.br%26ad_provider%3Dbingv7aa%26ad_type%3Dtxad%26click_metadata%3DlZfA0eQj3ePM8ojnTQbI9FFFHDx7hI9MxpdWqn2l8dY2SBSOVYt6HjAylX4WQB2yLTGDj%252DXDtS75HPb2Odt_9DMOa9KBpumDqf4ocYBgJXGtkR41v3vtuKSJ_rl1zVdwwjw92Cgv0OcA5mvaptVg6zxb1THM9aqGCd1NV...
+[2026-02-18 22:42:57.395] [INFO ] [DuckDuckGoService ] HTML page_text length: 3884 chars
+[2026-02-18 22:42:57.416] [INFO ] [WebOrchestrator   ] DDG HTML returned results — skipping Bing
+[2026-02-18 22:42:57.416] [INFO ] [WebOrchestrator   ] ⏱  searchWeb total completed in 3.002 ms
+[2026-02-18 22:42:57.416] [INFO ] [searchWeb         ] ── Tool result #7 ──
+            page_text     : All Regions
+            Argentina
+            Australia
+            Austria
+            Belgium (fr)
+            Belgium (nl)
+            Brazil
+            Bulgaria
+            Canada (en)
+            Canada (fr)
+            Catalonia
+            Chile
+            China
+            Colombia
+            Croatia
+            Czech Republic
+            Denmark
+            Estonia
+            Finland
+            France
+            Germany
+            Greece
+            Hong Kong
+            Hungary
+            Iceland
+            India (en)
+            Indonesia (en)
+            Ireland
+            Israel (en)
+            Italy
+            Japan
+            Korea
+            Latvia
+            Lithuania
+            Malaysia (en)
+            Mexico
+            Netherlands
+            New Zealand
+            Norway
+            Pakistan (en)
+            Peru
+            Philippines (en)
+            Poland
+            Portugal
+            Romania
+            Russia
+            Saudi Arabia
+            Singapore
+            Slovakia
+            Slovenia
+            South Africa
+            Spain (ca)
+            Spain (es)
+            Sweden
+            Switzerland (de)
+            Switzerland (fr)
+            Taiwan
+            Thailand (en)
+            Turkey
+            US (English)
+            US (Spanish)
+            Ukraine
+            United Kingdom
+            Vietnam (en)
+             
+            Any Time
+            Past Day
+            Past Week
+            Past Month
+            Past Year
+            Ônibus São Paulo x Brasília - Compre sua Passagem Online AD
+            buson.com.br
+            Ônibus de São Paulo - Rodoviária do Tietê - SP para Brasília - DF. Descubra ofertas exclusivas, compare preços e viaje sem preocupação.
+            ClickBus Passagens de Ônibus - 100% Seguro, Rápido e Fácil AD
+            clickbus.com.br  Chega de Filas na Rodo... [+2884 chars truncated]
+            engine        : DuckDuckGo
+            query         : passagem de ônibus BSB para SP 20 de março buses.com.br
+            instant_answer: {"Abstract":"","AbstractSource":"","AbstractText":"","AbstractURL":"","Answer":"","AnswerType":"","Definition":"","DefinitionSource":"","DefinitionURL":"","Entity":"","Heading":"","Image":"","ImageHeight":"","ImageIsLogo":"","ImageWidth":"","Infobox":"","Redirect":"","RelatedTopics":[],"Results":[],"Type":"","meta":{"attribution":null,"blockgroup":null,"created_date":"2021-03-24","description":"testing","designer":null,"dev_date":"2021-03-24","dev_milestone":"development","developer":[{"name":"zt","type":"duck.co","url":"https://duck.co/user/zt"}],"example_query":"","id":"just_another_test","is_stackexchange":0,"js_callback_name":"another_test","live_date":null,"maintainer":{"github":""},"name":"Just Another Test","perl_module":"DDG::Lontail::AnotherTest","producer":null,"production_state":"offline","repo":"fathead","signal_from":"just_another_test","src_domain":"how about there","src_id":null,"src_name":"hi there","src_options":{"directory":"","is_fanon":0,"is_mediawiki":0,"is_wikiped... [+252 chars truncated]
+            results       : [{"title":"Ônibus São Paulo x Brasília - Compre sua Passagem Online","url":"https://duckduckgo.com/l/?uddg=https%3A%2F%2Fduckduckgo.com%2Fy.js%3Fad_domain%3Dbuson.com.br%26ad_provider%3Dbingv7aa%26ad_type%3Dtxad%26click_metadata%3DlZfA0eQj3ePM8ojnTQbI9FFFHDx7hI9MxpdWqn2l8dY2SBSOVYt6HjAylX4WQB2yLTGDj%252DXDtS75HPb2Odt_9DMOa9KBpumDqf4ocYBgJXGtkR41v3vtuKSJ_rl1zVdwwjw92Cgv0OcA5mvaptVg6zxb1THM9aqGCd1NV3t6d6c.RmFMGGnm1Spe6d%252D1OenLIQ%26rut%3D70da1f8f8df378e9a5c7bc348959bdd206e2c731171dff20bc7d3e6ff4e3366d%26u3%3Dhttps%253A%252F%252Fwww.bing.com%252Faclick%253Fld%253De8i5Eoi9cicJD4NxIGJhxzYzVUCUzhsUk0kHaKcM_uYJY%252DFY2MNxnJnMRCntg%252DWdJji4WlyOyed9OCevVllS6Jc6Lse5HbE2bscoXxZ7NwyIRHc70_SRGxsa9EFolaj0I9ILfpgyhIP5xoFANOdXyGQIQt5KjAXkVcRKKxJ8AdTCefI9tqewSPnMPRBkeNvqbSrCLrd6ugFoj7mB%252DC%252DzvJ8hahMms%2526u%253DaHR0cHMlM2ElMmYlMmZ3d3cuYnVzb24uY29tLmJyJTJmcGFzc2FnZW0tZGUtb25pYnVzJTJmc2FvLXBhdWxvLXJvZG92aWFyaWEtZG8tdGlldGUtc3AlMmZicmFzaWxpYS1kZiUzZm1zY2xraWQlM2QxN2IxNDVkM2Q4OWYxMzY4ODkzODJjNDV... [+4943 chars truncated]
+            status        : success
+
+══════════════════════════════════════════════════════════════════════
+  TOOL CALL: fetchPageContent
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:42:59.300] [INFO ] [WebContentSkill   ] URL: https://www.buser.com.br/onibus/brasilia-df/sao-paulo-sp
+[2026-02-18 22:42:59.613] [DEBUG] [BrowserService    ] [NAV→] GET https://www.buser.com.br/onibus/brasilia-df/sao-paulo-sp
+[2026-02-18 22:43:00.464] [DEBUG] [BrowserService    ] [NAV←] HTTP 200 https://www.buser.com.br/onibus/brasilia-df/sao-paulo-sp
+[2026-02-18 22:43:01.209] [INFO ] [WebContentSkill   ] ⏱  Navigation completed in 1.909 ms
+[2026-02-18 22:43:01.228] [DEBUG] [BrowserService    ] [NAV→] GET https://www.googletagmanager.com/static/service_worker/6240/sw_iframe.html?origin=https%3A%2F%2Fwww.buser.com.br
+[2026-02-18 22:43:01.246] [INFO ] [WebContentSkill   ] Page title: "Ônibus de Brasília - DF para São Paulo - SP | Buser"
+[2026-02-18 22:43:01.246] [INFO ] [WebContentSkill   ] Raw body text length: 7915 chars
+[2026-02-18 22:43:01.247] [DEBUG] [WebContentSkill   ] Body text truncated to 5000 chars
+[2026-02-18 22:43:01.247] [INFO ] [WebContentSkill   ] ⏱  Total execution completed in 1.947 ms
+[2026-02-18 22:43:01.247] [INFO ] [fetchPageContent  ] ── Tool result #8 ──
+            title         : Ônibus de Brasília - DF para São Paulo - SP | Buser
+            url           : https://www.buser.com.br/onibus/brasilia-df/sao-paulo-sp
+            content       : Home Ônibus Brasília - DF São Paulo - SP
+            20 horários de ônibus encontrados
+            
+            Horário de Embarque
+            
+            Tipo de Poltrona
+            
+            Característica
+            
+            Trajeto
+            
+            Ponto de embarque
+            
+            Ponto de desembarque
+            
+            Empresas
+            
+            Ônibus de Brasília para São Paulo
+            
+            Ordenar por
+            
+            Melhor preço disponível
+            
+            Expresso JK
+            
+            12:30
+            
+            19/02
+            
+            Rodoviária Interestadual
+            
+            Escala 
+            
+            09:00
+            
+            20/02
+            
+            Terminal Rodoviário do Tietê
+            
+            Poltrona
+            
+            Semi-leito 
+            
+            R$ 184,28
+            
+            3x R$ 68,32
+            
+            Selecionar
+            Ver detalhes
+            quinta-feira, 19 de fevereiro
+            
+            Catedral Turismo
+            
+            01:20
+            
+            19/02
+            
+            Rodoviária Interestadual
+            
+            22:35
+            
+            Terminal Rodoviário do Tietê
+            
+            Poltrona
+            
+            Executivo 
+            
+            R$ 204,40
+            
+            3x R$ 75,78
+            
+            2 vagas disponíveis
+            Selecionar
+            Ver detalhes
+            
+            Catedral Turismo
+            
+            01:20
+            
+            19/02
+            
+            Rodoviária Interestadual
+            
+            22:35
+            
+            Terminal Rodoviário do Tietê
+            
+            Poltrona
+            
+            Convencional 
+            
+            R$ 204,40
+            
+            3x R$ 75,78
+            
+            2 vagas disponíveis
+            Selecionar
+            Ver detalhes
+            
+            Catedral Turismo
+            
+            08:00
+            
+            19/02
+            
+            Rodoviária Interestadual
+            
+            05:10
+            
+            20/02
+            
+            Terminal Rodoviário do Tietê
+            
+            Poltrona
+            
+            Leito 
+            
+            R$ 237,96
+            
+            3x R$ 88,23
+            
+            11 vagas ... [+4023 chars truncated]
+            status        : success
+[2026-02-18 22:43:05.409] [DEBUG] [SearchAgent       ] Event #1  type=TOOL_CALL              final=false  content_preview=Function Call: FunctionCall{id=Optional[adk-9ffc10f0-a79e-428a-a92f-a67ca4888af8], args=Optional[{query=passagem de ônib...
+[2026-02-18 22:43:05.410] [DEBUG] [SearchAgent       ] Event #2  type=TOOL_RESPONSE          final=false  content_preview=Function Response: FunctionResponse{willContinue=Optional.empty, scheduling=Optional.empty, parts=Optional.empty, id=Opt...
+[2026-02-18 22:43:05.410] [DEBUG] [SearchAgent       ] Event #3  type=TOOL_CALL              final=false  content_preview=Function Call: FunctionCall{id=Optional[adk-5e26c10d-8527-428b-8c85-eb0984f3f40d], args=Optional[{url=https://www.buser....
+[2026-02-18 22:43:05.411] [DEBUG] [SearchAgent       ] Event #4  type=TOOL_RESPONSE          final=false  content_preview=Function Response: FunctionResponse{willContinue=Optional.empty, scheduling=Optional.empty, parts=Optional.empty, id=Opt...
+[2026-02-18 22:43:05.411] [DEBUG] [SearchAgent       ] Event #5  type=FINAL_RESPONSE         final=true   content_preview=Não consegui encontrar os preços das passagens de ônibus de Brasília (BSB) para São Paulo (SP) para o dia 20 de março no...
+
+  ────────────────────── FINAL RESPONSE EVENT #5 ─────────────────────
+[2026-02-18 22:43:05.411] [INFO ] [SearchAgent       ] Response text length: 479 chars
+[2026-02-18 22:43:05.411] [INFO ] [SearchAgent       ] ⏱  processQuery total completed in 12.494 ms
+[2026-02-18 22:43:05.412] [INFO ] [SearchAgent       ] Total ADK events received: 5
+
+  ────────────────────────── AGENT RESPONSE ──────────────────────────
+[2026-02-18 22:43:05.412] [INFO ] [SearchAgent       ] Agent ◀  Não consegui encontrar os preços das passagens de ônibus de Brasília (BSB) para São Paulo (SP) para o dia 20 de março no site Buser.com.br diretamente. A página que acessei exibe horários e preços para datas próximas (como 19 e 20 de fevereiro), mas não oferece uma opção clara para selecionar uma data específica como 20 de março para a pesquisa.
+
+Você gostaria que eu tentasse encontrar preços para o dia 20 de fevereiro, ou que procurasse em outro site de passagens de ônibus?
+[2026-02-18 22:43:05.412] [INFO ] [ChatInterface     ] ⏱  Turn #5 end-to-end completed in 12.495 ms
+
+  ──────────────────────────── USER INPUT ────────────────────────────
+[2026-02-18 22:50:05.112] [INFO ] [ChatInterface     ] User  ▶  exit
+[2026-02-18 22:50:05.112] [INFO ] [ChatInterface     ] User requested exit
+[2026-02-18 22:50:05.113] [INFO ] [ChatInterface     ] Total turns: 5
+
+══════════════════════════════════════════════════════════════════════
+  SESSION END  2026-02-18 22:50:05.113
+══════════════════════════════════════════════════════════════════════
+[2026-02-18 22:50:05.114] [INFO ] [Main              ] Application exiting normally

@@ -4,7 +4,11 @@ import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.services.BrowserService;
 import com.gazapps.util.StringUtils;
+import com.gazapps.util.UrlValidator;
 import com.google.adk.tools.Annotations.Schema;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
 
@@ -40,6 +44,18 @@ public class FormSkill {
         LOG.info("FormSkill", "Fields: " + StringUtils.truncate(fields, 300));
         LOG.info("FormSkill", "Submit selector: " + submitSelector);
         long start = System.currentTimeMillis();
+
+        // Fix 1 — SSRF: validate URL before any navigation
+        try {
+            UrlValidator.validate(url);
+        } catch (IllegalArgumentException e) {
+            LOG.warn("FormSkill", "Blocked unsafe URL: " + e.getMessage());
+            Map<String, String> error = new HashMap<>();
+            error.put("status", "error");
+            error.put("url", url);
+            error.put("message", "URL blocked for security reasons: " + e.getMessage());
+            return error;
+        }
 
         return BrowserService.execute(page -> {
             try {
@@ -119,15 +135,18 @@ public class FormSkill {
                             + "... [content truncated]";
                 }
 
-                // Extract fields_filled count from JS result
+                // Fix 3 — parse fill result with Gson instead of fragile string indexing
                 String fieldsFilled = "0";
                 if (fillResult != null) {
-                    String fr = fillResult.toString();
-                    int idx = fr.indexOf("\"filled\":");
-                    if (idx >= 0) {
-                        int end = fr.indexOf(',', idx);
-                        if (end < 0) end = fr.indexOf('}', idx);
-                        fieldsFilled = fr.substring(idx + 9, end).trim();
+                    try {
+                        JsonObject fr = JsonParser.parseString(fillResult.toString()).getAsJsonObject();
+                        fieldsFilled = String.valueOf(fr.get("filled").getAsInt());
+                        JsonArray fillErrors = fr.getAsJsonArray("errors");
+                        if (fillErrors != null && fillErrors.size() > 0) {
+                            LOG.warn("FormSkill", "Fill errors: " + fillErrors);
+                        }
+                    } catch (Exception parseEx) {
+                        LOG.warn("FormSkill", "Could not parse fill result: " + fillResult);
                     }
                 }
 
@@ -154,24 +173,20 @@ public class FormSkill {
     }
 
     /**
-     * Parses a simple JSON object string like {"#sel": "value", ...} into a Map.
-     * Uses basic string parsing — sufficient for the flat key/value structure the LLM produces.
+     * Fix 2 — Parses a JSON object string like {"#sel": "value", ...} into a Map.
+     * Uses Gson (available as a transitive dependency of google-adk) for correct handling
+     * of commas inside values, numeric values, and other edge cases.
      */
     static java.util.Map<String, String> parseJsonFields(String json) {
         java.util.Map<String, String> map = new java.util.LinkedHashMap<>();
         if (json == null || json.isBlank()) return map;
-        // Strip outer braces
-        String inner = json.trim();
-        if (inner.startsWith("{")) inner = inner.substring(1);
-        if (inner.endsWith("}")) inner = inner.substring(0, inner.length() - 1);
-        // Split by commas that are outside quotes (simple heuristic: split on "," followed by optional space and ")
-        String[] pairs = inner.split(",(?=\\s*\")");
-        for (String pair : pairs) {
-            int colon = pair.indexOf(':');
-            if (colon < 0) continue;
-            String key = pair.substring(0, colon).trim().replaceAll("^\"|\"$", "");
-            String val = pair.substring(colon + 1).trim().replaceAll("^\"|\"$", "");
-            map.put(key, val);
+        try {
+            JsonObject obj = JsonParser.parseString(json.trim()).getAsJsonObject();
+            for (var entry : obj.entrySet()) {
+                map.put(entry.getKey(), entry.getValue().getAsString());
+            }
+        } catch (Exception e) {
+            LOG.warn("FormSkill", "Failed to parse fields JSON: " + e.getMessage());
         }
         return map;
     }

@@ -3,6 +3,7 @@ package com.gazapps.skills;
 import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.services.BrowserService;
+import com.gazapps.util.UrlValidator;
 import com.google.adk.tools.Annotations.Schema;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
@@ -21,6 +22,17 @@ public class WebContentSkill {
         LOG.section("TOOL CALL: fetchPageContent");
         LOG.info("WebContentSkill", "URL: " + url);
         long start = System.currentTimeMillis();
+
+        try {
+            UrlValidator.validate(url);
+        } catch (IllegalArgumentException e) {
+            LOG.warn("WebContentSkill", "Blocked unsafe URL: " + e.getMessage());
+            Map<String, String> error = new HashMap<>();
+            error.put("status", "error");
+            error.put("url", url);
+            error.put("message", "URL blocked for security reasons: " + e.getMessage());
+            return error;
+        }
 
         return BrowserService.execute(page -> {
             try {
@@ -77,6 +89,17 @@ public class WebContentSkill {
         LOG.section("TOOL CALL: screenshotPage");
         LOG.info("WebContentSkill", "URL: " + url + "  filename: " + filename);
         long start = System.currentTimeMillis();
+
+        try {
+            UrlValidator.validate(url);
+        } catch (IllegalArgumentException e) {
+            LOG.warn("WebContentSkill", "Blocked unsafe URL for screenshot: " + e.getMessage());
+            Map<String, String> error = new HashMap<>();
+            error.put("status", "error");
+            error.put("url", url);
+            error.put("message", "URL blocked for security reasons: " + e.getMessage());
+            return error;
+        }
 
         return BrowserService.execute(page -> {
             try {
