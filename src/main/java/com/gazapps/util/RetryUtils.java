@@ -1,5 +1,6 @@
 package com.gazapps.util;
 
+import com.gazapps.logging.LogService;
 import java.util.function.Predicate;
 
 /**
@@ -7,6 +8,8 @@ import java.util.function.Predicate;
  * Pure Java — no dependency on Playwright, ADK, or any framework.
  */
 public final class RetryUtils {
+
+    private static final LogService LOG = LogService.getInstance();
 
     private RetryUtils() {}
 
@@ -60,16 +63,16 @@ public final class RetryUtils {
                     return result;   // success — exit immediately
                 }
                 lastResult = result;
-                System.err.printf("[RetryUtils] [%s] tentativa %d/%d — resultado é falha%n",
-                        context, attempt, maxAttempts);
+                LOG.warn("RetryUtils", "[" + context + "] tentativa " + attempt + "/"
+                        + maxAttempts + " — resultado é falha");
             } catch (InterruptedException ie) {
                 // Always restore the interrupt flag before re-throwing
                 Thread.currentThread().interrupt();
                 throw ie;
             } catch (Exception e) {
                 lastException = e;
-                System.err.printf("[RetryUtils] [%s] tentativa %d/%d — exceção: %s%n",
-                        context, attempt, maxAttempts, e.getMessage());
+                LOG.warn("RetryUtils", "[" + context + "] tentativa " + attempt + "/"
+                        + maxAttempts + " — exceção: " + e.getMessage());
             }
 
             if (attempt < maxAttempts) {
