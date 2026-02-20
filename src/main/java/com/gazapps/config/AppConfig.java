@@ -185,6 +185,23 @@ public final class AppConfig {
     public static final int SEARCH_CACHE_TTL_MINUTES =
             intVal("search.cache.ttl.minutes", 60);
 
+    // ── Search Pipeline ────────────────────────────────────────────────────────
+    /** Run DDG HTML + Bing in parallel via CompletableFuture (default false = sequential). */
+    public static final boolean SEARCH_PARALLEL_ENABLED =
+            boolVal("search.parallel.enabled", false);
+
+    /** Timeout for the parallel CompletableFuture.allOf() call (ms). */
+    public static final int SEARCH_PARALLEL_TIMEOUT_MS =
+            intVal("search.parallel.timeout.ms", 25_000);
+
+    /** Number of consecutive DDG HTML failures before the circuit opens. */
+    public static final int SEARCH_CIRCUIT_DDG_FAILURE_THRESHOLD =
+            intVal("search.circuit.ddg.failure.threshold", 5);
+
+    /** Time (ms) the DDG circuit stays OPEN before transitioning to HALF_OPEN. */
+    public static final int SEARCH_CIRCUIT_DDG_RESET_MS =
+            intVal("search.circuit.ddg.reset.ms", 30_000);
+
     // ── Telegram ───────────────────────────────────────────────────────────────
     /** Interface mode: "cli" (default) or "telegram". */
     public static final String INTERFACE_MODE =

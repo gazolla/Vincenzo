@@ -6,7 +6,6 @@ import com.gazapps.util.RetryUtils;
 import com.gazapps.util.StringUtils;
 import com.microsoft.playwright.options.LoadState;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -31,7 +30,8 @@ public class DuckDuckGoService {
                 + URLEncoder.encode(query, StandardCharsets.UTF_8)
                 + "&format=json&no_html=1&skip_disambig=1";
         LOG.debug("DuckDuckGoService", "JSON URL: " + url);
-        // Build request once — HttpRequest is immutable and safe to reuse across retries
+        // Build request once — HttpRequest is immutable and safe to reuse across
+        // retries
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("User-Agent", AppConfig.USER_AGENT)
@@ -47,11 +47,12 @@ public class DuckDuckGoService {
                         long t0 = System.currentTimeMillis();
                         HttpResponse<String> resp = HTTP.send(req, HttpResponse.BodyHandlers.ofString());
                         LOG.timing("DuckDuckGoService", "JSON API call", System.currentTimeMillis() - t0);
-                        if (resp.statusCode() == 200) return resp.body();
+                        if (resp.statusCode() == 200)
+                            return resp.body();
                         LOG.warn("DuckDuckGoService", "JSON API returned HTTP " + resp.statusCode());
                         return null;
                     },
-                    result -> result == null  // null = falha → retry
+                    result -> result == null // null = falha → retry
             );
         } catch (Exception e) {
             LOG.error("DuckDuckGoService", "JSON API failed after retries", e);
@@ -96,7 +97,8 @@ public class DuckDuckGoService {
 
                             Object raw = page.evaluate(extractScript);
                             String json = raw != null ? raw.toString() : "[]";
-                            LOG.debug("DuckDuckGoService", "HTML structured results: " + StringUtils.truncate(json, 400));
+                            LOG.debug("DuckDuckGoService",
+                                    "HTML structured results: " + StringUtils.truncate(json, 400));
 
                             String pageText = page.innerText("body");
                             LOG.info("DuckDuckGoService", "HTML page_text length: " + pageText.length() + " chars");
@@ -120,8 +122,7 @@ public class DuckDuckGoService {
                             return error;
                         }
                     }),
-                    result -> "error".equals(result.get("status"))
-            );
+                    result -> "error".equals(result.get("status")));
         } catch (Exception e) {
             LOG.error("DuckDuckGoService", "HTML search failed after retries", e);
             Map<String, String> error = new HashMap<>();

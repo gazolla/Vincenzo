@@ -8,17 +8,89 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 /**
  * Handles Playwright browser creation and execution with anti-detection
  * measures.
  * Follows KISS & DRY principles by centralizing browser logic.
+ *
+ * <p>User-Agent rotation: on each {@link #execute} call a different UA profile
+ * is selected from a built-in pool of 5 realistic profiles (Chrome Win/Mac/Linux,
+ * Edge Win, Safari Mac). If the operator has overridden {@code browser.user-agent}
+ * in {@code application.properties} with a custom value, that single UA is used
+ * for every call (no rotation).</p>
  */
 public class BrowserService {
 
     private static final LogService LOG = LogService.getInstance();
+
+    // ── User-Agent rotation ───────────────────────────────────────────────────
+
+    /**
+     * Internal UA profile. Carries the UA string together with matching
+     * {@code sec-ch-ua} and {@code sec-ch-ua-platform} hint headers so
+     * the browser context stays internally consistent.
+     */
+    record UaProfile(String userAgent, String secChUa, String secChUaPlatform) {}
+
+    /**
+     * Default UA used by AppConfig when no override is set in application.properties.
+     * Must stay in sync with the default value in AppConfig.
+     */
+    static final String DEFAULT_USER_AGENT =
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " +
+            "AppleWebKit/537.36 (KHTML, like Gecko) " +
+            "Chrome/133.0.0.0 Safari/537.36";
+
+    static final List<UaProfile> UA_POOL = List.of(
+        new UaProfile(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+            "\"Not(A:Brand\";v=\"99\", \"Google Chrome\";v=\"133\", \"Chromium\";v=\"133\"",
+            "\"Windows\""),
+        new UaProfile(
+            DEFAULT_USER_AGENT,
+            "\"Not(A:Brand\";v=\"99\", \"Google Chrome\";v=\"133\", \"Chromium\";v=\"133\"",
+            "\"macOS\""),
+        new UaProfile(
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+            "\"Not(A:Brand\";v=\"99\", \"Google Chrome\";v=\"133\", \"Chromium\";v=\"133\"",
+            "\"Linux\""),
+        new UaProfile(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0",
+            "\"Not(A:Brand\";v=\"99\", \"Microsoft Edge\";v=\"133\", \"Chromium\";v=\"133\"",
+            "\"Windows\""),
+        new UaProfile(
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3 Safari/605.1.15",
+            "\"Not(A:Brand\";v=\"99\"",
+            "\"macOS\"")
+    );
+
+    /** Monotonically increasing index; modulo UA_POOL.size() gives round-robin position. */
+    static final AtomicInteger UA_INDEX = new AtomicInteger(0);
+
+    /**
+     * Returns the next {@link UaProfile} from the pool (round-robin).
+     * If the operator has set a custom UA in {@code application.properties},
+     * that UA is returned unchanged (no rotation).
+     */
+    static UaProfile nextUaProfile() {
+        if (!AppConfig.USER_AGENT.equals(DEFAULT_USER_AGENT)) {
+            // Custom UA configured — use it as-is with generic hint headers
+            return new UaProfile(
+                AppConfig.USER_AGENT,
+                "\"Not(A:Brand\";v=\"99\"",
+                "\"Windows\""
+            );
+        }
+        int idx = Math.abs(UA_INDEX.getAndIncrement() % UA_POOL.size());
+        return UA_POOL.get(idx);
+    }
+
+    // ── Execute ───────────────────────────────────────────────────────────────
 
     /**
      * Executes a browser action within a stealth Playwright context and returns a
@@ -70,16 +142,19 @@ public class BrowserService {
 
         Browser browser = playwright.chromium().launch(launchOptions);
 
+        UaProfile ua = nextUaProfile();
+        LOG.debug("BrowserService", "UA profile: " + ua.userAgent().substring(0, Math.min(60, ua.userAgent().length())) + "…");
+
         Browser.NewContextOptions contextOptions = new Browser.NewContextOptions()
-                .setUserAgent(AppConfig.USER_AGENT)
+                .setUserAgent(ua.userAgent())
                 .setLocale(AppConfig.LOCALE)
                 .setAcceptDownloads(true)
                 .setExtraHTTPHeaders(Map.of(
                         "Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8",
                         "Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                        "sec-ch-ua", "\"Not(A:Brand\";v=\"99\", \"Google Chrome\";v=\"133\", \"Chromium\";v=\"133\"",
-                        "sec-ch-ua-mobile", "?0",
-                        "sec-ch-ua-platform", "\"macOS\"",
+                        "sec-ch-ua",          ua.secChUa(),
+                        "sec-ch-ua-mobile",   "?0",
+                        "sec-ch-ua-platform", ua.secChUaPlatform(),
                         "Upgrade-Insecure-Requests", "1"));
 
         BrowserContext context = browser.newContext(contextOptions);
