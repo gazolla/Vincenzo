@@ -280,4 +280,33 @@ public final class AppConfig {
     /** Maximum number of notifications to hold in the in-memory queue (CLI fallback). */
     public static final int NOTIFICATION_QUEUE_MAX_SIZE =
             intVal("notification.queue.max.size", 100);
+
+    // ── MemorySkill ────────────────────────────────────────────────────────────
+    /** Maximum number of memory entries stored. New saves are rejected once this limit is reached. */
+    public static final int MEMORY_MAX_ITEMS =
+            intVal("memory.max.items", 500);
+
+    /**
+     * Dynamic accessor for the memory max items limit.
+     * Reads from {@code PROPS} at call time, allowing test overrides via PROPS.
+     */
+    public static int memoryMaxItems() {
+        return intVal("memory.max.items", 500);
+    }
+
+    /**
+     * Path to the JSON file where memory entries are persisted.
+     * Kept as a constant for IDE discoverability; use {@link #memoryStorageFile()} in code
+     * so tests can override the value at runtime via PROPS reflection.
+     */
+    public static final String MEMORY_STORAGE_FILE =
+            str("memory.storage.file", "work/memory-store.json");
+
+    /**
+     * Dynamic accessor for the memory storage file path.
+     * Reads from {@code PROPS} at call time, allowing test overrides via PROPS.
+     */
+    public static String memoryStorageFile() {
+        return str("memory.storage.file", "work/memory-store.json");
+    }
 }

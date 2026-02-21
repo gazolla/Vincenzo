@@ -70,6 +70,11 @@ public class SearchAgent {
                                 - sendNotification(message): sends a proactive message or alert to the user
                                 - listPendingNotifications(): lists queued notifications not yet read (CLI mode)
                                 - markAsRead(notificationId): marks a queued notification as read
+                                - saveMemory(content, tags, category): store a fact, preference, note, research summary, or task context persistently across sessions
+                                - retrieveMemory(query, tags): search stored memories by text substring and/or tags
+                                - listMemories(tag): list all stored memories, optionally filtered by a single tag
+                                - deleteMemory(id): permanently remove a memory entry
+                                - updateMemory(id, content, tags): update the content or tags of an existing memory entry
 
                                 MANDATORY rules - follow these without exception:
                                 1. ALWAYS use searchWeb for ANY request involving: prices, flights, tickets, hotels, news, weather,
@@ -101,11 +106,29 @@ public class SearchAgent {
                                 16. Use sendNotification(message) to proactively send a message or alert to the user.
                                 17. Use listPendingNotifications() to show queued notifications not yet delivered (useful in CLI mode).
                                 18. Use markAsRead(notificationId) after the user acknowledges a queued notification.
+                                19. Use saveMemory(content, tags, category) to remember any user preference, fact, research
+                                    finding, reminder, or project context the user explicitly asks you to store, or that you
+                                    judge important enough to retain across sessions (e.g. "prefiro Python a Java", "deadline
+                                    do projeto é 15 de março"). Always confirm with the user what to save.
+                                    Use descriptive tags like 'preference,python' or 'task,work'.
+                                    category must be one of: 'preference', 'note', 'research', 'task'.
+                                20. Use retrieveMemory(query, tags) at the START of any turn where the user references past
+                                    context, preferences, or asks "o que você sabe sobre mim / meus projetos".
+                                    Do NOT answer from session history alone — always check the memory store first.
+                                21. Use listMemories(tag="") to show the user a complete list of stored memories.
+                                    Use listMemories(tag="preference") to show only preference entries, etc.
+                                22. Use deleteMemory(id) only after confirming with the user. Always call listMemories()
+                                    or retrieveMemory() first to verify the correct id before deleting.
+                                23. Use updateMemory(id, content, tags) to amend an existing memory when the user says
+                                    something like "atualize minha nota sobre Python" or "adicione Go também".
+                                    Always call retrieveMemory first to find the id, then confirm the update with the user.
 
                                 Example: if asked about flight prices, hotel rates, or anything commercial → searchWeb immediately.
                                 Example for fillFormAndSubmit: fetchPageContent(url) first → identify selectors → then fillFormAndSubmit(url, fields, submitSelector).
                                 Example for RSS: discoverFeed(siteUrl) → readFeed(feedUrl, 10) or searchInFeed(feedUrl, keyword).
                                 Example for monitoring: confirm details → scheduleMonitor(url, keyword, 60, description) → confirm to user.
+                                Example for memory: user says "lembre que prefiro dark mode" → saveMemory(content="Usuário prefere dark mode em todas as UIs", tags="preference,ui", category="preference").
+                                Example for memory recall: user asks "quais são minhas preferências?" → retrieveMemory(query="", tags="preference") → apresentar resultados.
                                 """
                                 .formatted(java.time.LocalDateTime.now()
                                         .format(java.time.format.DateTimeFormatter
@@ -141,7 +164,17 @@ public class SearchAgent {
                         com.google.adk.tools.FunctionTool.create(com.gazapps.skills.NotificationSkill.class,
                                 "listPendingNotifications"),
                         com.google.adk.tools.FunctionTool.create(com.gazapps.skills.NotificationSkill.class,
-                                "markAsRead"))
+                                "markAsRead"),
+                        com.google.adk.tools.FunctionTool.create(com.gazapps.skills.MemorySkill.class,
+                                "saveMemory"),
+                        com.google.adk.tools.FunctionTool.create(com.gazapps.skills.MemorySkill.class,
+                                "retrieveMemory"),
+                        com.google.adk.tools.FunctionTool.create(com.gazapps.skills.MemorySkill.class,
+                                "listMemories"),
+                        com.google.adk.tools.FunctionTool.create(com.gazapps.skills.MemorySkill.class,
+                                "deleteMemory"),
+                        com.google.adk.tools.FunctionTool.create(com.gazapps.skills.MemorySkill.class,
+                                "updateMemory"))
                 .build();
     }
 
