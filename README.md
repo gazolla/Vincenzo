@@ -38,55 +38,6 @@ Unlike simple chatbots that answer only from training data, Vincenzo's agent:
 
 The framework is built around the concept of **Skills** — modular Java classes that expose tools to the LLM agent via Google ADK's `@FunctionTool` mechanism. Every new capability you give to Vincenzo is a new Skill.
 
-### Architecture Overview
-
-```
-┌───────────────────────────────────────────────────────┐
-│                        Main.java                       │
-│              (Entry point, mode selection)             │
-└────────────────────┬──────────────────────────────────┘
-                     │
-         ┌───────────▼───────────┐
-         │     SearchAgent.java   │  ← Google ADK LlmAgent
-         │  (Orchestrates tools)  │     (Gemini model)
-         └───────────┬───────────┘
-                     │ registers
-        ┌────────────▼────────────────┐
-        │         Skills (Tools)       │
-        │  ┌──────────────────────┐   │
-        │  │  WebOrchestrator     │   │  searchWeb
-        │  │  WebContentSkill     │   │  fetchPageContent, screenshotPage
-        │  │  SummarizeSkill      │   │  summarizeUrl
-        │  │  ExtractSkill        │   │  extractStructuredData
-        │  │  FormSkill           │   │  fillFormAndSubmit
-        │  │  PdfSkill            │   │  readPdf
-        │  └──────────────────────┘   │
-        └────────────┬────────────────┘
-                     │ uses
-        ┌────────────▼────────────────┐
-        │       Services / Utils       │
-        │  BrowserService (Playwright) │
-        │  DuckDuckGoService           │
-        │  BingService                 │
-        │  SearchCache / CircuitBreaker│
-        └─────────────────────────────┘
-
-         ┌────────────────────────┐
-         │    User Interfaces     │
-         │  CLI  │  Telegram Bot  │
-         └────────────────────────┘
-```
-
----
-
-## Documentation
-
-| Section | Link |
-|---|---|
-| 🚀 Installation (Local & VPS) | [docs/installation.md](docs/installation.md) |
-| ⚙️ Configuration Reference | [docs/configuration.md](docs/configuration.md) |
-| 🛠️ Creating New Skills | [docs/creating-skills.md](docs/creating-skills.md) |
-
 ---
 
 ## Quick Start
