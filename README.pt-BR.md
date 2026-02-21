@@ -4,7 +4,7 @@
 
 <!-- Salve a imagem do robô Vincenzo como docs/vincenzo-robot.png para exibi-la aqui -->
 
-# 🤖 Vincenzo
+# Vincenzo
 
 ### Assistente de Busca com IA na Internet
 
@@ -16,70 +16,29 @@
 
 ---
 
-## 📖 Sobre o Nome
+## Sobre o Nome
 
 **Vincenzo** foi inspirado pelo **V.I.N.CENT** (*Vital Information Necessary CENTralized*), o icônico robô do filme de ficção científica da Disney de 1979, **"The Black Hole" (O Buraco Negro)**. V.I.N.CENT encantou o público com sua inteligência, lealdade e bom humor — o tipo de robô que você sempre quis ter ao seu lado. Desde criança, sempre quis um robô assim. Bem… agora eu tenho. Conheça o **Vincenzo** 🤖
 
 ---
 
-## 🌐 O que é o Framework Vincenzo?
+## O que é o Framework Vincenzo?
 
 O Vincenzo é um **framework de IA conversacional em Java 21** construído sobre o [Google ADK (Agent Development Kit)](https://google.github.io/adk-docs/) que dá a um agente LLM alimentado pelo Gemini acesso a um **navegador web real** via [Microsoft Playwright](https://playwright.dev/java/).
 
 Diferente de chatbots simples que respondem apenas a partir de dados de treinamento, o agente do Vincenzo:
 
-- 🔍 **Pesquisa na web** em tempo real via DuckDuckGo e Bing
-- 📄 **Lê qualquer página web** completamente, extraindo texto limpo
-- 📸 **Tira screenshots** de páginas
-- 📊 **Extrai dados estruturados** de páginas usando seletores CSS
-- 📝 **Resume** qualquer artigo ou URL
-- 📋 **Preenche e envia formulários HTML** em sites
-- 📕 **Lê arquivos PDF** baixados da web
+- **Pesquisa na web** em tempo real via DuckDuckGo e Bing
+- **Lê qualquer página web** completamente, extraindo texto limpo
+- **Tira screenshots** de páginas
+- **Extrai dados estruturados** de páginas usando seletores CSS
+- **Resume** qualquer artigo ou URL
+- **Preenche e envia formulários HTML** em sites
+- **Lê arquivos PDF** baixados da web
 
 O framework é construído em torno do conceito de **Skills** (Habilidades) — classes Java modulares que expõem ferramentas ao agente LLM via o mecanismo `@FunctionTool` do Google ADK. Cada nova capacidade que você dá ao Vincenzo é uma nova Skill.
 
-### Visão Geral da Arquitetura
-
-```
-┌───────────────────────────────────────────────────────┐
-│                        Main.java                       │
-│         (Ponto de entrada, seleção do modo)            │
-└────────────────────┬──────────────────────────────────┘
-                     │
-         ┌───────────▼───────────┐
-         │     SearchAgent.java   │  ← Google ADK LlmAgent
-         │  (Orquestra as tools)  │     (modelo Gemini)
-         └───────────┬───────────┘
-                     │ registra
-        ┌────────────▼────────────────┐
-        │         Skills (Tools)       │
-        │  ┌──────────────────────┐   │
-        │  │  WebOrchestrator     │   │  searchWeb
-        │  │  WebContentSkill     │   │  fetchPageContent, screenshotPage
-        │  │  SummarizeSkill      │   │  summarizeUrl
-        │  │  ExtractSkill        │   │  extractStructuredData
-        │  │  FormSkill           │   │  fillFormAndSubmit
-        │  │  PdfSkill            │   │  readPdf
-        │  └──────────────────────┘   │
-        └────────────┬────────────────┘
-                     │ usa
-        ┌────────────▼────────────────┐
-        │       Services / Utils       │
-        │  BrowserService (Playwright) │
-        │  DuckDuckGoService           │
-        │  BingService                 │
-        │  SearchCache / CircuitBreaker│
-        └─────────────────────────────┘
-
-         ┌────────────────────────┐
-         │  Interfaces do Usuário │
-         │  CLI  │  Bot Telegram  │
-         └────────────────────────┘
-```
-
----
-
-## 📚 Documentação
+## Documentação
 
 | Seção | Link |
 |---|---|
@@ -108,7 +67,7 @@ mvn compile exec:java
 
 ---
 
-## 🛠️ Skills Integradas
+## Skills Integradas
 
 | Método da Skill | Descrição |
 |---|---|
@@ -122,7 +81,7 @@ mvn compile exec:java
 
 ---
 
-## 💬 Modos de Interface
+## Modos de Interface
 
 O Vincenzo suporta dois modos de interface configurados pelo `application.properties`:
 
@@ -133,7 +92,7 @@ O Vincenzo suporta dois modos de interface configurados pelo `application.proper
 
 ---
 
-## 🔑 Pré-requisitos
+## Pré-requisitos
 
 - Java 21+
 - Maven 3.9+
@@ -142,6 +101,6 @@ O Vincenzo suporta dois modos de interface configurados pelo `application.proper
 
 ---
 
-## 📜 Licença
+## Licença
 
 Licença MIT — veja [LICENSE](LICENSE) para detalhes.
