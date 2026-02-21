@@ -233,4 +233,51 @@ public final class AppConfig {
         String env = System.getenv("TELEGRAM_BOT_TOKEN");
         return (env != null) ? env.trim() : "";
     }
+
+    // ── RssSkill ───────────────────────────────────────────────────────────────
+    /** HTTP connect timeout for RSS/Atom feed fetch (seconds). */
+    public static final int RSS_FETCH_TIMEOUT_SECONDS =
+            intVal("rss.fetch.timeout.seconds", 15);
+
+    /** Maximum number of RSS items returned by readFeed. */
+    public static final int RSS_MAX_ITEMS =
+            intVal("rss.max.items", 20);
+
+    /** Maximum characters of each RSS item description returned. */
+    public static final int RSS_MAX_DESCRIPTION_CHARS =
+            intVal("rss.max.description.chars", 500);
+
+    // ── SchedulerSkill ─────────────────────────────────────────────────────────
+    /** Maximum number of concurrent monitor jobs allowed. */
+    public static final int SCHEDULER_MAX_JOBS =
+            intVal("scheduler.max.jobs", 20);
+
+    /** Minimum allowed interval between job executions (minutes). */
+    public static final int SCHEDULER_MIN_INTERVAL_MINUTES =
+            intVal("scheduler.min.interval.minutes", 5);
+
+    /**
+     * Path to the JSON file where scheduled jobs are persisted.
+     * Read dynamically from PROPS so tests can override the value at runtime
+     * without needing to modify static final fields.
+     */
+    public static final String SCHEDULER_JOBS_FILE =
+            str("scheduler.jobs.file", "work/scheduler-jobs.json");
+
+    /**
+     * Dynamic accessor for the scheduler jobs file path.
+     * Reads from {@code PROPS} at call time, allowing test overrides via PROPS.
+     */
+    public static String schedulerJobsFile() {
+        return str("scheduler.jobs.file", "work/scheduler-jobs.json");
+    }
+
+    // ── NotificationSkill ──────────────────────────────────────────────────────
+    /** Telegram chat_id to send proactive notifications to. */
+    public static final String NOTIFICATION_TELEGRAM_CHAT_ID =
+            str("notification.telegram.chat.id", "");
+
+    /** Maximum number of notifications to hold in the in-memory queue (CLI fallback). */
+    public static final int NOTIFICATION_QUEUE_MAX_SIZE =
+            intVal("notification.queue.max.size", 100);
 }

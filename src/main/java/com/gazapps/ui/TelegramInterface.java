@@ -249,6 +249,16 @@ public class TelegramInterface {
         }
     }
 
+    // ── Accessors ─────────────────────────────────────────────────────────────
+
+    /**
+     * Returns the underlying {@link TelegramBot} instance so other services
+     * (e.g. {@code NotificationService}) can send proactive messages.
+     */
+    public TelegramBot getBot() {
+        return this.bot;
+    }
+
     // ── Cleanup ───────────────────────────────────────────────────────────────
 
     private void cleanup() {

@@ -3,6 +3,8 @@ package com.gazapps;
 import com.gazapps.agent.SearchAgent;
 import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
+import com.gazapps.services.NotificationService;
+import com.gazapps.services.SchedulerService;
 import com.gazapps.ui.ChatInterface;
 import com.gazapps.ui.TelegramInterface;
 
@@ -42,9 +44,15 @@ public class Main {
 
         SearchAgent agent = new SearchAgent();
 
+        // Initialize SchedulerService singleton — reloads persisted jobs from disk
+        SchedulerService.getInstance();
+        log.info("Main", "SchedulerService initialized");
+
         if ("telegram".equalsIgnoreCase(AppConfig.INTERFACE_MODE)) {
             validateTelegramConfig(log);
             TelegramInterface telegram = new TelegramInterface(agent);
+            // Inject TelegramBot into NotificationService for proactive message delivery
+            NotificationService.getInstance().setBot(telegram.getBot());
             telegram.start();
         } else {
             ChatInterface chat = new ChatInterface(agent);

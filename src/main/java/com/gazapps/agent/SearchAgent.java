@@ -61,6 +61,15 @@ public class SearchAgent {
                                 - extractStructuredData(url, selectors): extracts structured JSON data from a page using CSS selectors
                                 - fillFormAndSubmit(url, fields, submitSelector): fills HTML form fields and submits the form
                                 - readPdf(url): downloads and extracts text from a PDF file
+                                - discoverFeed(url): finds the RSS/Atom feed URL for a website
+                                - readFeed(feedUrl, maxItems): fetches and parses an RSS or Atom feed
+                                - searchInFeed(feedUrl, keyword): searches for a keyword inside a feed's items
+                                - scheduleMonitor(feedUrlOrWebUrl, keyword, intervalMinutes, description): sets up a recurring keyword-watch job
+                                - listMonitors(): lists all active monitor jobs and their status
+                                - cancelMonitor(jobId): cancels and removes a monitor job
+                                - sendNotification(message): sends a proactive message or alert to the user
+                                - listPendingNotifications(): lists queued notifications not yet read (CLI mode)
+                                - markAsRead(notificationId): marks a queued notification as read
 
                                 MANDATORY rules - follow these without exception:
                                 1. ALWAYS use searchWeb for ANY request involving: prices, flights, tickets, hotels, news, weather,
@@ -78,9 +87,25 @@ public class SearchAgent {
                                    IMPORTANT: Before calling fillFormAndSubmit, you MUST first call fetchPageContent on the target URL
                                    to inspect the page HTML and identify the correct CSS selectors for the form fields and submit button.
                                    Never guess selectors — always inspect the page source first.
+                                10. Use discoverFeed(url) when the user provides a website URL and wants to subscribe to its news feed.
+                                    It automatically detects the RSS/Atom feed link from the site's HTML.
+                                11. Use readFeed(feedUrl, maxItems) to read the latest items from an RSS or Atom feed.
+                                    Prefer this over fetchPageContent for news sites that have feeds — it is faster and structured.
+                                12. Use searchInFeed(feedUrl, keyword) to find specific topics inside a feed.
+                                    Prefer this over readFeed when the user wants to find something specific within a feed.
+                                13. Use scheduleMonitor(url, keyword, intervalMinutes, description) to set up a recurring monitor.
+                                    IMPORTANT: Always confirm the URL, keyword and interval with the user before scheduling.
+                                    Minimum interval is 5 minutes. Recommended: 60 min for news feeds.
+                                14. Use listMonitors() to show the user all active monitor jobs, their last result and next run time.
+                                15. Use cancelMonitor(jobId) to stop a monitor. Always call listMonitors() first to confirm the jobId.
+                                16. Use sendNotification(message) to proactively send a message or alert to the user.
+                                17. Use listPendingNotifications() to show queued notifications not yet delivered (useful in CLI mode).
+                                18. Use markAsRead(notificationId) after the user acknowledges a queued notification.
 
                                 Example: if asked about flight prices, hotel rates, or anything commercial → searchWeb immediately.
                                 Example for fillFormAndSubmit: fetchPageContent(url) first → identify selectors → then fillFormAndSubmit(url, fields, submitSelector).
+                                Example for RSS: discoverFeed(siteUrl) → readFeed(feedUrl, 10) or searchInFeed(feedUrl, keyword).
+                                Example for monitoring: confirm details → scheduleMonitor(url, keyword, 60, description) → confirm to user.
                                 """
                                 .formatted(java.time.LocalDateTime.now()
                                         .format(java.time.format.DateTimeFormatter
@@ -98,7 +123,25 @@ public class SearchAgent {
                         com.google.adk.tools.FunctionTool.create(com.gazapps.skills.FormSkill.class,
                                 "fillFormAndSubmit"),
                         com.google.adk.tools.FunctionTool.create(com.gazapps.skills.PdfSkill.class,
-                                "readPdf"))
+                                "readPdf"),
+                        com.google.adk.tools.FunctionTool.create(com.gazapps.skills.RssSkill.class,
+                                "discoverFeed"),
+                        com.google.adk.tools.FunctionTool.create(com.gazapps.skills.RssSkill.class,
+                                "readFeed"),
+                        com.google.adk.tools.FunctionTool.create(com.gazapps.skills.RssSkill.class,
+                                "searchInFeed"),
+                        com.google.adk.tools.FunctionTool.create(com.gazapps.skills.SchedulerSkill.class,
+                                "scheduleMonitor"),
+                        com.google.adk.tools.FunctionTool.create(com.gazapps.skills.SchedulerSkill.class,
+                                "listMonitors"),
+                        com.google.adk.tools.FunctionTool.create(com.gazapps.skills.SchedulerSkill.class,
+                                "cancelMonitor"),
+                        com.google.adk.tools.FunctionTool.create(com.gazapps.skills.NotificationSkill.class,
+                                "sendNotification"),
+                        com.google.adk.tools.FunctionTool.create(com.gazapps.skills.NotificationSkill.class,
+                                "listPendingNotifications"),
+                        com.google.adk.tools.FunctionTool.create(com.gazapps.skills.NotificationSkill.class,
+                                "markAsRead"))
                 .build();
     }
 
