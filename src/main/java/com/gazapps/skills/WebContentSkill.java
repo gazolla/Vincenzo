@@ -3,6 +3,7 @@ package com.gazapps.skills;
 import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.services.BrowserService;
+import com.gazapps.util.BrowserErrors;
 import com.gazapps.util.RetryUtils;
 import com.gazapps.util.UrlValidator;
 import com.google.adk.tools.Annotations.Schema;
@@ -81,6 +82,7 @@ public class WebContentSkill {
                             Map<String, String> error = new HashMap<>();
                             error.put("status", "error");
                             error.put("url", url);
+                            error.put("error_type", BrowserErrors.classify(e));
                             error.put("message", "Failed to fetch page: " + e.getMessage());
                             return error;
                         }
@@ -92,6 +94,7 @@ public class WebContentSkill {
             Map<String, String> error = new HashMap<>();
             error.put("status", "error");
             error.put("url", url);
+            error.put("error_type", BrowserErrors.classify(e));
             error.put("message", "Failed to fetch page: " + e.getMessage());
             return error;
         }
@@ -147,6 +150,8 @@ public class WebContentSkill {
                 LOG.error("WebContentSkill", "Screenshot failed", e);
                 Map<String, String> error = new HashMap<>();
                 error.put("status", "error");
+                error.put("url", url);
+                error.put("error_type", BrowserErrors.classify(e));
                 error.put("message", "Screenshot failed: " + e.getMessage());
                 return error;
             }

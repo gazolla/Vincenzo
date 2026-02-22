@@ -3,6 +3,8 @@ package com.gazapps.skills;
 import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.services.BrowserService;
+import com.gazapps.util.BrowserErrors;
+import com.gazapps.util.RetryUtils;
 import com.google.adk.tools.Annotations.Schema;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
@@ -32,55 +34,72 @@ public class SummarizeSkill {
         LOG.info("SummarizeSkill", "URL: " + url);
         long start = System.currentTimeMillis();
 
-        return BrowserService.execute(page -> {
-            try {
-                page.navigate(url, new Page.NavigateOptions()
-                        .setTimeout(AppConfig.SUMMARIZE_NAVIGATE_TIMEOUT_MS));
-                page.waitForLoadState(LoadState.DOMCONTENTLOADED);
-                LOG.timing("SummarizeSkill", "Navigation", System.currentTimeMillis() - start);
+        try {
+            return RetryUtils.withRetry(
+                    "SummarizeSkill.summarizeUrl",
+                    AppConfig.RETRY_MAX_ATTEMPTS,
+                    AppConfig.RETRY_INITIAL_DELAY_MS,
+                    () -> BrowserService.execute(page -> {
+                        try {
+                            page.navigate(url, new Page.NavigateOptions()
+                                    .setTimeout(AppConfig.SUMMARIZE_NAVIGATE_TIMEOUT_MS));
+                            page.waitForLoadState(LoadState.DOMCONTENTLOADED);
+                            LOG.timing("SummarizeSkill", "Navigation", System.currentTimeMillis() - start);
 
-                // Remove noise before text extraction
-                page.evaluate("""
-                        document.querySelectorAll(
-                            'script,style,nav,footer,header,aside,iframe,' +
-                            '[aria-hidden="true"],[class*="cookie"],[class*="banner"],' +
-                            '[class*="popup"],[class*="ad-"],[class*="sidebar"]'
-                        ).forEach(el => el.remove());
-                        """);
+                            // Remove noise before text extraction
+                            page.evaluate("""
+                                    document.querySelectorAll(
+                                        'script,style,nav,footer,header,aside,iframe,' +
+                                        '[aria-hidden="true"],[class*="cookie"],[class*="banner"],' +
+                                        '[class*="popup"],[class*="ad-"],[class*="sidebar"]'
+                                    ).forEach(el => el.remove());
+                                    """);
 
-                String title = page.title();
-                String bodyText = page.innerText("body");
-                int rawLen = bodyText.length();
+                            String title = page.title();
+                            String bodyText = page.innerText("body");
+                            int rawLen = bodyText.length();
 
-                LOG.info("SummarizeSkill", "Page title: \"" + title + "\"");
-                LOG.info("SummarizeSkill", "Raw body text length: " + rawLen + " chars");
+                            LOG.info("SummarizeSkill", "Page title: \"" + title + "\"");
+                            LOG.info("SummarizeSkill", "Raw body text length: " + rawLen + " chars");
 
-                if (bodyText.length() > AppConfig.SUMMARIZE_MAX_CHARS) {
-                    bodyText = bodyText.substring(0, AppConfig.SUMMARIZE_MAX_CHARS)
-                            + "... [content truncated]";
-                    LOG.debug("SummarizeSkill", "Body text truncated to "
-                            + AppConfig.SUMMARIZE_MAX_CHARS + " chars");
-                }
+                            if (bodyText.length() > AppConfig.SUMMARIZE_MAX_CHARS) {
+                                bodyText = bodyText.substring(0, AppConfig.SUMMARIZE_MAX_CHARS)
+                                        + "... [content truncated]";
+                                LOG.debug("SummarizeSkill", "Body text truncated to "
+                                        + AppConfig.SUMMARIZE_MAX_CHARS + " chars");
+                            }
 
-                Map<String, String> result = new HashMap<>();
-                result.put("status", "success");
-                result.put("url", url);
-                result.put("title", title);
-                result.put("content", bodyText);
-                result.put("char_count", String.valueOf(rawLen));
+                            Map<String, String> result = new HashMap<>();
+                            result.put("status", "success");
+                            result.put("url", url);
+                            result.put("title", title);
+                            result.put("content", bodyText);
+                            result.put("char_count", String.valueOf(rawLen));
 
-                LOG.timing("SummarizeSkill", "Total execution", System.currentTimeMillis() - start);
-                LOG.toolResult("summarizeUrl", result);
-                return result;
+                            LOG.timing("SummarizeSkill", "Total execution", System.currentTimeMillis() - start);
+                            LOG.toolResult("summarizeUrl", result);
+                            return result;
 
-            } catch (Exception e) {
-                LOG.error("SummarizeSkill", "Failed for " + url, e);
-                Map<String, String> error = new HashMap<>();
-                error.put("status", "error");
-                error.put("url", url);
-                error.put("message", "Failed to fetch page for summarization: " + e.getMessage());
-                return error;
-            }
-        });
+                        } catch (Exception e) {
+                            LOG.error("SummarizeSkill", "Failed for " + url, e);
+                            Map<String, String> error = new HashMap<>();
+                            error.put("status", "error");
+                            error.put("url", url);
+                            error.put("error_type", BrowserErrors.classify(e));
+                            error.put("message", "Failed to fetch page for summarization: " + e.getMessage());
+                            return error;
+                        }
+                    }),
+                    result -> "error".equals(result.get("status"))
+            );
+        } catch (Exception e) {
+            LOG.error("SummarizeSkill", "Failed for " + url + " after retries", e);
+            Map<String, String> error = new HashMap<>();
+            error.put("status", "error");
+            error.put("url", url);
+            error.put("error_type", BrowserErrors.classify(e));
+            error.put("message", "Failed to fetch page for summarization: " + e.getMessage());
+            return error;
+        }
     }
 }

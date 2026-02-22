@@ -3,6 +3,8 @@ package com.gazapps.skills;
 import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.services.BrowserService;
+import com.gazapps.util.BrowserErrors;
+import com.gazapps.util.RetryUtils;
 import com.gazapps.util.StringUtils;
 import com.google.adk.tools.Annotations.Schema;
 import com.microsoft.playwright.Page;
@@ -37,83 +39,100 @@ public class ExtractSkill {
         LOG.info("ExtractSkill", "Selectors: " + StringUtils.truncate(selectors, 300));
         long start = System.currentTimeMillis();
 
-        return BrowserService.execute(page -> {
-            try {
-                page.navigate(url, new Page.NavigateOptions()
-                        .setTimeout(AppConfig.EXTRACT_NAVIGATE_TIMEOUT_MS));
-                page.waitForLoadState(LoadState.DOMCONTENTLOADED);
-                LOG.timing("ExtractSkill", "Navigation", System.currentTimeMillis() - start);
+        try {
+            return RetryUtils.withRetry(
+                    "ExtractSkill.extractStructuredData",
+                    AppConfig.RETRY_MAX_ATTEMPTS,
+                    AppConfig.RETRY_INITIAL_DELAY_MS,
+                    () -> BrowserService.execute(page -> {
+                        try {
+                            page.navigate(url, new Page.NavigateOptions()
+                                    .setTimeout(AppConfig.EXTRACT_NAVIGATE_TIMEOUT_MS));
+                            page.waitForLoadState(LoadState.DOMCONTENTLOADED);
+                            LOG.timing("ExtractSkill", "Navigation", System.currentTimeMillis() - start);
 
-                // Build and run a JavaScript extraction script using the provided selectors.
-                // Playwright passes the selectorsMap as the arrow-function parameter (sels).
-                // maxItems is a Java constant (not user data), so it is safely interpolated.
-                String extractScript = """
-                        sels => {
-                            try {
-                                var maxItems = %d;
-                                var fields = Object.keys(sels);
-                                if (fields.length === 0) return JSON.stringify([]);
+                            // Build and run a JavaScript extraction script using the provided selectors.
+                            // Playwright passes the selectorsMap as the arrow-function parameter (sels).
+                            // maxItems is a Java constant (not user data), so it is safely interpolated.
+                            String extractScript = """
+                                    sels => {
+                                        try {
+                                            var maxItems = %d;
+                                            var fields = Object.keys(sels);
+                                            if (fields.length === 0) return JSON.stringify([]);
 
-                                // Collect NodeLists for each selector
-                                var lists = {};
-                                var maxLen = 0;
-                                fields.forEach(function(field) {
-                                    var nodes = document.querySelectorAll(sels[field]);
-                                    lists[field] = nodes;
-                                    if (nodes.length > maxLen) maxLen = nodes.length;
-                                });
+                                            // Collect NodeLists for each selector
+                                            var lists = {};
+                                            var maxLen = 0;
+                                            fields.forEach(function(field) {
+                                                var nodes = document.querySelectorAll(sels[field]);
+                                                lists[field] = nodes;
+                                                if (nodes.length > maxLen) maxLen = nodes.length;
+                                            });
 
-                                var results = [];
-                                var limit = Math.min(maxLen, maxItems);
-                                for (var i = 0; i < limit; i++) {
-                                    var item = {};
-                                    fields.forEach(function(field) {
-                                        var node = lists[field][i];
-                                        item[field] = node ? (node.innerText || node.textContent || '').trim() : '';
-                                    });
-                                    results.push(item);
+                                            var results = [];
+                                            var limit = Math.min(maxLen, maxItems);
+                                            for (var i = 0; i < limit; i++) {
+                                                var item = {};
+                                                fields.forEach(function(field) {
+                                                    var node = lists[field][i];
+                                                    item[field] = node ? (node.innerText || node.textContent || '').trim() : '';
+                                                });
+                                                results.push(item);
+                                            }
+                                            return JSON.stringify(results);
+                                        } catch(e) {
+                                            return JSON.stringify({error: e.message});
+                                        }
+                                    }
+                                    """.formatted(AppConfig.EXTRACT_MAX_ITEMS);
+
+                            // Pass only the selectors Map as arg — Playwright serializes Maps safely
+                            java.util.Map<String, String> selectorsMap = FormSkill.parseJsonFields(selectors);
+                            Object raw = page.evaluate(extractScript, selectorsMap);
+                            String data = raw != null ? raw.toString() : "[]";
+                            LOG.debug("ExtractSkill", "Extracted data: " + StringUtils.truncate(data, 500));
+
+                            // Count items in result
+                            int itemCount = 0;
+                            if (data.startsWith("[")) {
+                                for (int i = 0; i < data.length(); i++) {
+                                    if (data.charAt(i) == '{') itemCount++;
                                 }
-                                return JSON.stringify(results);
-                            } catch(e) {
-                                return JSON.stringify({error: e.message});
                             }
+                            LOG.info("ExtractSkill", "Items extracted: " + itemCount);
+
+                            Map<String, String> result = new HashMap<>();
+                            result.put("status", "success");
+                            result.put("url", url);
+                            result.put("data", data);
+                            result.put("item_count", String.valueOf(itemCount));
+                            result.put("selectors_used", selectors);
+
+                            LOG.timing("ExtractSkill", "Total execution", System.currentTimeMillis() - start);
+                            LOG.toolResult("extractStructuredData", result);
+                            return result;
+
+                        } catch (Exception e) {
+                            LOG.error("ExtractSkill", "Failed for " + url, e);
+                            Map<String, String> error = new HashMap<>();
+                            error.put("status", "error");
+                            error.put("url", url);
+                            error.put("error_type", BrowserErrors.classify(e));
+                            error.put("message", "Failed to extract structured data: " + e.getMessage());
+                            return error;
                         }
-                        """.formatted(AppConfig.EXTRACT_MAX_ITEMS);
-
-                // Pass only the selectors Map as arg — Playwright serializes Maps safely
-                java.util.Map<String, String> selectorsMap = FormSkill.parseJsonFields(selectors);
-                Object raw = page.evaluate(extractScript, selectorsMap);
-                String data = raw != null ? raw.toString() : "[]";
-                LOG.debug("ExtractSkill", "Extracted data: " + StringUtils.truncate(data, 500));
-
-                // Count items in result
-                int itemCount = 0;
-                if (data.startsWith("[")) {
-                    for (int i = 0; i < data.length(); i++) {
-                        if (data.charAt(i) == '{') itemCount++;
-                    }
-                }
-                LOG.info("ExtractSkill", "Items extracted: " + itemCount);
-
-                Map<String, String> result = new HashMap<>();
-                result.put("status", "success");
-                result.put("url", url);
-                result.put("data", data);
-                result.put("item_count", String.valueOf(itemCount));
-                result.put("selectors_used", selectors);
-
-                LOG.timing("ExtractSkill", "Total execution", System.currentTimeMillis() - start);
-                LOG.toolResult("extractStructuredData", result);
-                return result;
-
-            } catch (Exception e) {
-                LOG.error("ExtractSkill", "Failed for " + url, e);
-                Map<String, String> error = new HashMap<>();
-                error.put("status", "error");
-                error.put("url", url);
-                error.put("message", "Failed to extract structured data: " + e.getMessage());
-                return error;
-            }
-        });
+                    }),
+                    result -> "error".equals(result.get("status"))
+            );
+        } catch (Exception e) {
+            LOG.error("ExtractSkill", "Failed for " + url + " after retries", e);
+            Map<String, String> error = new HashMap<>();
+            error.put("status", "error");
+            error.put("url", url);
+            error.put("error_type", BrowserErrors.classify(e));
+            error.put("message", "Failed to extract structured data: " + e.getMessage());
+            return error;
+        }
     }
 }

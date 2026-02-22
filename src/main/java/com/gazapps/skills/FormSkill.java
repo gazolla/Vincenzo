@@ -3,6 +3,7 @@ package com.gazapps.skills;
 import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.services.BrowserService;
+import com.gazapps.util.BrowserErrors;
 import com.gazapps.util.StringUtils;
 import com.gazapps.util.UrlValidator;
 import com.google.adk.tools.Annotations.Schema;
@@ -166,6 +167,7 @@ public class FormSkill {
                 Map<String, String> error = new HashMap<>();
                 error.put("status", "error");
                 error.put("url", url);
+                error.put("error_type", BrowserErrors.classify(e));
                 error.put("message", "Form fill/submit failed: " + e.getMessage());
                 return error;
             }
