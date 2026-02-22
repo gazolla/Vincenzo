@@ -86,7 +86,9 @@ public class SearchAgent {
                                 4. Respond in the SAME LANGUAGE the user writes in (if Portuguese, answer in Portuguese).
                                 5. Only skip searching for pure math, definitions, or stable facts that cannot change.
                                 6. If the URL ends with .pdf or the content is clearly a PDF document, use readPdf instead of fetchPageContent.
-                                7. To extract prices, tables, or lists from a page with known structure, prefer extractStructuredData.
+                                7. To extract prices, tables, links, or lists from a page with known structure, prefer extractStructuredData. \
+                                   For text content use plain CSS selectors, e.g. {"title":".product-name","price":".price"}. \
+                                   To extract a URL or any HTML attribute, append |attrName to the selector, e.g. {"link":".titleline > a|href","img":"img.cover|src"}.
                                 8. Use summarizeUrl when the user asks to summarize or get the key points of a specific URL or article.
                                 9. Use fillFormAndSubmit to search on sites that require form interaction and have no public API.
                                    IMPORTANT: Before calling fillFormAndSubmit, you MUST first call fetchPageContent on the target URL

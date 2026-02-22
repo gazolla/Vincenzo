@@ -24,15 +24,19 @@ public class ExtractSkill {
 
     @Schema(description = """
             Extract structured data from a web page using CSS selectors.
-            Use this to extract prices, product names, tables, listings, or any
+            Use this to extract prices, product names, links, tables, listings, or any
             repeating structured content from a page. The selectors parameter
             must be a JSON object mapping field names to CSS selectors, e.g.:
             {"title": ".product-name", "price": ".price-tag", "rating": ".stars"}
+            To extract a URL/href from a link, append "|href" to the selector, e.g.:
+            {"title": ".titleline > a", "link": ".titleline > a|href"}
+            To extract any HTML attribute, append "|attrName" to the selector, e.g.:
+            {"image": "img.cover|src", "data": "div.item|data-id"}
             Returns extracted data as a JSON array of matched items.
             """)
     public static Map<String, String> extractStructuredData(
             @Schema(name = "url", description = "The full URL of the page to extract data from") String url,
-            @Schema(name = "selectors", description = "JSON object mapping field names to CSS selectors, e.g. {\"title\":\".product-name\",\"price\":\".price\"}") String selectors) {
+            @Schema(name = "selectors", description = "JSON object mapping field names to CSS selectors. For text: {\"title\":\".product-name\",\"price\":\".price\"}. For attributes append |attrName: {\"link\":\".titleline > a|href\",\"img\":\"img.cover|src\"}") String selectors) {
 
         LOG.section("TOOL CALL: extractStructuredData");
         LOG.info("ExtractSkill", "URL: " + url);
@@ -54,6 +58,9 @@ public class ExtractSkill {
                             // Build and run a JavaScript extraction script using the provided selectors.
                             // Playwright passes the selectorsMap as the arrow-function parameter (sels).
                             // maxItems is a Java constant (not user data), so it is safely interpolated.
+                            //
+                            // Selector syntax: "cssSelector" for text, "cssSelector|attr" for attributes.
+                            // Examples: ".title" → innerText; ".link|href" → href attribute value.
                             String extractScript = """
                                     sels => {
                                         try {
@@ -61,11 +68,23 @@ public class ExtractSkill {
                                             var fields = Object.keys(sels);
                                             if (fields.length === 0) return JSON.stringify([]);
 
+                                            // Parse each selector into {css, attr} — attr is null for text extraction
+                                            var parsed = {};
+                                            fields.forEach(function(field) {
+                                                var raw = sels[field];
+                                                var pipe = raw.lastIndexOf('|');
+                                                if (pipe !== -1) {
+                                                    parsed[field] = {css: raw.substring(0, pipe), attr: raw.substring(pipe + 1)};
+                                                } else {
+                                                    parsed[field] = {css: raw, attr: null};
+                                                }
+                                            });
+
                                             // Collect NodeLists for each selector
                                             var lists = {};
                                             var maxLen = 0;
                                             fields.forEach(function(field) {
-                                                var nodes = document.querySelectorAll(sels[field]);
+                                                var nodes = document.querySelectorAll(parsed[field].css);
                                                 lists[field] = nodes;
                                                 if (nodes.length > maxLen) maxLen = nodes.length;
                                             });
@@ -76,7 +95,15 @@ public class ExtractSkill {
                                                 var item = {};
                                                 fields.forEach(function(field) {
                                                     var node = lists[field][i];
-                                                    item[field] = node ? (node.innerText || node.textContent || '').trim() : '';
+                                                    if (!node) { item[field] = ''; return; }
+                                                    var attr = parsed[field].attr;
+                                                    if (attr) {
+                                                        // Attribute extraction: href, src, data-*, etc.
+                                                        item[field] = (node.getAttribute(attr) || '').trim();
+                                                    } else {
+                                                        // Text extraction
+                                                        item[field] = (node.innerText || node.textContent || '').trim();
+                                                    }
                                                 });
                                                 results.push(item);
                                             }
