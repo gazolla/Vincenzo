@@ -31,10 +31,14 @@ Diferente de chatbots simples que respondem apenas a partir de dados de treiname
 - **Pesquisa na web** em tempo real via DuckDuckGo e Bing
 - **Lê qualquer página web** completamente, extraindo texto limpo
 - **Tira screenshots** de páginas
-- **Extrai dados estruturados** de páginas usando seletores CSS
+- **Extrai dados estruturados** de páginas usando seletores CSS (incluindo atributos HTML via sintaxe `|attr`)
 - **Resume** qualquer artigo ou URL
 - **Preenche e envia formulários HTML** em sites
 - **Lê arquivos PDF** baixados da web
+- **Lê feeds RSS/Atom** e os pesquisa por palavra-chave
+- **Agenda monitores** que vigiam feeds ou páginas e notificam ao encontrar correspondências
+- **Envia e gerencia notificações** (fila no CLI ou Telegram)
+- **Armazena e recupera memória de longo prazo** entre sessões
 
 O framework é construído em torno do conceito de **Skills** (Habilidades) — classes Java modulares que expõem ferramentas ao agente LLM via o mecanismo `@FunctionTool` do Google ADK. Cada nova capacidade que você dá ao Vincenzo é uma nova Skill.
 
@@ -45,6 +49,7 @@ O framework é construído em torno do conceito de **Skills** (Habilidades) — 
 | 🚀 Instalação (Local e VPS) | [docs/installation.pt-BR.md](docs/installation.pt-BR.md) |
 | ⚙️ Referência de Configuração | [docs/configuration.pt-BR.md](docs/configuration.pt-BR.md) |
 | 🛠️ Criando Novas Skills | [docs/creating-skills.pt-BR.md](docs/creating-skills.pt-BR.md) |
+| 🧪 Guia de Testes | [docs/testing.md](docs/testing.md) |
 
 ---
 
@@ -75,9 +80,23 @@ mvn compile exec:java
 | `fetchPageContent(url)` | Lê o conteúdo completo de qualquer página web |
 | `screenshotPage(url, filename)` | Tira um screenshot de uma página web |
 | `summarizeUrl(url)` | Busca e limpa uma página para resumo pelo LLM |
-| `extractStructuredData(url, selectors)` | Extrai dados estruturados usando seletores CSS |
+| `extractStructuredData(url, selectors)` | Extrai dados estruturados usando seletores CSS; use `selector\|attr` para atributos HTML |
 | `fillFormAndSubmit(url, fields, selector)` | Preenche e envia formulários HTML |
 | `readPdf(url)` | Baixa e extrai texto de arquivos PDF |
+| `discoverFeed(url)` | Detecta automaticamente a URL do feed RSS/Atom de um site |
+| `readFeed(url)` | Lê e retorna itens de um feed RSS/Atom |
+| `searchInFeed(url, keyword)` | Pesquisa itens do feed por palavra-chave |
+| `scheduleMonitor(url, keyword, interval)` | Agenda um monitor recorrente que notifica ao encontrar palavras-chave |
+| `listMonitors()` | Lista todos os jobs de monitor agendados |
+| `cancelMonitor(jobId)` | Cancela e remove um monitor agendado |
+| `sendNotification(message)` | Envia uma notificação (fila CLI ou Telegram) |
+| `listPendingNotifications()` | Lista notificações não lidas |
+| `markAsRead(notifId)` | Marca uma notificação como lida |
+| `saveMemory(content, tags)` | Salva uma entrada de memória para recuperação futura |
+| `retrieveMemory(query)` | Pesquisa memórias armazenadas por consulta semântica |
+| `listMemories()` | Lista todas as entradas de memória armazenadas |
+| `updateMemory(id, content)` | Atualiza uma entrada de memória existente |
+| `deleteMemory(id)` | Exclui uma entrada de memória |
 
 ---
 

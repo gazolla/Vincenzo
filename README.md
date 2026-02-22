@@ -31,10 +31,14 @@ Unlike simple chatbots that answer only from training data, Vincenzo's agent:
 - **Searches the web** in real time via DuckDuckGo and Bing
 - **Reads any web page** fully, extracting clean text
 - **Takes screenshots** of pages
-- **Extracts structured data** from pages using CSS selectors
+- **Extracts structured data** from pages using CSS selectors (including HTML attributes via `|attr` syntax)
 - **Summarizes** any article or URL
 - **Fills out and submits HTML forms** on websites
 - **Reads PDF files** downloaded from the web
+- **Reads RSS/Atom feeds** and searches them by keyword
+- **Schedules monitors** that watch feeds or pages and notify on matches
+- **Sends and manages notifications** (CLI queue or Telegram)
+- **Stores and retrieves long-term memory** across sessions
 
 The framework is built around the concept of **Skills** — modular Java classes that expose tools to the LLM agent via Google ADK's `@FunctionTool` mechanism. Every new capability you give to Vincenzo is a new Skill.
 
@@ -45,6 +49,7 @@ The framework is built around the concept of **Skills** — modular Java classes
 | 🚀 Installation (Local & VPS) | [docs/installation.md](docs/installation.md) |
 | ⚙️ Configuration Reference | [docs/configuration.md](docs/configuration.md) |
 | 🛠️ Creating New Skills | [docs/creating-skills.md](docs/creating-skills.md) |
+| 🧪 Testing Guide | [docs/testing.md](docs/testing.md) |
 
 ---
 
@@ -75,9 +80,23 @@ mvn compile exec:java
 | `fetchPageContent(url)` | Reads the full text content of any web page |
 | `screenshotPage(url, filename)` | Takes a screenshot of a web page |
 | `summarizeUrl(url)` | Fetches and cleans a page for LLM summarization |
-| `extractStructuredData(url, selectors)` | Extracts structured data using CSS selectors |
+| `extractStructuredData(url, selectors)` | Extracts structured data using CSS selectors; use `selector\|attr` for HTML attributes |
 | `fillFormAndSubmit(url, fields, selector)` | Fills and submits HTML forms |
 | `readPdf(url)` | Downloads and extracts text from PDF files |
+| `discoverFeed(url)` | Auto-detects the RSS/Atom feed URL from a website |
+| `readFeed(url)` | Reads and returns items from an RSS/Atom feed |
+| `searchInFeed(url, keyword)` | Searches feed items by keyword |
+| `scheduleMonitor(url, keyword, interval)` | Schedules a recurring monitor that notifies on keyword matches |
+| `listMonitors()` | Lists all active scheduled monitor jobs |
+| `cancelMonitor(jobId)` | Cancels and removes a scheduled monitor |
+| `sendNotification(message)` | Sends a notification (CLI queue or Telegram) |
+| `listPendingNotifications()` | Lists unread notifications |
+| `markAsRead(notifId)` | Marks a notification as read |
+| `saveMemory(content, tags)` | Saves a memory entry for long-term recall |
+| `retrieveMemory(query)` | Searches stored memories by semantic query |
+| `listMemories()` | Lists all stored memory entries |
+| `updateMemory(id, content)` | Updates an existing memory entry |
+| `deleteMemory(id)` | Deletes a memory entry |
 
 ---
 

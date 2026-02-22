@@ -191,6 +191,79 @@ public class MySkill {
 
 ---
 
+## Adding Retry to a Browser Skill
+
+For **read-only / idempotent** browser skills (no form submissions, no side effects), wrap the
+`BrowserService.execute(...)` call with `RetryUtils.withRetry(...)` to automatically retry on
+transient network or timeout errors:
+
+```java
+import com.gazapps.config.AppConfig;
+import com.gazapps.util.BrowserErrors;
+import com.gazapps.util.RetryUtils;
+
+public class MySkill {
+
+    public static Map<String, String> myTool(String url) {
+        try {
+            return RetryUtils.withRetry(
+                    "MySkill.myTool",
+                    AppConfig.RETRY_MAX_ATTEMPTS,
+                    AppConfig.RETRY_INITIAL_DELAY_MS,
+                    () -> BrowserService.execute(page -> {
+                        try {
+                            // ... your browser code ...
+                            Map<String, String> result = new HashMap<>();
+                            result.put("status", "success");
+                            return result;
+                        } catch (Exception e) {
+                            Map<String, String> error = new HashMap<>();
+                            error.put("status", "error");
+                            error.put("error_type", BrowserErrors.classify(e)); // ← classify
+                            error.put("message", "Failed: " + e.getMessage());
+                            return error;
+                        }
+                    }),
+                    result -> "error".equals(result.get("status")) // ← retry predicate
+            );
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("status", "error");
+            error.put("error_type", BrowserErrors.classify(e));
+            error.put("message", "Failed after retries: " + e.getMessage());
+            return error;
+        }
+    }
+}
+```
+
+> **Do NOT add retry to skills with side effects** (form submissions, payments, writes) — a retry
+> could duplicate the action. For those, only add `error_type` classification to the catch block.
+
+---
+
+## Classifying Errors with `BrowserErrors`
+
+Always add `error_type` to error result maps so the LLM can give precise failure messages:
+
+```java
+import com.gazapps.util.BrowserErrors;
+
+// In any catch block:
+error.put("error_type", BrowserErrors.classify(e));
+```
+
+`BrowserErrors.classify(Exception)` returns one of:
+
+| Value | When |
+|---|---|
+| `"timeout"` | Navigation or response timed out |
+| `"network"` | DNS failure or connection refused |
+| `"blocked"` | HTTP 403/401 or bot detection |
+| `"unknown"` | Any other exception |
+
+---
+
 ## Using `LogService` in Your Skill
 
 All Skills should log using the shared `LogService`:
@@ -225,6 +298,8 @@ public class MySkill {
 [ ] Annotate class/method with @Schema (clear descriptions)
 [ ] Return Map<String, String> with "status" key
 [ ] Catch all exceptions and return error map
+[ ] Add error_type via BrowserErrors.classify(e) to all catch blocks
+[ ] If idempotent (read-only), wrap with RetryUtils.withRetry(...)
 [ ] Register in SearchAgent.java with FunctionTool.create(...)
 [ ] (Optional) Add usage hint to agent instructions
 [ ] mvn compile exec:java  →  test it

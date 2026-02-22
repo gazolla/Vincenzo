@@ -22,7 +22,11 @@ After building the fat JAR, you can override it by placing an `application.prope
 11. [Log Management](#log-management)
 12. [Search Cache](#search-cache)
 13. [Search Pipeline](#search-pipeline)
-14. [Telegram](#telegram)
+14. [RssSkill](#rssskill)
+15. [SchedulerSkill](#schedulerskill)
+16. [NotificationSkill](#notificationskill)
+17. [MemorySkill](#memoryskill)
+18. [Telegram](#telegram)
 
 ---
 
@@ -87,14 +91,14 @@ fetch.page.navigate.timeout.ms=20000
 # screenshotPage navigation timeout
 screenshot.navigate.timeout.ms=15000
 
-# summarizeUrl navigation timeout
-summarize.navigate.timeout.ms=20000
+# summarizeUrl navigation timeout (increased — long articles with many assets)
+summarize.navigate.timeout.ms=25000
 
 # extractStructuredData navigation timeout
 extract.navigate.timeout.ms=20000
 
-# fillFormAndSubmit navigation timeout
-form.navigate.timeout.ms=20000
+# fillFormAndSubmit navigation timeout (increased — heavy JS and post-submit redirects)
+form.navigate.timeout.ms=30000
 ```
 
 ---
@@ -238,6 +242,71 @@ search.parallel.timeout.ms=25000
 # After N consecutive failures, DDG HTML is skipped for reset.ms milliseconds
 search.circuit.ddg.failure.threshold=5
 search.circuit.ddg.reset.ms=30000
+```
+
+---
+
+## RssSkill
+
+Settings for `discoverFeed`, `readFeed`, and `searchInFeed`:
+
+```properties
+# HTTP connection timeout for RSS/Atom feed fetches (seconds)
+rss.fetch.timeout.seconds=15
+
+# Maximum number of feed items returned by readFeed
+rss.max.items=20
+
+# Maximum characters of each feed item description
+rss.max.description.chars=500
+```
+
+---
+
+## SchedulerSkill
+
+Settings for `scheduleMonitor`, `listMonitors`, and `cancelMonitor`:
+
+```properties
+# Maximum number of concurrent monitor jobs
+scheduler.max.jobs=20
+
+# Minimum interval between job executions (minutes)
+scheduler.min.interval.minutes=5
+
+# JSON file path for persisting scheduled jobs (relative to working directory)
+scheduler.jobs.file=work/scheduler-jobs.json
+```
+
+---
+
+## NotificationSkill
+
+Settings for `sendNotification`, `listPendingNotifications`, and `markAsRead`:
+
+```properties
+# Telegram chat_id for proactive notifications (required for Telegram mode)
+notification.telegram.chat.id=
+
+# Maximum notifications held in the in-memory queue (CLI fallback)
+notification.queue.max.size=100
+```
+
+> In `cli` mode, notifications are stored in memory and retrieved via `listPendingNotifications`.
+> In `telegram` mode, they are sent directly to the chat specified by `notification.telegram.chat.id`.
+
+---
+
+## MemorySkill
+
+Settings for `saveMemory`, `retrieveMemory`, `listMemories`, `updateMemory`, and `deleteMemory`:
+
+```properties
+# JSON file path for persisting memory entries (relative to working directory)
+memory.storage.file=work/memory-store.json
+
+# Maximum number of memory entries stored (new saves are rejected beyond this limit)
+memory.max.items=500
 ```
 
 ---

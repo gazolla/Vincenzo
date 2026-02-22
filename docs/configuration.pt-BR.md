@@ -22,7 +22,11 @@ Após compilar o fat JAR, você pode substituir as configurações colocando um 
 11. [Gerenciamento de Logs](#gerenciamento-de-logs)
 12. [Cache de Busca](#cache-de-busca)
 13. [Pipeline de Busca](#pipeline-de-busca)
-14. [Telegram](#telegram)
+14. [RssSkill](#rssskill)
+15. [SchedulerSkill](#schedulerskill)
+16. [NotificationSkill](#notificationskill)
+17. [MemorySkill](#memoryskill)
+18. [Telegram](#telegram)
 
 ---
 
@@ -87,14 +91,14 @@ fetch.page.navigate.timeout.ms=20000
 # Timeout de navegação do screenshotPage
 screenshot.navigate.timeout.ms=15000
 
-# Timeout de navegação do summarizeUrl
-summarize.navigate.timeout.ms=20000
+# Timeout de navegação do summarizeUrl (aumentado — artigos longos com muitos assets)
+summarize.navigate.timeout.ms=25000
 
 # Timeout de navegação do extractStructuredData
 extract.navigate.timeout.ms=20000
 
-# Timeout de navegação do fillFormAndSubmit
-form.navigate.timeout.ms=20000
+# Timeout de navegação do fillFormAndSubmit (aumentado — JS pesado e redirecionamentos pós-submit)
+form.navigate.timeout.ms=30000
 ```
 
 ---
@@ -238,6 +242,71 @@ search.parallel.timeout.ms=25000
 # Após N falhas consecutivas, o DDG HTML é ignorado por reset.ms milissegundos
 search.circuit.ddg.failure.threshold=5
 search.circuit.ddg.reset.ms=30000
+```
+
+---
+
+## RssSkill
+
+Configurações para `discoverFeed`, `readFeed` e `searchInFeed`:
+
+```properties
+# Timeout de conexão HTTP para buscas de feeds RSS/Atom (segundos)
+rss.fetch.timeout.seconds=15
+
+# Número máximo de itens retornados pelo readFeed
+rss.max.items=20
+
+# Máximo de caracteres da descrição de cada item do feed
+rss.max.description.chars=500
+```
+
+---
+
+## SchedulerSkill
+
+Configurações para `scheduleMonitor`, `listMonitors` e `cancelMonitor`:
+
+```properties
+# Número máximo de jobs de monitor simultâneos
+scheduler.max.jobs=20
+
+# Intervalo mínimo entre execuções de jobs (minutos)
+scheduler.min.interval.minutes=5
+
+# Caminho do arquivo JSON para persistir jobs agendados (relativo ao diretório de trabalho)
+scheduler.jobs.file=work/scheduler-jobs.json
+```
+
+---
+
+## NotificationSkill
+
+Configurações para `sendNotification`, `listPendingNotifications` e `markAsRead`:
+
+```properties
+# chat_id do Telegram para notificações proativas (obrigatório no modo Telegram)
+notification.telegram.chat.id=
+
+# Máximo de notificações na fila em memória (fallback CLI)
+notification.queue.max.size=100
+```
+
+> No modo `cli`, as notificações são armazenadas em memória e recuperadas via `listPendingNotifications`.
+> No modo `telegram`, são enviadas diretamente ao chat especificado em `notification.telegram.chat.id`.
+
+---
+
+## MemorySkill
+
+Configurações para `saveMemory`, `retrieveMemory`, `listMemories`, `updateMemory` e `deleteMemory`:
+
+```properties
+# Caminho do arquivo JSON para persistir entradas de memória (relativo ao diretório de trabalho)
+memory.storage.file=work/memory-store.json
+
+# Número máximo de entradas de memória armazenadas (novos saves são rejeitados ao exceder o limite)
+memory.max.items=500
 ```
 
 ---
