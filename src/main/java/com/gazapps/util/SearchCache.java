@@ -6,6 +6,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheStats;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -48,10 +49,10 @@ public final class SearchCache {
 
     /**
      * Returns the cached result for the normalized query,
-     * or {@code null} if absent or expired.
+     * or {@link Optional#empty()} if absent or expired.
      */
-    public static Map<String, String> get(String normalizedQuery) {
-        return CACHE.getIfPresent(normalizedQuery);
+    public static Optional<Map<String, String>> get(String normalizedQuery) {
+        return Optional.ofNullable(CACHE.getIfPresent(normalizedQuery));
     }
 
     /**

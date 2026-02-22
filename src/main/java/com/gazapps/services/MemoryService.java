@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -85,14 +86,14 @@ public class MemoryService {
     /**
      * Save a new memory entry.
      *
-     * @return the new id (e.g. {@code "mem-a1b2c3d4"}), or {@code null} if the
-     *         {@code memory.max.items} limit has been reached
+     * @return an {@link Optional} containing the new id (e.g. {@code "mem-a1b2c3d4"}),
+     *         or {@link Optional#empty()} if the {@code memory.max.items} limit has been reached
      */
-    public String save(String content, List<String> tags, String category) {
+    public Optional<String> save(String content, List<String> tags, String category) {
         int maxItems = AppConfig.memoryMaxItems();
         if (entries.size() >= maxItems) {
             LOG.warn("MemoryService", "Max items limit reached (" + maxItems + ")");
-            return null;
+            return Optional.empty();
         }
         long now = System.currentTimeMillis();
         String id = "mem-" + UUID.randomUUID().toString().substring(0, 8);
@@ -102,7 +103,7 @@ public class MemoryService {
         entries.put(id, entry);
         saveData();
         LOG.info("MemoryService", "Saved " + id + " tags=" + safeTags + " category=" + safeCategory);
-        return id;
+        return Optional.of(id);
     }
 
     /**
@@ -164,13 +165,14 @@ public class MemoryService {
      * Update content and/or tags of an existing entry.
      * Pass {@code null} for any field to keep the existing value.
      *
-     * @return the updated entry, or {@code null} if the id was not found
+     * @return an {@link Optional} containing the updated entry,
+     *         or {@link Optional#empty()} if the id was not found
      */
-    public MemoryEntry update(String id, String newContent, List<String> newTags) {
+    public Optional<MemoryEntry> update(String id, String newContent, List<String> newTags) {
         MemoryEntry existing = entries.get(id);
         if (existing == null) {
             LOG.warn("MemoryService", "Update requested for unknown id: " + id);
-            return null;
+            return Optional.empty();
         }
         String content = (newContent != null && !newContent.isBlank())
                 ? newContent : existing.content();
@@ -182,7 +184,7 @@ public class MemoryService {
         entries.put(id, updated);
         saveData();
         LOG.info("MemoryService", "Updated " + id);
-        return updated;
+        return Optional.of(updated);
     }
 
     // ── Persistence ───────────────────────────────────────────────────────────

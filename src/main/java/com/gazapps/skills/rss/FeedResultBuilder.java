@@ -1,5 +1,6 @@
 package com.gazapps.skills.rss;
 
+import com.gazapps.util.SkillStatus;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -23,7 +24,7 @@ public final class FeedResultBuilder {
     /** Build a standard error map. */
     public static Map<String, String> error(String url, String message) {
         Map<String, String> err = new HashMap<>();
-        err.put("status", "error");
+        err.put("status", SkillStatus.ERROR.value());
         err.put("url", url != null ? url : "");
         err.put("message", message);
         return err;
@@ -32,7 +33,7 @@ public final class FeedResultBuilder {
     /** Build the success result for {@code discoverFeed}. */
     public static Map<String, String> discoverSuccess(String url, String feedUrl, String feedType) {
         Map<String, String> result = new HashMap<>();
-        result.put("status", feedUrl.isEmpty() ? "not_found" : "success");
+        result.put("status", feedUrl.isEmpty() ? SkillStatus.NOT_FOUND.value() : SkillStatus.SUCCESS.value());
         result.put("url", url);
         result.put("feed_url", feedUrl);
         result.put("feed_type", feedType);
@@ -46,7 +47,7 @@ public final class FeedResultBuilder {
     public static Map<String, String> readSuccess(String feedUrl, String feedTitle,
             List<FeedItem> items) {
         Map<String, String> result = new HashMap<>();
-        result.put("status", "success");
+        result.put("status", SkillStatus.SUCCESS.value());
         result.put("feed_url", feedUrl);
         result.put("feed_title", feedTitle);
         result.put("item_count", String.valueOf(items.size()));
@@ -58,7 +59,7 @@ public final class FeedResultBuilder {
     public static Map<String, String> searchSuccess(String feedUrl, String keyword,
             List<FeedItem> matches) {
         Map<String, String> result = new HashMap<>();
-        result.put("status", "success");
+        result.put("status", SkillStatus.SUCCESS.value());
         result.put("feed_url", feedUrl);
         result.put("keyword", keyword);
         result.put("match_count", String.valueOf(matches.size()));

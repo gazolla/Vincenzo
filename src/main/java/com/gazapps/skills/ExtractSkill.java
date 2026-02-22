@@ -5,6 +5,7 @@ import com.gazapps.logging.LogService;
 import com.gazapps.services.BrowserService;
 import com.gazapps.util.BrowserErrors;
 import com.gazapps.util.RetryUtils;
+import com.gazapps.util.SkillStatus;
 import com.gazapps.util.StringUtils;
 import com.google.adk.tools.Annotations.Schema;
 import com.microsoft.playwright.Page;
@@ -130,7 +131,7 @@ public class ExtractSkill {
                             LOG.info("ExtractSkill", "Items extracted: " + itemCount);
 
                             Map<String, String> result = new HashMap<>();
-                            result.put("status", "success");
+                            result.put("status", SkillStatus.SUCCESS.value());
                             result.put("url", url);
                             result.put("data", data);
                             result.put("item_count", String.valueOf(itemCount));
@@ -143,19 +144,19 @@ public class ExtractSkill {
                         } catch (Exception e) {
                             LOG.error("ExtractSkill", "Failed for " + url, e);
                             Map<String, String> error = new HashMap<>();
-                            error.put("status", "error");
+                            error.put("status", SkillStatus.ERROR.value());
                             error.put("url", url);
                             error.put("error_type", BrowserErrors.classify(e));
                             error.put("message", "Failed to extract structured data: " + e.getMessage());
                             return error;
                         }
                     }),
-                    result -> "error".equals(result.get("status"))
+                    result -> SkillStatus.ERROR.value().equals(result.get("status"))
             );
         } catch (Exception e) {
             LOG.error("ExtractSkill", "Failed for " + url + " after retries", e);
             Map<String, String> error = new HashMap<>();
-            error.put("status", "error");
+            error.put("status", SkillStatus.ERROR.value());
             error.put("url", url);
             error.put("error_type", BrowserErrors.classify(e));
             error.put("message", "Failed to extract structured data: " + e.getMessage());

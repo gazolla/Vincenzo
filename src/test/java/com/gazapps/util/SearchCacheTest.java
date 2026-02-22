@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,15 +20,15 @@ class SearchCacheTest {
     // ── get/put básico ────────────────────────────────────────────────────────
 
     @Test
-    void get_onEmptyCache_returnsNull() {
-        assertNull(SearchCache.get("qualquer query"));
+    void get_onEmptyCache_returnsEmpty() {
+        assertTrue(SearchCache.get("qualquer query").isEmpty());
     }
 
     @Test
     void putAndGet_returnsSameResult() {
         Map<String, String> result = Map.of("status", "success", "page_text", "conteúdo");
         SearchCache.put("cotação dólar", result);
-        assertEquals(result, SearchCache.get("cotação dólar"));
+        assertEquals(Optional.of(result), SearchCache.get("cotação dólar"));
     }
 
     // ── normalização ──────────────────────────────────────────────────────────
@@ -65,16 +66,16 @@ class SearchCacheTest {
         // Armazenar com chave normalizada lowercase
         SearchCache.put(SearchCache.normalize("IA"), result);
         // Buscar com query em uppercase — deve normalizar antes de consultar
-        assertEquals(result, SearchCache.get(SearchCache.normalize("IA")));
+        assertEquals(Optional.of(result), SearchCache.get(SearchCache.normalize("IA")));
         // E buscar com lowercase direto também deve funcionar
-        assertEquals(result, SearchCache.get("ia"));
+        assertEquals(Optional.of(result), SearchCache.get("ia"));
     }
 
     @Test
     void get_afterPutWithSpaces_retrievedNormalized() {
         Map<String, String> result = Map.of("status", "success");
         SearchCache.put(SearchCache.normalize("cotação  dólar"), result);
-        assertEquals(result, SearchCache.get("cotação dólar"));
+        assertEquals(Optional.of(result), SearchCache.get("cotação dólar"));
     }
 
     // ── invalidação ───────────────────────────────────────────────────────────
@@ -83,10 +84,10 @@ class SearchCacheTest {
     void invalidate_removesEntry() {
         Map<String, String> result = Map.of("status", "success");
         SearchCache.put("query", result);
-        assertNotNull(SearchCache.get("query"));
+        assertTrue(SearchCache.get("query").isPresent());
 
         SearchCache.invalidate("query");
-        assertNull(SearchCache.get("query"));
+        assertTrue(SearchCache.get("query").isEmpty());
     }
 
     @Test
@@ -104,9 +105,9 @@ class SearchCacheTest {
 
         SearchCache.clear();
 
-        assertNull(SearchCache.get("query1"));
-        assertNull(SearchCache.get("query2"));
-        assertNull(SearchCache.get("query3"));
+        assertTrue(SearchCache.get("query1").isEmpty());
+        assertTrue(SearchCache.get("query2").isEmpty());
+        assertTrue(SearchCache.get("query3").isEmpty());
     }
 
     // ── stats ─────────────────────────────────────────────────────────────────
@@ -137,8 +138,8 @@ class SearchCacheTest {
         SearchCache.put("query a", r1);
         SearchCache.put("query b", r2);
 
-        assertEquals(r1, SearchCache.get("query a"));
-        assertEquals(r2, SearchCache.get("query b"));
+        assertEquals(Optional.of(r1), SearchCache.get("query a"));
+        assertEquals(Optional.of(r2), SearchCache.get("query b"));
         assertNotEquals(r1, r2);
     }
 }

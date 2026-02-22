@@ -4,11 +4,13 @@ import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.util.CircuitBreaker;
 import com.gazapps.util.SearchCache;
+import com.gazapps.util.SkillStatus;
 import com.gazapps.util.StringUtils;
 
 import com.google.adk.tools.Annotations.Schema;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.*;
 
 /**
@@ -64,11 +66,11 @@ public class WebOrchestrator {
         // ── Cache lookup ────────────────────────────────────────────────────
         if (AppConfig.SEARCH_CACHE_ENABLED) {
             String cacheKey = SearchCache.normalize(query);
-            Map<String, String> cached = SearchCache.get(cacheKey);
-            if (cached != null) {
+            Optional<Map<String, String>> cached = SearchCache.get(cacheKey);
+            if (cached.isPresent()) {
                 LOG.info("WebOrchestrator", "Cache HIT for: \"" + query + "\"");
                 LOG.timing("WebOrchestrator", "searchWeb (cache hit)", System.currentTimeMillis() - start);
-                return cached;
+                return cached.get();
             }
             LOG.debug("WebOrchestrator", "Cache MISS for: \"" + query + "\"");
         }
@@ -84,7 +86,7 @@ public class WebOrchestrator {
                 : executeSequential(query, instantJson);
 
         // ── Store in cache (successes only) ────────────────────────────────
-        if (AppConfig.SEARCH_CACHE_ENABLED && "success".equals(webResults.get("status"))) {
+        if (AppConfig.SEARCH_CACHE_ENABLED && SkillStatus.SUCCESS.value().equals(webResults.get("status"))) {
             SearchCache.put(SearchCache.normalize(query), webResults);
             LOG.debug("WebOrchestrator", "Result cached. Stats: " + SearchCache.stats());
         }
@@ -137,22 +139,22 @@ public class WebOrchestrator {
         try {
             CompletableFuture.allOf(ddgFuture, bingFuture)
                     .get(AppConfig.SEARCH_PARALLEL_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-            ddgResult  = ddgFuture.getNow(Map.of("status", "error"));
-            bingResult = bingFuture.getNow(Map.of("status", "error"));
+            ddgResult  = ddgFuture.getNow(Map.of("status", SkillStatus.ERROR.value()));
+            bingResult = bingFuture.getNow(Map.of("status", SkillStatus.ERROR.value()));
         } catch (TimeoutException e) {
             LOG.warn("WebOrchestrator", "Parallel search timed out after "
                     + AppConfig.SEARCH_PARALLEL_TIMEOUT_MS + "ms — using available results");
-            ddgResult  = ddgFuture.isDone()  ? ddgFuture.getNow(Map.of("status", "error"))  : Map.of("status", "error");
-            bingResult = bingFuture.isDone() ? bingFuture.getNow(Map.of("status", "error")) : Map.of("status", "error");
+            ddgResult  = ddgFuture.isDone()  ? ddgFuture.getNow(Map.of("status", SkillStatus.ERROR.value()))  : Map.of("status", SkillStatus.ERROR.value());
+            bingResult = bingFuture.isDone() ? bingFuture.getNow(Map.of("status", SkillStatus.ERROR.value())) : Map.of("status", SkillStatus.ERROR.value());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             LOG.warn("WebOrchestrator", "Parallel search interrupted — using Bing result only");
-            ddgResult  = Map.of("status", "error");
-            bingResult = bingFuture.getNow(Map.of("status", "error"));
+            ddgResult  = Map.of("status", SkillStatus.ERROR.value());
+            bingResult = bingFuture.getNow(Map.of("status", SkillStatus.ERROR.value()));
         } catch (ExecutionException e) {
             LOG.warn("WebOrchestrator", "Parallel search execution error: " + e.getCause().getMessage());
-            ddgResult  = ddgFuture.isCompletedExceptionally()  ? Map.of("status", "error") : ddgFuture.getNow(Map.of("status", "error"));
-            bingResult = bingFuture.isCompletedExceptionally() ? Map.of("status", "error") : bingFuture.getNow(Map.of("status", "error"));
+            ddgResult  = ddgFuture.isCompletedExceptionally()  ? Map.of("status", SkillStatus.ERROR.value()) : ddgFuture.getNow(Map.of("status", SkillStatus.ERROR.value()));
+            bingResult = bingFuture.isCompletedExceptionally() ? Map.of("status", SkillStatus.ERROR.value()) : bingFuture.getNow(Map.of("status", SkillStatus.ERROR.value()));
         }
 
         // Prefer DDG if sufficient; otherwise use Bing
@@ -181,7 +183,7 @@ public class WebOrchestrator {
         if (!DDG_CIRCUIT_BREAKER.allowCall()) {
             LOG.warn("WebOrchestrator",
                     "DDG circuit OPEN [" + DDG_CIRCUIT_BREAKER.getState() + "] — skipping DDG HTML");
-            return Map.of("status", "error");
+            return Map.of("status", SkillStatus.ERROR.value());
         }
         try {
             Map<String, String> result = com.gazapps.services.DuckDuckGoService.searchHtml(query);
@@ -190,13 +192,13 @@ public class WebOrchestrator {
         } catch (Exception ex) {
             DDG_CIRCUIT_BREAKER.recordFailure();
             LOG.warn("WebOrchestrator", "DDG HTML failed (circuit breaker notified): " + ex.getMessage());
-            return Map.of("status", "error");
+            return Map.of("status", SkillStatus.ERROR.value());
         }
     }
 
     /** Returns {@code true} if the DDG HTML result is considered sufficient. */
     private static boolean isDdgSufficient(Map<String, String> html) {
-        return "success".equals(html.get("status"))
+        return SkillStatus.SUCCESS.value().equals(html.get("status"))
                 && html.get("page_text") != null
                 && html.get("page_text").length() > 300;
     }

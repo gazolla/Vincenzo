@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,15 +45,16 @@ class MemoryServiceTest {
 
     @Test
     void save_validContent_returnsId() {
-        String id = MemoryService.getInstance().save("Test content", List.of("tag1"), "note");
-        assertNotNull(id);
-        assertFalse(id.isBlank());
+        Optional<String> idOpt = MemoryService.getInstance().save("Test content", List.of("tag1"), "note");
+        assertTrue(idOpt.isPresent());
+        assertFalse(idOpt.get().isBlank());
     }
 
     @Test
     void save_idStartsWithMem() {
-        String id = MemoryService.getInstance().save("Some fact", List.of(), "note");
-        assertTrue(id.startsWith("mem-"), "id should start with 'mem-'");
+        Optional<String> idOpt = MemoryService.getInstance().save("Some fact", List.of(), "note");
+        assertTrue(idOpt.isPresent());
+        assertTrue(idOpt.get().startsWith("mem-"), "id should start with 'mem-'");
     }
 
     @Test
@@ -80,8 +82,7 @@ class MemoryServiceTest {
 
     @Test
     void save_nullTags_treatedAsEmpty() {
-        String id = MemoryService.getInstance().save("No tags here", null, "note");
-        assertNotNull(id);
+        assertTrue(MemoryService.getInstance().save("No tags here", null, "note").isPresent());
         MemoryService.MemoryEntry entry = MemoryService.getInstance().list(null).get(0);
         assertNotNull(entry.tags());
         assertTrue(entry.tags().isEmpty());
@@ -95,7 +96,7 @@ class MemoryServiceTest {
     }
 
     @Test
-    void save_maxItemsReached_returnsNull() throws Exception {
+    void save_maxItemsReached_returnsEmpty() throws Exception {
         // Override limit to 2 for this test
         Field propsField = AppConfig.class.getDeclaredField("PROPS");
         propsField.setAccessible(true);
@@ -108,10 +109,10 @@ class MemoryServiceTest {
         MemoryService svc = MemoryService.getInstance();
 
         try {
-            assertNotNull(svc.save("First", List.of(), "note"));
-            assertNotNull(svc.save("Second", List.of(), "note"));
-            assertNull(svc.save("Third — should be rejected", List.of(), "note"),
-                    "save() should return null when max items is reached");
+            assertTrue(svc.save("First", List.of(), "note").isPresent());
+            assertTrue(svc.save("Second", List.of(), "note").isPresent());
+            assertTrue(svc.save("Third — should be rejected", List.of(), "note").isEmpty(),
+                    "save() should return empty when max items is reached");
         } finally {
             props.setProperty("memory.max.items", original);
         }
@@ -231,7 +232,7 @@ class MemoryServiceTest {
     @Test
     void delete_existingId_returnsTrue() {
         MemoryService svc = MemoryService.getInstance();
-        String id = svc.save("To be deleted", List.of(), "note");
+        String id = svc.save("To be deleted", List.of(), "note").orElseThrow();
         assertTrue(svc.delete(id));
     }
 
@@ -243,7 +244,7 @@ class MemoryServiceTest {
     @Test
     void delete_afterDelete_notInList() {
         MemoryService svc = MemoryService.getInstance();
-        String id = svc.save("Gone", List.of(), "note");
+        String id = svc.save("Gone", List.of(), "note").orElseThrow();
         svc.delete(id);
 
         assertTrue(svc.list(null).isEmpty());
@@ -254,20 +255,18 @@ class MemoryServiceTest {
     @Test
     void update_existingId_contentChanged() {
         MemoryService svc = MemoryService.getInstance();
-        String id = svc.save("Original content", List.of("tag"), "note");
+        String id = svc.save("Original content", List.of("tag"), "note").orElseThrow();
 
-        MemoryService.MemoryEntry updated = svc.update(id, "Updated content", null);
-        assertNotNull(updated);
+        MemoryService.MemoryEntry updated = svc.update(id, "Updated content", null).orElseThrow();
         assertEquals("Updated content", updated.content());
     }
 
     @Test
     void update_existingId_tagsChanged() {
         MemoryService svc = MemoryService.getInstance();
-        String id = svc.save("Content", List.of("old-tag"), "note");
+        String id = svc.save("Content", List.of("old-tag"), "note").orElseThrow();
 
-        MemoryService.MemoryEntry updated = svc.update(id, null, List.of("new-tag"));
-        assertNotNull(updated);
+        MemoryService.MemoryEntry updated = svc.update(id, null, List.of("new-tag")).orElseThrow();
         assertTrue(updated.tags().contains("new-tag"));
         assertFalse(updated.tags().contains("old-tag"));
     }
@@ -275,34 +274,34 @@ class MemoryServiceTest {
     @Test
     void update_nullContent_keepsExistingContent() {
         MemoryService svc = MemoryService.getInstance();
-        String id = svc.save("Keep this content", List.of(), "note");
+        String id = svc.save("Keep this content", List.of(), "note").orElseThrow();
 
-        MemoryService.MemoryEntry updated = svc.update(id, null, List.of("new-tag"));
+        MemoryService.MemoryEntry updated = svc.update(id, null, List.of("new-tag")).orElseThrow();
         assertEquals("Keep this content", updated.content());
     }
 
     @Test
     void update_nullTags_keepsExistingTags() {
         MemoryService svc = MemoryService.getInstance();
-        String id = svc.save("Content", List.of("keep-tag"), "note");
+        String id = svc.save("Content", List.of("keep-tag"), "note").orElseThrow();
 
-        MemoryService.MemoryEntry updated = svc.update(id, "New content", null);
+        MemoryService.MemoryEntry updated = svc.update(id, "New content", null).orElseThrow();
         assertTrue(updated.tags().contains("keep-tag"));
     }
 
     @Test
-    void update_unknownId_returnsNull() {
-        assertNull(MemoryService.getInstance().update("mem-unknown", "text", null));
+    void update_unknownId_returnsEmpty() {
+        assertTrue(MemoryService.getInstance().update("mem-unknown", "text", null).isEmpty());
     }
 
     @Test
     void update_updatedAtIsRefreshed() throws InterruptedException {
         MemoryService svc = MemoryService.getInstance();
-        String id = svc.save("Original", List.of(), "note");
+        String id = svc.save("Original", List.of(), "note").orElseThrow();
         MemoryService.MemoryEntry original = svc.list(null).get(0);
 
         Thread.sleep(5);
-        MemoryService.MemoryEntry updated = svc.update(id, "Changed", null);
+        MemoryService.MemoryEntry updated = svc.update(id, "Changed", null).orElseThrow();
 
         assertTrue(updated.updatedAt() >= original.updatedAt(),
                 "updatedAt should be refreshed after update");
@@ -319,7 +318,7 @@ class MemoryServiceTest {
         resetSingleton();
 
         MemoryService svc = MemoryService.getInstance();
-        String id = svc.save("Persistent content", List.of("persist", "test"), "research");
+        String id = svc.save("Persistent content", List.of("persist", "test"), "research").orElseThrow();
         MemoryService.MemoryEntry original = svc.list(null).get(0);
 
         assertTrue(Files.exists(storageFile), "JSON file should be created after save");
@@ -357,7 +356,7 @@ class MemoryServiceTest {
         resetSingleton();
 
         MemoryService svc = MemoryService.getInstance();
-        String id = svc.save("Will be deleted", List.of(), "note");
+        String id = svc.save("Will be deleted", List.of(), "note").orElseThrow();
         svc.delete(id);
 
         // Reset and reload

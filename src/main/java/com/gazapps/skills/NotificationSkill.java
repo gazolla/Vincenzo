@@ -3,6 +3,7 @@ package com.gazapps.skills;
 import com.gazapps.logging.LogService;
 import com.gazapps.services.NotificationService;
 import com.gazapps.services.NotificationService.Notification;
+import com.gazapps.util.SkillStatus;
 import com.gazapps.util.StringUtils;
 import com.google.adk.tools.Annotations.Schema;
 import com.google.gson.JsonArray;
@@ -49,7 +50,7 @@ public class NotificationSkill {
         if (message == null || message.isBlank()) {
             LOG.warn("NotificationSkill", "Rejected blank message");
             Map<String, String> err = new HashMap<>();
-            err.put("status",  "error");
+            err.put("status",  SkillStatus.ERROR.value());
             err.put("message", "message must not be blank");
             return err;
         }
@@ -61,7 +62,7 @@ public class NotificationSkill {
         String delivery = "sent_telegram".equals(notifId) ? "telegram" : "queued";
 
         Map<String, String> result = new HashMap<>();
-        result.put("status",          "success");
+        result.put("status",          SkillStatus.SUCCESS.value());
         result.put("notification_id", notifId);
         result.put("delivery",        delivery);
         result.put("message_preview", StringUtils.truncate(message, 100));
@@ -97,7 +98,7 @@ public class NotificationSkill {
         }
 
         Map<String, String> result = new HashMap<>();
-        result.put("status",        "success");
+        result.put("status",        SkillStatus.SUCCESS.value());
         result.put("count",         String.valueOf(pending.size()));
         result.put("notifications", jsonNotifs.toString());
 
@@ -131,11 +132,11 @@ public class NotificationSkill {
 
         Map<String, String> result = new HashMap<>();
         if (found) {
-            result.put("status",          "success");
+            result.put("status",          SkillStatus.SUCCESS.value());
             result.put("notification_id", notificationId);
             result.put("message",         "Notification marked as read");
         } else {
-            result.put("status",          "error");
+            result.put("status",          SkillStatus.ERROR.value());
             result.put("notification_id", notificationId);
             result.put("message",         "Notification not found: " + notificationId
                     + ". Use listPendingNotifications() to see available ids.");

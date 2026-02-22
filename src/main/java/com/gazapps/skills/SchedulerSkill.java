@@ -4,6 +4,7 @@ import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.services.SchedulerService;
 import com.gazapps.services.SchedulerService.MonitorJob;
+import com.gazapps.util.SkillStatus;
 import com.gazapps.util.UrlValidator;
 import com.google.adk.tools.Annotations.Schema;
 import com.google.gson.JsonArray;
@@ -92,7 +93,7 @@ public class SchedulerSkill {
                 .orElse(null);
 
         Map<String, String> result = new HashMap<>();
-        result.put("status",           "success");
+        result.put("status",           SkillStatus.SUCCESS.value());
         result.put("job_id",           jobId);
         result.put("url",              feedUrlOrWebUrl);
         result.put("keyword",          keyword);
@@ -133,7 +134,7 @@ public class SchedulerSkill {
         }
 
         Map<String, String> result = new HashMap<>();
-        result.put("status",    "success");
+        result.put("status",    SkillStatus.SUCCESS.value());
         result.put("job_count", String.valueOf(monitorList.size()));
         result.put("jobs",      jsonJobs.toString());
 
@@ -162,11 +163,11 @@ public class SchedulerSkill {
 
         Map<String, String> result = new HashMap<>();
         if (cancelled) {
-            result.put("status",  "success");
+            result.put("status",  SkillStatus.SUCCESS.value());
             result.put("job_id", jobId);
             result.put("message", "Monitor job cancelled and removed");
         } else {
-            result.put("status",  "error");
+            result.put("status",  SkillStatus.ERROR.value());
             result.put("job_id", jobId);
             result.put("message", "Job not found: " + jobId + ". Use listMonitors() to see existing jobs.");
         }
@@ -179,7 +180,7 @@ public class SchedulerSkill {
 
     private static Map<String, String> errorMap(String url, String message) {
         Map<String, String> err = new HashMap<>();
-        err.put("status",  "error");
+        err.put("status",  SkillStatus.ERROR.value());
         err.put("url",     url != null ? url : "");
         err.put("message", message);
         return err;

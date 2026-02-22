@@ -5,6 +5,7 @@ import com.gazapps.logging.LogService;
 import com.gazapps.services.BrowserService;
 import com.gazapps.util.BrowserErrors;
 import com.gazapps.util.RetryUtils;
+import com.gazapps.util.SkillStatus;
 import com.gazapps.util.UrlValidator;
 import com.google.adk.tools.Annotations.Schema;
 import com.microsoft.playwright.Page;
@@ -30,7 +31,7 @@ public class WebContentSkill {
         } catch (IllegalArgumentException e) {
             LOG.warn("WebContentSkill", "Blocked unsafe URL: " + e.getMessage());
             Map<String, String> error = new HashMap<>();
-            error.put("status", "error");
+            error.put("status", SkillStatus.ERROR.value());
             error.put("url", url);
             error.put("message", "URL blocked for security reasons: " + e.getMessage());
             return error;
@@ -68,7 +69,7 @@ public class WebContentSkill {
                             }
 
                             Map<String, String> result = new HashMap<>();
-                            result.put("status", "success");
+                            result.put("status", SkillStatus.SUCCESS.value());
                             result.put("url", url);
                             result.put("title", title);
                             result.put("content", bodyText);
@@ -80,19 +81,19 @@ public class WebContentSkill {
                         } catch (Exception e) {
                             LOG.error("WebContentSkill", "Failed for " + url, e);
                             Map<String, String> error = new HashMap<>();
-                            error.put("status", "error");
+                            error.put("status", SkillStatus.ERROR.value());
                             error.put("url", url);
                             error.put("error_type", BrowserErrors.classify(e));
                             error.put("message", "Failed to fetch page: " + e.getMessage());
                             return error;
                         }
                     }),
-                    result -> "error".equals(result.get("status"))
+                    result -> SkillStatus.ERROR.value().equals(result.get("status"))
             );
         } catch (Exception e) {
             LOG.error("WebContentSkill", "Failed for " + url + " after retries", e);
             Map<String, String> error = new HashMap<>();
-            error.put("status", "error");
+            error.put("status", SkillStatus.ERROR.value());
             error.put("url", url);
             error.put("error_type", BrowserErrors.classify(e));
             error.put("message", "Failed to fetch page: " + e.getMessage());
@@ -114,7 +115,7 @@ public class WebContentSkill {
         } catch (IllegalArgumentException e) {
             LOG.warn("WebContentSkill", "Blocked unsafe URL for screenshot: " + e.getMessage());
             Map<String, String> error = new HashMap<>();
-            error.put("status", "error");
+            error.put("status", SkillStatus.ERROR.value());
             error.put("url", url);
             error.put("message", "URL blocked for security reasons: " + e.getMessage());
             return error;
@@ -137,7 +138,7 @@ public class WebContentSkill {
                 LOG.info("WebContentSkill", "Screenshot saved: " + outputPath.toAbsolutePath());
 
                 Map<String, String> result = new HashMap<>();
-                result.put("status", "success");
+                result.put("status", SkillStatus.SUCCESS.value());
                 result.put("url", url);
                 result.put("file", outputPath.toString());
                 result.put("title", page.title());
@@ -149,7 +150,7 @@ public class WebContentSkill {
             } catch (Exception e) {
                 LOG.error("WebContentSkill", "Screenshot failed", e);
                 Map<String, String> error = new HashMap<>();
-                error.put("status", "error");
+                error.put("status", SkillStatus.ERROR.value());
                 error.put("url", url);
                 error.put("error_type", BrowserErrors.classify(e));
                 error.put("message", "Screenshot failed: " + e.getMessage());

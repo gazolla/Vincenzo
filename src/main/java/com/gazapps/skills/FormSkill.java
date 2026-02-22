@@ -4,6 +4,7 @@ import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.services.BrowserService;
 import com.gazapps.util.BrowserErrors;
+import com.gazapps.util.SkillStatus;
 import com.gazapps.util.StringUtils;
 import com.gazapps.util.UrlValidator;
 import com.google.adk.tools.Annotations.Schema;
@@ -52,7 +53,7 @@ public class FormSkill {
         } catch (IllegalArgumentException e) {
             LOG.warn("FormSkill", "Blocked unsafe URL: " + e.getMessage());
             Map<String, String> error = new HashMap<>();
-            error.put("status", "error");
+            error.put("status", SkillStatus.ERROR.value());
             error.put("url", url);
             error.put("message", "URL blocked for security reasons: " + e.getMessage());
             return error;
@@ -152,7 +153,7 @@ public class FormSkill {
                 }
 
                 Map<String, String> result = new HashMap<>();
-                result.put("status", "success");
+                result.put("status", SkillStatus.SUCCESS.value());
                 result.put("url", url);
                 result.put("response_url", responseUrl);
                 result.put("result_content", resultText);
@@ -165,7 +166,7 @@ public class FormSkill {
             } catch (Exception e) {
                 LOG.error("FormSkill", "Failed for " + url, e);
                 Map<String, String> error = new HashMap<>();
-                error.put("status", "error");
+                error.put("status", SkillStatus.ERROR.value());
                 error.put("url", url);
                 error.put("error_type", BrowserErrors.classify(e));
                 error.put("message", "Form fill/submit failed: " + e.getMessage());

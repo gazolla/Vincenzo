@@ -3,6 +3,7 @@ package com.gazapps.skills;
 import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.util.RetryUtils;
+import com.gazapps.util.SkillStatus;
 import com.gazapps.util.UrlValidator;
 import com.google.adk.tools.Annotations.Schema;
 import org.apache.pdfbox.Loader;
@@ -49,7 +50,7 @@ public class PdfSkill {
         } catch (IllegalArgumentException e) {
             LOG.warn("PdfSkill", "Blocked unsafe URL: " + e.getMessage());
             Map<String, String> error = new HashMap<>();
-            error.put("status", "error");
+            error.put("status", SkillStatus.ERROR.value());
             error.put("url", url);
             error.put("message", "URL blocked for security reasons: " + e.getMessage());
             return error;
@@ -98,7 +99,7 @@ public class PdfSkill {
                 }
 
                 Map<String, String> result = new HashMap<>();
-                result.put("status", "success");
+                result.put("status", SkillStatus.SUCCESS.value());
                 result.put("url", url);
                 result.put("page_count", String.valueOf(pageCount));
                 result.put("text_content", text);
@@ -112,7 +113,7 @@ public class PdfSkill {
         } catch (Exception e) {
             LOG.error("PdfSkill", "Failed for " + url, e);
             Map<String, String> error = new HashMap<>();
-            error.put("status", "error");
+            error.put("status", SkillStatus.ERROR.value());
             error.put("url", url);
             error.put("message", "PDF read failed: " + e.getMessage());
             return error;

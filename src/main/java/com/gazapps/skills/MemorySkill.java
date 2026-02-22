@@ -4,6 +4,7 @@ import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.services.MemoryService;
 import com.gazapps.services.MemoryService.MemoryEntry;
+import com.gazapps.util.SkillStatus;
 import com.google.adk.tools.Annotations.Schema;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -68,14 +70,15 @@ public final class MemorySkill {
         List<String> tagList = parseTags(tags);
         String safeCategory = (category != null && !category.isBlank()) ? category.trim() : "note";
 
-        String id = MemoryService.getInstance().save(content, tagList, safeCategory);
-        if (id == null) {
+        Optional<String> savedId = MemoryService.getInstance().save(content, tagList, safeCategory);
+        if (savedId.isEmpty()) {
             return errorMap("Memory limit reached (" + AppConfig.memoryMaxItems()
                     + "). Delete some entries first using deleteMemory(id).");
         }
+        String id = savedId.get();
 
         Map<String, String> result = new HashMap<>();
-        result.put("status",   "success");
+        result.put("status",   SkillStatus.SUCCESS.value());
         result.put("id",       id);
         result.put("content",  content);
         result.put("tags",     tagList.toString());
@@ -113,7 +116,7 @@ public final class MemorySkill {
         List<MemoryEntry> matches = MemoryService.getInstance().search(query, tagList);
 
         Map<String, String> result = new HashMap<>();
-        result.put("status",      "success");
+        result.put("status",      SkillStatus.SUCCESS.value());
         result.put("query",       query != null ? query : "");
         result.put("tags",        tags != null ? tags : "");
         result.put("match_count", String.valueOf(matches.size()));
@@ -142,7 +145,7 @@ public final class MemorySkill {
         List<MemoryEntry> all = MemoryService.getInstance().list(tag);
 
         Map<String, String> result = new HashMap<>();
-        result.put("status",      "success");
+        result.put("status",      SkillStatus.SUCCESS.value());
         result.put("tag_filter",  tag != null ? tag : "");
         result.put("entry_count", String.valueOf(all.size()));
         result.put("memories",    entriesToJson(all).toString());
@@ -174,11 +177,11 @@ public final class MemorySkill {
 
         Map<String, String> result = new HashMap<>();
         if (deleted) {
-            result.put("status",  "success");
+            result.put("status",  SkillStatus.SUCCESS.value());
             result.put("id",      id);
             result.put("message", "Memory entry deleted");
         } else {
-            result.put("status",  "error");
+            result.put("status",  SkillStatus.ERROR.value());
             result.put("id",      id);
             result.put("message", "Memory entry not found: " + id
                     + ". Use listMemories() to see existing ids.");
@@ -222,14 +225,15 @@ public final class MemorySkill {
         List<String> tagList = (tags != null && !tags.isBlank()) ? parseTags(tags) : null;
         String newContent    = (content != null && !content.isBlank()) ? content : null;
 
-        MemoryEntry updated = MemoryService.getInstance().update(id, newContent, tagList);
-        if (updated == null) {
+        Optional<MemoryEntry> updatedOpt = MemoryService.getInstance().update(id, newContent, tagList);
+        if (updatedOpt.isEmpty()) {
             return errorMap("Memory entry not found: " + id
                     + ". Use listMemories() to see existing ids.");
         }
+        MemoryEntry updated = updatedOpt.get();
 
         Map<String, String> result = new HashMap<>();
-        result.put("status",   "success");
+        result.put("status",   SkillStatus.SUCCESS.value());
         result.put("id",       updated.id());
         result.put("content",  updated.content());
         result.put("tags",     updated.tags().toString());
@@ -275,7 +279,7 @@ public final class MemorySkill {
 
     private static Map<String, String> errorMap(String message) {
         Map<String, String> err = new HashMap<>();
-        err.put("status",  "error");
+        err.put("status",  SkillStatus.ERROR.value());
         err.put("message", message);
         return err;
     }
