@@ -133,8 +133,13 @@ public class SearchAgent {
                                                                 22. Use deleteMemory(id) only after confirming with the user. Always call listMemories()
                                                                     or retrieveMemory() first to verify the correct id before deleting.
                                                                 23. Use updateMemory(id, content, tags) to amend an existing memory when the user says
-                                                                    something like "atualize minha nota sobre Python" or "adicione Go também".
+                                                                    something like "atualize minha nota sobre Python" ou "adicione Go também".
                                                                     Always call retrieveMemory first to find the id, then confirm the update with the user.
+                                                                24. Use deepResearch(query) when the user asks for a comprehensive report, detailed analysis,
+                                                                    multi-source comparison, or any task requiring multiple sources and structured synthesis.
+                                                                    deepResearch runs a full pipeline: search → read pages → synthesize → fact-check.
+                                                                    ALWAYS confirm with the user before calling deepResearch — it takes longer but produces
+                                                                    a thorough, verified, structured report. Never use it for simple factual questions.
 
                                                                 Example: if asked about flight prices, hotel rates, or anything commercial → searchWeb immediately.
                                                                 Example for fillFormAndSubmit: fetchPageContent(url) first → identify selectors → then fillFormAndSubmit(url, fields, submitSelector).
@@ -142,6 +147,7 @@ public class SearchAgent {
                                                                 Example for monitoring: confirm details → scheduleMonitor(url, keyword, 60, description) → confirm to user.
                                                                 Example for memory: user says "lembre que prefiro dark mode" → saveMemory(content="Usuário prefere dark mode em todas as UIs", tags="preference,ui", category="preference").
                                                                 Example for memory recall: user asks "quais são minhas preferências?" → retrieveMemory(query="", tags="preference") → apresentar resultados.
+                                                                Example for deep research: user asks "faça um relatório completo sobre EVs no Brasil" → confirm → deepResearch(query).
                                                                 """
                                                                 .formatted(java.time.LocalDateTime.now()
                                                                                 .format(java.time.format.DateTimeFormatter
@@ -208,7 +214,10 @@ public class SearchAgent {
                                                                 "deleteMemory"),
                                                 com.google.adk.tools.FunctionTool.create(
                                                                 com.gazapps.skills.MemorySkill.class,
-                                                                "updateMemory"))
+                                                                "updateMemory"),
+                                                com.google.adk.tools.FunctionTool.create(
+                                                                com.gazapps.skills.ResearchSkill.class,
+                                                                "deepResearch"))
                                 .build();
         }
 
