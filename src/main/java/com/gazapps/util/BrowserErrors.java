@@ -3,28 +3,35 @@ package com.gazapps.util;
 /**
  * Classifies browser/network exceptions into a short, LLM-friendly error type.
  *
- * <p>Used by all browser-based skills to populate the {@code "error_type"} key
+ * <p>
+ * Used by all browser-based skills to populate the {@code "error_type"} key
  * in the result map, so the LLM can give the user a more precise error message
- * (e.g. "the site timed out" vs "the site blocked access").</p>
+ * (e.g. "the site timed out" vs "the site blocked access").
+ * </p>
  *
- * <p>Return values:
+ * <p>
+ * Return values:
  * <ul>
- *   <li>{@code "timeout"}  — navigation or response timed out</li>
- *   <li>{@code "network"}  — DNS failure or connection refused</li>
- *   <li>{@code "blocked"}  — HTTP 403/401 or bot-detection wall</li>
- *   <li>{@code "unknown"}  — anything else</li>
+ * <li>{@code "timeout"} — navigation or response timed out</li>
+ * <li>{@code "network"} — DNS failure or connection refused</li>
+ * <li>{@code "blocked"} — HTTP 403/401 or bot-detection wall</li>
+ * <li>{@code "unknown"} — anything else</li>
  * </ul>
  */
 public final class BrowserErrors {
 
-    private BrowserErrors() {}
+    private BrowserErrors() {
+    }
 
     /**
-     * Classifies the given exception and returns a short error-type string.
+     * Classifies the given throwable and returns a short error-type string.
+     * Accepts {@link Throwable} so callers don't need to cast from RuntimeException
+     * causes.
      * Never throws; returns {@code "unknown"} for {@code null} input.
      */
-    public static String classify(Exception e) {
-        if (e == null) return "unknown";
+    public static String classify(Throwable e) {
+        if (e == null)
+            return "unknown";
         String msg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
         String cls = e.getClass().getSimpleName().toLowerCase();
 

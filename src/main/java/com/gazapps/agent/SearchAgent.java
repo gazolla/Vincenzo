@@ -2,7 +2,6 @@ package com.gazapps.agent;
 
 import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
-import com.gazapps.skills.WebOrchestrator;
 import com.google.adk.agents.BaseAgent;
 import com.google.adk.agents.LlmAgent;
 import com.google.adk.agents.RunConfig;
@@ -55,169 +54,54 @@ public class SearchAgent {
         }
 
         private static BaseAgent buildAgent() {
+                // Root agent — pure routing, no direct tools.
+                // AutoFlow: ADK injects a 'transferToAgent' tool for each sub-agent.
+                // The root LLM decides which specialist to delegate to based on each
+                // sub-agent's 'description'. Sub-agents respond directly to the user
+                // (disallowTransferToParent=true) — no extra round-trip back to root.
                 return LlmAgent.builder()
-                                .name("internet-search-assistant")
-                                .description("A helpful assistant that can search the internet and read web pages")
+                                .name("vincenzo")
+                                .description("Vincenzo — AI assistant with internet access, memory and monitoring capabilities.")
                                 .model(AppConfig.LLM_MODEL)
                                 .instruction(
                                                 """
-                                                                You are a helpful AI assistant called Vincenzo with internet access powered by a real web browser.
+                                                                You are Vincenzo, a helpful AI assistant with internet access.
                                                                 Today's date and time: %s
 
-                                                                You have access to the following tools:
-                                                                - searchWeb(query): searches DuckDuckGo/Bing and returns real results (titles, URLs, snippets)
-                                                                - fetchPageContent(url): opens and reads the full text of any web page
-                                                                - screenshotPage(url, filename): takes a screenshot of a web page
-                                                                - summarizeUrl(url): fetches and cleans a page's content for summarization
-                                                                - extractStructuredData(url, selectors): extracts structured JSON data from a page using CSS selectors
-                                                                - fillFormAndSubmit(url, fields, submitSelector): fills HTML form fields and submits the form
-                                                                - readPdf(url): downloads and extracts text from a PDF file
-                                                                - discoverFeed(url): finds the RSS/Atom feed URL for a website
-                                                                - readFeed(feedUrl, maxItems): fetches and parses an RSS or Atom feed
-                                                                - searchInFeed(feedUrl, keyword): searches for a keyword inside a feed's items
-                                                                - scheduleMonitor(feedUrlOrWebUrl, keyword, intervalMinutes, description): sets up a recurring keyword-watch job
-                                                                - listMonitors(): lists all active monitor jobs and their status
-                                                                - cancelMonitor(jobId): cancels and removes a monitor job
-                                                                - sendNotification(message): sends a proactive message or alert to the user
-                                                                - listPendingNotifications(): lists queued notifications not yet read (CLI mode)
-                                                                - markAsRead(notificationId): marks a queued notification as read
-                                                                - saveMemory(content, tags, category): store a fact, preference, note, research summary, or task context persistently across sessions
-                                                                - retrieveMemory(query, tags): search stored memories by text substring and/or tags
-                                                                - listMemories(tag): list all stored memories, optionally filtered by a single tag
-                                                                - deleteMemory(id): permanently remove a memory entry
-                                                                - updateMemory(id, content, tags): update the content or tags of an existing memory entry
+                                                                You have 5 specialist agents. Delegate ALL tasks to the appropriate one:
 
-                                                                MANDATORY rules - follow these without exception:
-                                                                1. ALWAYS use searchWeb for ANY request involving: prices, flights, tickets, hotels, news, weather,
-                                                                   exchange rates, sports scores, product availability, events, schedules, or ANY real-world data
-                                                                   that changes over time. DO NOT answer from memory for these topics.
-                                                                2. After getting search results, use fetchPageContent on 1-2 of the most relevant URLs to get
-                                                                   detailed and accurate information before answering.
-                                                                3. Always include the source URLs in your answer.
-                                                                4. Respond in the SAME LANGUAGE the user writes in (if Portuguese, answer in Portuguese).
-                                                                5. Only skip searching for pure math, definitions, or stable facts that cannot change.
-                                                                6. If the URL ends with .pdf or the content is clearly a PDF document, use readPdf instead of fetchPageContent.
-                                                                7. To extract prices, tables, links, or lists from a page with known structure, prefer extractStructuredData. \
-                                                                   For text content use plain CSS selectors, e.g. {"title":".product-name","price":".price"}. \
-                                                                   To extract a URL or any HTML attribute, append |attrName to the selector, e.g. {"link":".titleline > a|href","img":"img.cover|src"}.
-                                                                8. Use summarizeUrl when the user asks to summarize or get the key points of a specific URL or article.
-                                                                9. Use fillFormAndSubmit to search on sites that require form interaction and have no public API.
-                                                                   IMPORTANT: Before calling fillFormAndSubmit, you MUST first call fetchPageContent on the target URL
-                                                                   to inspect the page HTML and identify the correct CSS selectors for the form fields and submit button.
-                                                                   Never guess selectors — always inspect the page source first.
-                                                                10. Use discoverFeed(url) when the user provides a website URL and wants to subscribe to its news feed.
-                                                                    It automatically detects the RSS/Atom feed link from the site's HTML.
-                                                                11. Use readFeed(feedUrl, maxItems) to read the latest items from an RSS or Atom feed.
-                                                                    Prefer this over fetchPageContent for news sites that have feeds — it is faster and structured.
-                                                                12. Use searchInFeed(feedUrl, keyword) to find specific topics inside a feed.
-                                                                    Prefer this over readFeed when the user wants to find something specific within a feed.
-                                                                13. Use scheduleMonitor(url, keyword, intervalMinutes, description) to set up a recurring monitor.
-                                                                    IMPORTANT: Always confirm the URL, keyword and interval with the user before scheduling.
-                                                                    Minimum interval is 5 minutes. Recommended: 60 min for news feeds.
-                                                                14. Use listMonitors() to show the user all active monitor jobs, their last result and next run time.
-                                                                15. Use cancelMonitor(jobId) to stop a monitor. Always call listMonitors() first to confirm the jobId.
-                                                                16. Use sendNotification(message) to proactively send a message or alert to the user.
-                                                                17. Use listPendingNotifications() to show queued notifications not yet delivered (useful in CLI mode).
-                                                                18. Use markAsRead(notificationId) after the user acknowledges a queued notification.
-                                                                19. Use saveMemory(content, tags, category) to remember any user preference, fact, research
-                                                                    finding, reminder, or project context the user explicitly asks you to store, or that you
-                                                                    judge important enough to retain across sessions (e.g. "prefiro Python a Java", "deadline
-                                                                    do projeto é 15 de março"). Always confirm with the user what to save.
-                                                                    Use descriptive tags like 'preference,python' or 'task,work'.
-                                                                    category must be one of: 'preference', 'note', 'research', 'task'.
-                                                                20. Use retrieveMemory(query, tags) at the START of any turn where the user references past
-                                                                    context, preferences, or asks "o que você sabe sobre mim / meus projetos".
-                                                                    Do NOT answer from session history alone — always check the memory store first.
-                                                                21. Use listMemories(tag="") to show the user a complete list of stored memories.
-                                                                    Use listMemories(tag="preference") to show only preference entries, etc.
-                                                                22. Use deleteMemory(id) only after confirming with the user. Always call listMemories()
-                                                                    or retrieveMemory() first to verify the correct id before deleting.
-                                                                23. Use updateMemory(id, content, tags) to amend an existing memory when the user says
-                                                                    something like "atualize minha nota sobre Python" ou "adicione Go também".
-                                                                    Always call retrieveMemory first to find the id, then confirm the update with the user.
-                                                                24. Use deepResearch(query) when the user asks for a comprehensive report, detailed analysis,
-                                                                    multi-source comparison, or any task requiring multiple sources and structured synthesis.
-                                                                    deepResearch runs a full pipeline: search → read pages → synthesize → fact-check.
-                                                                    ALWAYS confirm with the user before calling deepResearch — it takes longer but produces
-                                                                    a thorough, verified, structured report. Never use it for simple factual questions.
+                                                                - WebAgent: internet searches, fetching web pages, screenshots, deep research reports.
+                                                                  Use for: any real-world data (news, prices, weather, flights, sports, etc.).
 
-                                                                Example: if asked about flight prices, hotel rates, or anything commercial → searchWeb immediately.
-                                                                Example for fillFormAndSubmit: fetchPageContent(url) first → identify selectors → then fillFormAndSubmit(url, fields, submitSelector).
-                                                                Example for RSS: discoverFeed(siteUrl) → readFeed(feedUrl, 10) or searchInFeed(feedUrl, keyword).
-                                                                Example for monitoring: confirm details → scheduleMonitor(url, keyword, 60, description) → confirm to user.
-                                                                Example for memory: user says "lembre que prefiro dark mode" → saveMemory(content="Usuário prefere dark mode em todas as UIs", tags="preference,ui", category="preference").
-                                                                Example for memory recall: user asks "quais são minhas preferências?" → retrieveMemory(query="", tags="preference") → apresentar resultados.
-                                                                Example for deep research: user asks "faça um relatório completo sobre EVs no Brasil" → confirm → deepResearch(query).
+                                                                - ContentAgent: summarize URLs, extract structured data, fill HTML forms, read PDFs.
+                                                                  Use for: summarization, data extraction, form submission, PDF reading.
+
+                                                                - FeedAgent: RSS/Atom feeds — discover, read, search.
+                                                                  Use for: anything involving news feeds or RSS subscriptions.
+
+                                                                - MonitorAgent: recurring keyword monitors, scheduling, notifications.
+                                                                  Use for: setting up alerts, managing monitors, sending/reading notifications.
+
+                                                                - MemoryAgent: persistent memories — save, retrieve, list, update, delete.
+                                                                  Use for: storing preferences, notes, research findings or reminders across sessions.
+
+                                                                Rules:
+                                                                1. ALWAYS delegate — never answer real-world or tool-based questions from your own knowledge.
+                                                                2. Respond in the SAME LANGUAGE the user writes in.
+                                                                3. For compound tasks (e.g. "search and save to memory"), delegate sequentially:
+                                                                   first to WebAgent for search, then to MemoryAgent to save the result.
+                                                                4. Only answer directly (without delegating) for: pure math, simple definitions,
+                                                                   or factual questions that cannot possibly change (e.g. "what is 2+2").
                                                                 """
                                                                 .formatted(java.time.LocalDateTime.now()
                                                                                 .format(java.time.format.DateTimeFormatter
                                                                                                 .ofPattern("dd/MM/yyyy HH:mm"))))
-                                .tools(
-                                                com.google.adk.tools.FunctionTool.create(WebOrchestrator.class,
-                                                                "searchWeb"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.WebContentSkill.class,
-                                                                "fetchPageContent"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.WebContentSkill.class,
-                                                                "screenshotPage"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.SummarizeSkill.class,
-                                                                "summarizeUrl"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.ExtractSkill.class,
-                                                                "extractStructuredData"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.FormSkill.class,
-                                                                "fillFormAndSubmit"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.PdfSkill.class,
-                                                                "readPdf"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.RssSkill.class,
-                                                                "discoverFeed"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.RssSkill.class,
-                                                                "readFeed"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.RssSkill.class,
-                                                                "searchInFeed"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.SchedulerSkill.class,
-                                                                "scheduleMonitor"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.SchedulerSkill.class,
-                                                                "listMonitors"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.SchedulerSkill.class,
-                                                                "cancelMonitor"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.NotificationSkill.class,
-                                                                "sendNotification"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.NotificationSkill.class,
-                                                                "listPendingNotifications"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.NotificationSkill.class,
-                                                                "markAsRead"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.MemorySkill.class,
-                                                                "saveMemory"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.MemorySkill.class,
-                                                                "retrieveMemory"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.MemorySkill.class,
-                                                                "listMemories"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.MemorySkill.class,
-                                                                "deleteMemory"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.MemorySkill.class,
-                                                                "updateMemory"),
-                                                com.google.adk.tools.FunctionTool.create(
-                                                                com.gazapps.skills.ResearchSkill.class,
-                                                                "deepResearch"))
+                                .subAgents(
+                                                SubAgents.webAgent(),
+                                                SubAgents.contentAgent(),
+                                                SubAgents.feedAgent(),
+                                                SubAgents.monitorAgent(),
+                                                SubAgents.memoryAgent())
                                 .build();
         }
 

@@ -45,67 +45,96 @@ public class WebContentSkill {
                     "WebContentSkill.fetchPageContent",
                     AppConfig.RETRY_MAX_ATTEMPTS,
                     AppConfig.RETRY_INITIAL_DELAY_MS,
-                    () -> BrowserService.execute(page -> {
+                    () -> {
+                        // BrowserService.execute wraps any internal exception in RuntimeException.
+                        // We catch it here (before RetryUtils sees it as an unhandled throw) so
+                        // the retry predicate can evaluate the returned error-map instead.
                         try {
-                            page.navigate(url,
-                                    new Page.NavigateOptions().setTimeout(AppConfig.FETCH_PAGE_NAVIGATE_TIMEOUT_MS));
-                            page.waitForLoadState(LoadState.DOMCONTENTLOADED);
-                            LOG.timing("WebContentSkill", "Navigation", System.currentTimeMillis() - start);
+                            return BrowserService.execute(page -> {
+                                try {
+                                    page.navigate(url,
+                                            new Page.NavigateOptions()
+                                                    .setTimeout(AppConfig.FETCH_PAGE_NAVIGATE_TIMEOUT_MS));
+                                    page.waitForLoadState(LoadState.DOMCONTENTLOADED);
+                                    LOG.timing("WebContentSkill", "Navigation",
+                                            System.currentTimeMillis() - start);
 
-                            // Remove noise before text extraction
-                            page.evaluate("""
-                                    document.querySelectorAll(
-                                        'script,style,nav,footer,header,aside,iframe,' +
-                                        '[aria-hidden="true"],[class*="cookie"],[class*="banner"],[class*="popup"]'
-                                    ).forEach(el => el.remove());
-                                    """);
+                                    // Remove noise before text extraction
+                                    page.evaluate(
+                                            """
+                                                    document.querySelectorAll(
+                                                        'script,style,nav,footer,header,aside,iframe,' +
+                                                        '[aria-hidden="true"],[class*="cookie"],[class*="banner"],[class*="popup"]'
+                                                    ).forEach(el => el.remove());
+                                                    """);
 
-                            String title = page.title();
-                            String bodyText = page.innerText("body");
-                            int rawLen = bodyText.length();
+                                    String title = page.title();
+                                    String bodyText = page.innerText("body");
+                                    int rawLen = bodyText.length();
 
-                            LOG.info("WebContentSkill", "Page title: \"" + title + "\"");
-                            LOG.info("WebContentSkill", "Raw body text length: " + rawLen + " chars");
+                                    LOG.info("WebContentSkill", "Page title: \"" + title + "\"");
+                                    LOG.info("WebContentSkill",
+                                            "Raw body text length: " + rawLen + " chars");
 
-                            if (bodyText.length() > AppConfig.FETCH_PAGE_MAX_CHARS) {
-                                bodyText = bodyText.substring(0, AppConfig.FETCH_PAGE_MAX_CHARS)
-                                        + "... [content truncated]";
-                                LOG.debug("WebContentSkill",
-                                        "Body text truncated to " + AppConfig.FETCH_PAGE_MAX_CHARS + " chars");
-                            }
+                                    if (bodyText.length() > AppConfig.FETCH_PAGE_MAX_CHARS) {
+                                        bodyText = bodyText.substring(0, AppConfig.FETCH_PAGE_MAX_CHARS)
+                                                + "... [content truncated]";
+                                        LOG.debug("WebContentSkill",
+                                                "Body text truncated to " + AppConfig.FETCH_PAGE_MAX_CHARS
+                                                        + " chars");
+                                    }
 
-                            Map<String, String> result = new HashMap<>();
-                            result.put("status", SkillStatus.SUCCESS.value());
-                            result.put("url", url);
-                            result.put("title", title);
-                            result.put("content", bodyText);
+                                    Map<String, String> result = new HashMap<>();
+                                    result.put("status", SkillStatus.SUCCESS.value());
+                                    result.put("url", url);
+                                    result.put("title", title);
+                                    result.put("content", bodyText);
 
-                            // Save to session.state so SummarizeSkill/FormSkill can reuse content
-                            SessionState.put(toolContext, SessionState.KEY_LAST_FETCH_URL, url);
-                            SessionState.put(toolContext, SessionState.KEY_LAST_FETCH_CONTENT, bodyText);
+                                    // Save to session.state so SummarizeSkill/FormSkill can reuse
+                                    SessionState.put(toolContext, SessionState.KEY_LAST_FETCH_URL, url);
+                                    SessionState.put(toolContext, SessionState.KEY_LAST_FETCH_CONTENT,
+                                            bodyText);
 
-                            LOG.timing("WebContentSkill", "Total execution", System.currentTimeMillis() - start);
-                            LOG.toolResult("fetchPageContent", result);
-                            return result;
+                                    LOG.timing("WebContentSkill", "Total execution",
+                                            System.currentTimeMillis() - start);
+                                    LOG.toolResult("fetchPageContent", result);
+                                    return result;
 
-                        } catch (Exception e) {
-                            LOG.error("WebContentSkill", "Failed for " + url, e);
-                            Map<String, String> error = new HashMap<>();
-                            error.put("status", SkillStatus.ERROR.value());
-                            error.put("url", url);
-                            error.put("error_type", BrowserErrors.classify(e));
-                            error.put("message", "Failed to fetch page: " + e.getMessage());
-                            return error;
+                                } catch (Exception inner) {
+                                    // Caught inside the Page lambda — BrowserService will
+                                    // re-wrap this in RuntimeException; we absorb it below.
+                                    LOG.error("WebContentSkill", "Page error for " + url, inner);
+                                    Map<String, String> err = new HashMap<>();
+                                    err.put("status", SkillStatus.ERROR.value());
+                                    err.put("url", url);
+                                    err.put("error_type", BrowserErrors.classify(inner));
+                                    err.put("message", "Failed to fetch page: " + inner.getMessage());
+                                    return err;
+                                }
+                            });
+                        } catch (RuntimeException re) {
+                            // BrowserService.execute wraps all exceptions in RuntimeException.
+                            // Absorb it here and return an error-map so RetryUtils can retry.
+                            Throwable cause = re.getCause() != null ? re.getCause() : re;
+                            LOG.error("WebContentSkill", "Failed for " + url, cause);
+                            Map<String, String> err = new HashMap<>();
+                            err.put("status", SkillStatus.ERROR.value());
+                            err.put("url", url);
+                            err.put("error_type", BrowserErrors.classify(cause));
+                            err.put("message", "Failed to fetch page: " + cause.getMessage());
+                            return err;
                         }
-                    }),
+                    },
                     result -> SkillStatus.ERROR.value().equals(result.get("status")));
-        } catch (Exception e) {
-            LOG.error("WebContentSkill", "Failed for " + url + " after retries", e);
+        } catch (Throwable t) {
+            // Defense: catch absolutely anything that escapes — RetryUtils, reflection,
+            // etc.
+            LOG.error("WebContentSkill", "Unhandled error for " + url + " after retries", t);
             Map<String, String> error = new HashMap<>();
             error.put("status", SkillStatus.ERROR.value());
             error.put("url", url);
-            error.put("error_type", BrowserErrors.classify(e));
-            error.put("message", "Failed to fetch page: " + e.getMessage());
+            error.put("error_type", BrowserErrors.classify(t));
+            error.put("message", "Failed to fetch page: " + t.getMessage());
             return error;
         }
     }
