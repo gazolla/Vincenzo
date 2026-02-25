@@ -5,13 +5,16 @@ import com.gazapps.logging.LogService;
 import com.gazapps.services.BrowserService;
 import com.gazapps.util.BrowserErrors;
 import com.gazapps.util.RetryUtils;
+import com.gazapps.util.SessionState;
 import com.gazapps.util.SkillStatus;
 import com.google.adk.tools.Annotations.Schema;
+import com.google.adk.tools.ToolContext;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * ADK tool that fetches and cleans a web page's content for summarization.
@@ -29,11 +32,28 @@ public class SummarizeSkill {
             ads, or navigation elements, ready for the LLM to summarize.
             """)
     public static Map<String, String> summarizeUrl(
-            @Schema(name = "url", description = "The full URL of the page to summarize") String url) {
+            @Schema(name = "url", description = "The full URL of the page to summarize") String url,
+            ToolContext toolContext) {
 
         LOG.section("TOOL CALL: summarizeUrl");
         LOG.info("SummarizeSkill", "URL: " + url);
         long start = System.currentTimeMillis();
+
+        // Fast-path: reuse content already fetched by fetchPageContent for the same URL
+        Optional<String> cachedContent = SessionState.getString(toolContext, SessionState.KEY_LAST_FETCH_CONTENT);
+        String cachedUrl = SessionState.getString(toolContext, SessionState.KEY_LAST_FETCH_URL).orElse("");
+        if (cachedContent.isPresent() && url.equals(cachedUrl)) {
+            LOG.info("SummarizeSkill", "Fast-path: reusing content from session.state for " + url);
+            Map<String, String> result = new HashMap<>();
+            result.put("status", SkillStatus.SUCCESS.value());
+            result.put("url", url);
+            result.put("title", "");
+            result.put("content", cachedContent.get());
+            result.put("char_count", String.valueOf(cachedContent.get().length()));
+            result.put("source", "session_cache");
+            LOG.toolResult("summarizeUrl", result);
+            return result;
+        }
 
         try {
             return RetryUtils.withRetry(
@@ -91,8 +111,7 @@ public class SummarizeSkill {
                             return error;
                         }
                     }),
-                    result -> SkillStatus.ERROR.value().equals(result.get("status"))
-            );
+                    result -> SkillStatus.ERROR.value().equals(result.get("status")));
         } catch (Exception e) {
             LOG.error("SummarizeSkill", "Failed for " + url + " after retries", e);
             Map<String, String> error = new HashMap<>();

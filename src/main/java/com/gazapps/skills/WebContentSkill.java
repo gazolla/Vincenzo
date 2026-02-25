@@ -5,9 +5,11 @@ import com.gazapps.logging.LogService;
 import com.gazapps.services.BrowserService;
 import com.gazapps.util.BrowserErrors;
 import com.gazapps.util.RetryUtils;
+import com.gazapps.util.SessionState;
 import com.gazapps.util.SkillStatus;
 import com.gazapps.util.UrlValidator;
 import com.google.adk.tools.Annotations.Schema;
+import com.google.adk.tools.ToolContext;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
 
@@ -20,7 +22,8 @@ public class WebContentSkill {
 
     @Schema(description = "Fetch the full text content of a web page given its URL. Use this to read articles, blog posts, documentation, or any page after getting URLs from search results.")
     public static Map<String, String> fetchPageContent(
-            @Schema(name = "url", description = "The full URL of the page to read") String url) {
+            @Schema(name = "url", description = "The full URL of the page to read") String url,
+            ToolContext toolContext) {
 
         LOG.section("TOOL CALL: fetchPageContent");
         LOG.info("WebContentSkill", "URL: " + url);
@@ -44,7 +47,8 @@ public class WebContentSkill {
                     AppConfig.RETRY_INITIAL_DELAY_MS,
                     () -> BrowserService.execute(page -> {
                         try {
-                            page.navigate(url, new Page.NavigateOptions().setTimeout(AppConfig.FETCH_PAGE_NAVIGATE_TIMEOUT_MS));
+                            page.navigate(url,
+                                    new Page.NavigateOptions().setTimeout(AppConfig.FETCH_PAGE_NAVIGATE_TIMEOUT_MS));
                             page.waitForLoadState(LoadState.DOMCONTENTLOADED);
                             LOG.timing("WebContentSkill", "Navigation", System.currentTimeMillis() - start);
 
@@ -64,8 +68,10 @@ public class WebContentSkill {
                             LOG.info("WebContentSkill", "Raw body text length: " + rawLen + " chars");
 
                             if (bodyText.length() > AppConfig.FETCH_PAGE_MAX_CHARS) {
-                                bodyText = bodyText.substring(0, AppConfig.FETCH_PAGE_MAX_CHARS) + "... [content truncated]";
-                                LOG.debug("WebContentSkill", "Body text truncated to " + AppConfig.FETCH_PAGE_MAX_CHARS + " chars");
+                                bodyText = bodyText.substring(0, AppConfig.FETCH_PAGE_MAX_CHARS)
+                                        + "... [content truncated]";
+                                LOG.debug("WebContentSkill",
+                                        "Body text truncated to " + AppConfig.FETCH_PAGE_MAX_CHARS + " chars");
                             }
 
                             Map<String, String> result = new HashMap<>();
@@ -73,6 +79,10 @@ public class WebContentSkill {
                             result.put("url", url);
                             result.put("title", title);
                             result.put("content", bodyText);
+
+                            // Save to session.state so SummarizeSkill/FormSkill can reuse content
+                            SessionState.put(toolContext, SessionState.KEY_LAST_FETCH_URL, url);
+                            SessionState.put(toolContext, SessionState.KEY_LAST_FETCH_CONTENT, bodyText);
 
                             LOG.timing("WebContentSkill", "Total execution", System.currentTimeMillis() - start);
                             LOG.toolResult("fetchPageContent", result);
@@ -88,8 +98,7 @@ public class WebContentSkill {
                             return error;
                         }
                     }),
-                    result -> SkillStatus.ERROR.value().equals(result.get("status"))
-            );
+                    result -> SkillStatus.ERROR.value().equals(result.get("status")));
         } catch (Exception e) {
             LOG.error("WebContentSkill", "Failed for " + url + " after retries", e);
             Map<String, String> error = new HashMap<>();
@@ -132,7 +141,8 @@ public class WebContentSkill {
                 if (!safeFile.endsWith(".png"))
                     safeFile += ".png";
 
-                java.nio.file.Path outputPath = com.gazapps.services.BrowserService.ensureDir(AppConfig.SCREENSHOTS_DIR).resolve(safeFile);
+                java.nio.file.Path outputPath = com.gazapps.services.BrowserService.ensureDir(AppConfig.SCREENSHOTS_DIR)
+                        .resolve(safeFile);
                 page.screenshot(new Page.ScreenshotOptions().setPath(outputPath).setFullPage(false));
 
                 LOG.info("WebContentSkill", "Screenshot saved: " + outputPath.toAbsolutePath());

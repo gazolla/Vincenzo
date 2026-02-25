@@ -4,10 +4,12 @@ import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.services.BrowserService;
 import com.gazapps.util.BrowserErrors;
+import com.gazapps.util.SessionState;
 import com.gazapps.util.SkillStatus;
 import com.gazapps.util.StringUtils;
 import com.gazapps.util.UrlValidator;
 import com.google.adk.tools.Annotations.Schema;
+import com.google.adk.tools.ToolContext;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -39,12 +41,17 @@ public class FormSkill {
     public static Map<String, String> fillFormAndSubmit(
             @Schema(name = "url", description = "The full URL of the page containing the form") String url,
             @Schema(name = "fields", description = "JSON object mapping CSS selectors to values, e.g. {\"#name\":\"Alice\",\"#city\":\"NY\"}") String fields,
-            @Schema(name = "submitSelector", description = "CSS selector of the submit button, e.g. 'button[type=submit]' or '#search-btn'") String submitSelector) {
+            @Schema(name = "submitSelector", description = "CSS selector of the submit button, e.g. 'button[type=submit]' or '#search-btn'") String submitSelector,
+            ToolContext toolContext) {
 
         LOG.section("TOOL CALL: fillFormAndSubmit");
         LOG.info("FormSkill", "URL: " + url);
         LOG.info("FormSkill", "Fields: " + StringUtils.truncate(fields, 300));
         LOG.info("FormSkill", "Submit selector: " + submitSelector);
+
+        // Audit log: verify the agent followed the rule of inspecting the page first
+        boolean pageWasInspected = url.equals(SessionState.getString(toolContext, SessionState.KEY_LAST_FETCH_URL).orElse(""));
+        LOG.debug("FormSkill", "Page pre-inspected via fetchPageContent: " + pageWasInspected);
         long start = System.currentTimeMillis();
 
         // Fix 1 — SSRF: validate URL before any navigation
@@ -177,12 +184,14 @@ public class FormSkill {
 
     /**
      * Fix 2 — Parses a JSON object string like {"#sel": "value", ...} into a Map.
-     * Uses Gson (available as a transitive dependency of google-adk) for correct handling
+     * Uses Gson (available as a transitive dependency of google-adk) for correct
+     * handling
      * of commas inside values, numeric values, and other edge cases.
      */
     static java.util.Map<String, String> parseJsonFields(String json) {
         java.util.Map<String, String> map = new java.util.LinkedHashMap<>();
-        if (json == null || json.isBlank()) return map;
+        if (json == null || json.isBlank())
+            return map;
         try {
             JsonObject obj = JsonParser.parseString(json.trim()).getAsJsonObject();
             for (var entry : obj.entrySet()) {

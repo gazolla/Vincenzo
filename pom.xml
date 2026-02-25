@@ -91,6 +91,12 @@
                 <version>3.13.0</version>
                 <configuration>
                     <release>21</release>
+                    <!-- Required by Google ADK: preserves parameter names in bytecode so
+                         FunctionTool can identify 'toolContext' and inject it automatically,
+                         and also enables @Schema-free tool methods to work. -->
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
 

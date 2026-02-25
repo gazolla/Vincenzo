@@ -31,13 +31,17 @@ import java.util.concurrent.TimeUnit;
 /**
  * Singleton service that manages periodic monitor jobs.
  *
- * <p>Jobs are persisted to {@code work/scheduler-jobs.json} (configurable via
+ * <p>
+ * Jobs are persisted to {@code work/scheduler-jobs.json} (configurable via
  * {@code scheduler.jobs.file}) using Gson. On startup the service reloads all
  * enabled jobs from disk and re-schedules them with a
- * {@link ScheduledExecutorService} backed by daemon threads.</p>
+ * {@link ScheduledExecutorService} backed by daemon threads.
+ * </p>
  *
- * <p>Each job checks a URL (RSS feed or web page) for a keyword and triggers a
- * notification via {@link NotificationService} when a match is found.</p>
+ * <p>
+ * Each job checks a URL (RSS feed or web page) for a keyword and triggers a
+ * notification via {@link NotificationService} when a match is found.
+ * </p>
  */
 public class SchedulerService {
 
@@ -74,15 +78,18 @@ public class SchedulerService {
 
     // ── MonitorJob ────────────────────────────────────────────────────────────
 
-    /** Represents a periodic monitor job. The {@code future} field is transient so Gson skips it. */
+    /**
+     * Represents a periodic monitor job. The {@code future} field is transient so
+     * Gson skips it.
+     */
     public static class MonitorJob {
-        public String  id;
-        public String  url;
-        public String  keyword;
-        public int     intervalMinutes;
-        public String  description;
-        public String  nextRunTime;   // ISO-8601
-        public String  lastResult;    // "pending" | "match" | "no_match" | "error"
+        public String id;
+        public String url;
+        public String keyword;
+        public int intervalMinutes;
+        public String description;
+        public String nextRunTime; // ISO-8601
+        public String lastResult; // "pending" | "match" | "no_match" | "error"
         public boolean enabled;
 
         /** Not serialized — holds the live ScheduledFuture reference. */
@@ -107,14 +114,14 @@ public class SchedulerService {
      */
     public String scheduleMonitor(String url, String keyword, int intervalMinutes, String description) {
         MonitorJob job = new MonitorJob();
-        job.id              = "job-" + UUID.randomUUID().toString().substring(0, 8);
-        job.url             = url;
-        job.keyword         = keyword;
+        job.id = "job-" + UUID.randomUUID().toString().substring(0, 8);
+        job.url = url;
+        job.keyword = keyword;
         job.intervalMinutes = intervalMinutes;
-        job.description     = description != null ? description : "";
-        job.nextRunTime     = LocalDateTime.now().plusMinutes(intervalMinutes).format(ISO);
-        job.lastResult      = "pending";
-        job.enabled         = true;
+        job.description = description != null ? description : "";
+        job.nextRunTime = LocalDateTime.now().plusMinutes(intervalMinutes).format(ISO);
+        job.lastResult = "pending";
+        job.enabled = true;
 
         jobs.put(job.id, job);
         scheduleJob(job);
@@ -161,10 +168,10 @@ public class SchedulerService {
                 () -> runJob(job),
                 initialDelay,
                 periodSeconds,
-                TimeUnit.SECONDS
-        );
+                TimeUnit.SECONDS);
         job.future = future;
-        LOG.debug("SchedulerService", "Job " + job.id + " scheduled — initialDelay=" + initialDelay + "s, period=" + periodSeconds + "s");
+        LOG.debug("SchedulerService",
+                "Job " + job.id + " scheduled — initialDelay=" + initialDelay + "s, period=" + periodSeconds + "s");
     }
 
     /** Compute seconds until the job's next planned run (0 if in the past). */
@@ -192,16 +199,19 @@ public class SchedulerService {
             if ("rss".equals(contentType)) {
                 Map<String, String> result = RssSkill.searchInFeed(job.url, job.keyword);
                 int matchCount = 0;
-                try { matchCount = Integer.parseInt(result.getOrDefault("match_count", "0")); } catch (NumberFormatException ignored) {}
+                try {
+                    matchCount = Integer.parseInt(result.getOrDefault("match_count", "0"));
+                } catch (NumberFormatException ignored) {
+                }
                 matched = "success".equals(result.get("status")) && matchCount > 0;
             } else {
-                Map<String, String> result = WebContentSkill.fetchPageContent(job.url);
+                Map<String, String> result = WebContentSkill.fetchPageContent(job.url, null);
                 String content = result.getOrDefault("content", "").toLowerCase();
                 matched = "success".equals(result.get("status"))
                         && content.contains(job.keyword.toLowerCase());
             }
 
-            job.lastResult  = matched ? "match" : "no_match";
+            job.lastResult = matched ? "match" : "no_match";
             job.nextRunTime = LocalDateTime.now().plusMinutes(job.intervalMinutes).format(ISO);
 
             if (matched) {
@@ -226,7 +236,8 @@ public class SchedulerService {
     }
 
     /**
-     * Heuristically determine whether a URL points to an RSS/Atom feed or a web page.
+     * Heuristically determine whether a URL points to an RSS/Atom feed or a web
+     * page.
      * Uses URL path patterns — no network call required.
      */
     private String detectFeedOrWeb(String url) {
@@ -249,7 +260,10 @@ public class SchedulerService {
         }
     }
 
-    /** Returns the jobs file path — reads dynamically so tests can override via PROPS. */
+    /**
+     * Returns the jobs file path — reads dynamically so tests can override via
+     * PROPS.
+     */
     private static Path jobsFilePath() {
         return Paths.get(AppConfig.schedulerJobsFile());
     }
@@ -262,9 +276,11 @@ public class SchedulerService {
         }
         try {
             String json = Files.readString(path, StandardCharsets.UTF_8);
-            Type listType = new TypeToken<List<MonitorJob>>() {}.getType();
+            Type listType = new TypeToken<List<MonitorJob>>() {
+            }.getType();
             List<MonitorJob> loaded = GSON.fromJson(json, listType);
-            if (loaded == null) return;
+            if (loaded == null)
+                return;
 
             int rescheduled = 0;
             for (MonitorJob job : loaded) {

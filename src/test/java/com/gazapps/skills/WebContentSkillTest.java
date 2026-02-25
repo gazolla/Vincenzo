@@ -11,12 +11,19 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Integration tests for WebContentSkill.
  *
- * <p>Playwright-based tests use {@code page.setContent()} to inject mock HTML directly
- * into the browser page, avoiding external network calls and bypassing UrlValidator's
- * loopback-blocking constraint (localhost URLs are rejected before Playwright is invoked).
+ * <p>
+ * Playwright-based tests use {@code page.setContent()} to inject mock HTML
+ * directly
+ * into the browser page, avoiding external network calls and bypassing
+ * UrlValidator's
+ * loopback-blocking constraint (localhost URLs are rejected before Playwright
+ * is invoked).
  *
- * <p>Prerequisite: Playwright browsers must be installed once before running these tests.
- * Run: {@code mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args=install}
+ * <p>
+ * Prerequisite: Playwright browsers must be installed once before running these
+ * tests.
+ * Run:
+ * {@code mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args=install}
  */
 class WebContentSkillTest {
 
@@ -96,7 +103,7 @@ class WebContentSkillTest {
 
     @Test
     void fetchPageContent_privateIpUrl_returnsErrorMap() {
-        Map<String, String> result = WebContentSkill.fetchPageContent("http://192.168.1.1/page");
+        Map<String, String> result = WebContentSkill.fetchPageContent("http://192.168.1.1/page", null);
 
         assertEquals("error", result.get("status"));
         assertNotNull(result.get("message"));
@@ -106,7 +113,7 @@ class WebContentSkillTest {
 
     @Test
     void fetchPageContent_loopbackUrl_returnsErrorMap() {
-        Map<String, String> result = WebContentSkill.fetchPageContent("http://127.0.0.1/page");
+        Map<String, String> result = WebContentSkill.fetchPageContent("http://127.0.0.1/page", null);
 
         assertEquals("error", result.get("status"));
         assertNotNull(result.get("message"));

@@ -11,11 +11,16 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Integration tests for FormSkill browser interaction.
  *
- * <p>Separate from {@link FormSkillTest} which covers the static {@code parseJsonFields}
- * parsing logic. These tests validate the JavaScript form-filling and click behavior
+ * <p>
+ * Separate from {@link FormSkillTest} which covers the static
+ * {@code parseJsonFields}
+ * parsing logic. These tests validate the JavaScript form-filling and click
+ * behavior
  * using a real Chromium browser via {@code page.setContent()}.
  *
- * <p>Prerequisite: run {@code mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args=install}
+ * <p>
+ * Prerequisite: run
+ * {@code mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args=install}
  */
 class FormSkillIntegrationTest {
 
@@ -134,7 +139,7 @@ class FormSkillIntegrationTest {
     @Test
     void fillFormAndSubmit_privateIpUrl_returnsErrorMap() {
         Map<String, String> result = FormSkill.fillFormAndSubmit(
-                "http://192.168.0.1/form", "{}", "button");
+                "http://192.168.0.1/form", "{}", "button", null);
 
         assertEquals("error", result.get("status"));
         assertNotNull(result.get("message"));
@@ -145,7 +150,7 @@ class FormSkillIntegrationTest {
     @Test
     void fillFormAndSubmit_loopbackUrl_returnsErrorMap() {
         Map<String, String> result = FormSkill.fillFormAndSubmit(
-                "http://127.0.0.1/form", "{}", "button[type=submit]");
+                "http://127.0.0.1/form", "{}", "button[type=submit]", null);
 
         assertEquals("error", result.get("status"));
     }

@@ -5,9 +5,11 @@ import com.gazapps.logging.LogService;
 import com.gazapps.services.BrowserService;
 import com.gazapps.util.BrowserErrors;
 import com.gazapps.util.RetryUtils;
+import com.gazapps.util.SessionState;
 import com.gazapps.util.SkillStatus;
 import com.gazapps.util.StringUtils;
 import com.google.adk.tools.Annotations.Schema;
+import com.google.adk.tools.ToolContext;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
 
@@ -37,7 +39,8 @@ public class ExtractSkill {
             """)
     public static Map<String, String> extractStructuredData(
             @Schema(name = "url", description = "The full URL of the page to extract data from") String url,
-            @Schema(name = "selectors", description = "JSON object mapping field names to CSS selectors. For text: {\"title\":\".product-name\",\"price\":\".price\"}. For attributes append |attrName: {\"link\":\".titleline > a|href\",\"img\":\"img.cover|src\"}") String selectors) {
+            @Schema(name = "selectors", description = "JSON object mapping field names to CSS selectors. For text: {\"title\":\".product-name\",\"price\":\".price\"}. For attributes append |attrName: {\"link\":\".titleline > a|href\",\"img\":\"img.cover|src\"}") String selectors,
+            ToolContext toolContext) {
 
         LOG.section("TOOL CALL: extractStructuredData");
         LOG.info("ExtractSkill", "URL: " + url);
@@ -113,7 +116,8 @@ public class ExtractSkill {
                                             return JSON.stringify({error: e.message});
                                         }
                                     }
-                                    """.formatted(AppConfig.EXTRACT_MAX_ITEMS);
+                                    """
+                                    .formatted(AppConfig.EXTRACT_MAX_ITEMS);
 
                             // Pass only the selectors Map as arg — Playwright serializes Maps safely
                             java.util.Map<String, String> selectorsMap = FormSkill.parseJsonFields(selectors);
@@ -125,7 +129,8 @@ public class ExtractSkill {
                             int itemCount = 0;
                             if (data.startsWith("[")) {
                                 for (int i = 0; i < data.length(); i++) {
-                                    if (data.charAt(i) == '{') itemCount++;
+                                    if (data.charAt(i) == '{')
+                                        itemCount++;
                                 }
                             }
                             LOG.info("ExtractSkill", "Items extracted: " + itemCount);
@@ -136,6 +141,10 @@ public class ExtractSkill {
                             result.put("data", data);
                             result.put("item_count", String.valueOf(itemCount));
                             result.put("selectors_used", selectors);
+
+                            // Save to session.state for cross-tool context within the same turn
+                            SessionState.put(toolContext, SessionState.KEY_LAST_EXTRACT_URL, url);
+                            SessionState.put(toolContext, SessionState.KEY_LAST_EXTRACT_DATA, data);
 
                             LOG.timing("ExtractSkill", "Total execution", System.currentTimeMillis() - start);
                             LOG.toolResult("extractStructuredData", result);
@@ -151,8 +160,7 @@ public class ExtractSkill {
                             return error;
                         }
                     }),
-                    result -> SkillStatus.ERROR.value().equals(result.get("status"))
-            );
+                    result -> SkillStatus.ERROR.value().equals(result.get("status")));
         } catch (Exception e) {
             LOG.error("ExtractSkill", "Failed for " + url + " after retries", e);
             Map<String, String> error = new HashMap<>();

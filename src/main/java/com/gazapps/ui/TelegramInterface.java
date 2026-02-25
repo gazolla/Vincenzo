@@ -23,15 +23,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Telegram interface for the AI Internet Search Assistant.
  *
- * <p>Supports two update modes:
+ * <p>
+ * Supports two update modes:
  * <ul>
- *   <li><b>polling</b> — calls {@code getUpdates} in a long-poll loop.
- *       No open port or public URL required. Default mode.</li>
- *   <li><b>webhook</b> — starts a {@code com.sun.net.httpserver.HttpServer} on
- *       the configured port and registers the webhook URL with Telegram.</li>
+ * <li><b>polling</b> — calls {@code getUpdates} in a long-poll loop.
+ * No open port or public URL required. Default mode.</li>
+ * <li><b>webhook</b> — starts a {@code com.sun.net.httpserver.HttpServer} on
+ * the configured port and registers the webhook URL with Telegram.</li>
  * </ul>
  *
- * <p>Configure via {@code application.properties}:
+ * <p>
+ * Configure via {@code application.properties}:
+ * 
  * <pre>
  *   interface.mode=telegram
  *   telegram.bot.token=&lt;token&gt;          # or env TELEGRAM_BOT_TOKEN
@@ -47,17 +50,16 @@ public class TelegramInterface {
     /** Telegram max message length (API limit). */
     private static final int TELEGRAM_MAX_LENGTH = 4096;
 
-    private final SearchAgent    agent;
-    private final TelegramBot    bot;
-    private final AtomicInteger  turnCounter = new AtomicInteger(0);
-    private volatile boolean     running     = true;
+    private final SearchAgent agent;
+    private final TelegramBot bot;
+    private final AtomicInteger turnCounter = new AtomicInteger(0);
+    private volatile boolean running = true;
 
     public TelegramInterface(SearchAgent agent) {
         this.agent = agent;
-        this.bot   = new TelegramBot(AppConfig.TELEGRAM_BOT_TOKEN);
+        this.bot = new TelegramBot(AppConfig.TELEGRAM_BOT_TOKEN);
 
-        RetryUtils.setRetryListener(msg ->
-                LOG.info("TelegramInterface", "Retry: " + msg));
+        RetryUtils.setRetryListener(msg -> LOG.info("TelegramInterface", "Retry: " + msg));
 
         LOG.info("TelegramInterface", "TelegramInterface instantiated");
     }
@@ -122,7 +124,9 @@ public class TelegramInterface {
                 running = false;
             } catch (Exception e) {
                 LOG.error("TelegramInterface", "Unexpected error in polling loop", e);
-                try { Thread.sleep(5_000); } catch (InterruptedException ie) {
+                try {
+                    Thread.sleep(5_000);
+                } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                     running = false;
                 }
@@ -136,7 +140,7 @@ public class TelegramInterface {
 
     private void startWebhook() {
         String webhookUrl = AppConfig.TELEGRAM_WEBHOOK_URL;
-        int    port       = AppConfig.TELEGRAM_WEBHOOK_PORT;
+        int port = AppConfig.TELEGRAM_WEBHOOK_PORT;
 
         if (webhookUrl.isBlank()) {
             LOG.error("TelegramInterface", "telegram.webhook.url is empty — aborting webhook mode");
@@ -180,7 +184,8 @@ public class TelegramInterface {
 
         // Block main thread until stop signal
         try {
-            while (running) Thread.sleep(500);
+            while (running)
+                Thread.sleep(500);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -192,15 +197,17 @@ public class TelegramInterface {
     // ── Update handler (shared by both modes) ─────────────────────────────────
 
     private void handleUpdate(Update u) {
-        if (u.message() == null || u.message().text() == null) return;
+        if (u.message() == null || u.message().text() == null)
+            return;
 
-        long   chatId = u.message().chat().id();
-        String text   = u.message().text().trim();
+        long chatId = u.message().chat().id();
+        String text = u.message().text().trim();
 
         // Strip non-printable control characters (keep \r \n \t)
         text = text.replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "");
 
-        if (text.isEmpty()) return;
+        if (text.isEmpty())
+            return;
 
         if (text.length() > 1000) {
             LOG.warn("TelegramInterface", "Input too long (" + text.length() + " chars) from chat " + chatId);
@@ -217,7 +224,7 @@ public class TelegramInterface {
 
         long start = System.currentTimeMillis();
         try {
-            String response = agent.processQuery(text);
+            String response = agent.processQuery(text, String.valueOf(chatId));
             long elapsed = System.currentTimeMillis() - start;
 
             LOG.agentResponse(response);
