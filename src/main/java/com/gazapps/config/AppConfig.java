@@ -90,6 +90,14 @@ public final class AppConfig {
     public static final int FETCH_PAGE_NAVIGATE_TIMEOUT_MS =
             intVal("fetch.page.navigate.timeout.ms", 20_000);
 
+    /**
+     * Extra time (ms) to wait for NETWORKIDLE after navigation in fetchPageContent.
+     * Ensures JS-rendered content (prices, dynamic data) is fully loaded before extraction.
+     * If the site never reaches idle within this window, we proceed with what's available.
+     */
+    public static final int FETCH_PAGE_NETWORKIDLE_TIMEOUT_MS =
+            intVal("fetch.page.networkidle.timeout.ms", 8_000);
+
     /** Timeout for screenshotPage navigation. */
     public static final int SCREENSHOT_NAVIGATE_TIMEOUT_MS =
             intVal("screenshot.navigate.timeout.ms", 15_000);

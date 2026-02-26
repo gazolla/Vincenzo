@@ -63,8 +63,9 @@ class ResearchAgentTest {
         LlmAgent searcher = (LlmAgent) agent.subAgents().get(0);
 
         // Searcher must have tools; synthesizer and fact-checker typically have none
+        // In ADK 0.6.0, tools() returns Single<List<BaseTool>> — use blockingGet() to unwrap.
         assertNotNull(searcher.tools());
-        assertFalse(searcher.tools().isEmpty(),
+        assertFalse(searcher.tools().blockingGet().isEmpty(),
                 "SearcherAgent must have at least searchWeb and fetchPageContent tools");
     }
 

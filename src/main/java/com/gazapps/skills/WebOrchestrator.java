@@ -62,7 +62,7 @@ public class WebOrchestrator {
             """)
     public static Map<String, String> searchWeb(
             @Schema(name = "query", description = "The search query in the user's language.") String query,
-            ToolContext toolContext) {
+            @Schema(name = "toolContext") ToolContext toolContext) {
 
         LOG.section("TOOL CALL: searchWeb");
         LOG.info("WebOrchestrator", "Query: \"" + query + "\"");

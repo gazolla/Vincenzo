@@ -83,6 +83,15 @@ public final class SubAgents {
 
                                                                 Exception: skip searchWeb ONLY for pure math or fixed definitions (e.g. "what is sqrt(2)").
 
+                                                                fetchPageContent — tips to improve success rate:
+                                                                - If fetchPageContent returns error_type=BOT_DETECTED, the site is blocking automated
+                                                                  access. Do NOT retry. Use the snippets from searchWeb results instead and inform the user.
+                                                                - For MercadoLivre: prefer direct product URLs (/MLB-XXXXXXXXX) over universal pages
+                                                                  (/up/MLBU...). If a search result gives a /up/ URL, search again adding "site:mercadolivre.com.br"
+                                                                  to get a direct listing URL.
+                                                                - For Amazon: bot detection is common. If blocked, use searchWeb snippets which already
+                                                                  contain price info extracted by the search engine.
+
                                                                 Use deepResearch(query) for comprehensive reports requiring multiple sources.
                                                                 ALWAYS confirm with the user before calling deepResearch.
                                                                 """
@@ -92,6 +101,7 @@ public final class SubAgents {
                                                 FunctionTool.create(WebContentSkill.class, "fetchPageContent"),
                                                 FunctionTool.create(WebContentSkill.class, "screenshotPage"),
                                                 FunctionTool.create(ResearchSkill.class, "deepResearch"))
+                                .disallowTransferToParent(true)
                                 .disallowTransferToPeers(true)
                                 .build();
         }

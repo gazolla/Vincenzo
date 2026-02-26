@@ -40,7 +40,7 @@ public class ExtractSkill {
     public static Map<String, String> extractStructuredData(
             @Schema(name = "url", description = "The full URL of the page to extract data from") String url,
             @Schema(name = "selectors", description = "JSON object mapping field names to CSS selectors. For text: {\"title\":\".product-name\",\"price\":\".price\"}. For attributes append |attrName: {\"link\":\".titleline > a|href\",\"img\":\"img.cover|src\"}") String selectors,
-            ToolContext toolContext) {
+            @Schema(name = "toolContext") ToolContext toolContext) {
 
         LOG.section("TOOL CALL: extractStructuredData");
         LOG.info("ExtractSkill", "URL: " + url);

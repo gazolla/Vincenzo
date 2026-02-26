@@ -33,7 +33,7 @@ public class SummarizeSkill {
             """)
     public static Map<String, String> summarizeUrl(
             @Schema(name = "url", description = "The full URL of the page to summarize") String url,
-            ToolContext toolContext) {
+            @Schema(name = "toolContext") ToolContext toolContext) {
 
         LOG.section("TOOL CALL: summarizeUrl");
         LOG.info("SummarizeSkill", "URL: " + url);

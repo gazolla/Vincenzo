@@ -42,7 +42,7 @@ public class FormSkill {
             @Schema(name = "url", description = "The full URL of the page containing the form") String url,
             @Schema(name = "fields", description = "JSON object mapping CSS selectors to values, e.g. {\"#name\":\"Alice\",\"#city\":\"NY\"}") String fields,
             @Schema(name = "submitSelector", description = "CSS selector of the submit button, e.g. 'button[type=submit]' or '#search-btn'") String submitSelector,
-            ToolContext toolContext) {
+            @Schema(name = "toolContext") ToolContext toolContext) {
 
         LOG.section("TOOL CALL: fillFormAndSubmit");
         LOG.info("FormSkill", "URL: " + url);

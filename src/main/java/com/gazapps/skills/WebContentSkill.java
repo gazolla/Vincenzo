@@ -23,7 +23,7 @@ public class WebContentSkill {
     @Schema(description = "Fetch the full text content of a web page given its URL. Use this to read articles, blog posts, documentation, or any page after getting URLs from search results.")
     public static Map<String, String> fetchPageContent(
             @Schema(name = "url", description = "The full URL of the page to read") String url,
-            ToolContext toolContext) {
+            @Schema(name = "toolContext") ToolContext toolContext) {
 
         LOG.section("TOOL CALL: fetchPageContent");
         LOG.info("WebContentSkill", "URL: " + url);
@@ -55,7 +55,20 @@ public class WebContentSkill {
                                     page.navigate(url,
                                             new Page.NavigateOptions()
                                                     .setTimeout(AppConfig.FETCH_PAGE_NAVIGATE_TIMEOUT_MS));
-                                    page.waitForLoadState(LoadState.DOMCONTENTLOADED);
+                                    // Wait for NETWORKIDLE so JS-rendered content (prices, dynamic
+                                    // data) is fully loaded before extraction.
+                                    // Gracefully degrade if the site keeps long-polling and never
+                                    // reaches idle within the configured window.
+                                    try {
+                                        page.waitForLoadState(LoadState.NETWORKIDLE,
+                                                new Page.WaitForLoadStateOptions()
+                                                        .setTimeout(AppConfig.FETCH_PAGE_NETWORKIDLE_TIMEOUT_MS));
+                                    } catch (Exception networkIdleEx) {
+                                        LOG.debug("WebContentSkill",
+                                                "NETWORKIDLE not reached within "
+                                                + AppConfig.FETCH_PAGE_NETWORKIDLE_TIMEOUT_MS
+                                                + " ms — proceeding with available content");
+                                    }
                                     LOG.timing("WebContentSkill", "Navigation",
                                             System.currentTimeMillis() - start);
 
@@ -75,6 +88,22 @@ public class WebContentSkill {
                                     LOG.info("WebContentSkill", "Page title: \"" + title + "\"");
                                     LOG.info("WebContentSkill",
                                             "Raw body text length: " + rawLen + " chars");
+
+                                    // Detect bot-blocking interstitials (e.g. Amazon "continuar
+                                    // comprando", Cloudflare challenges). Return a descriptive error
+                                    // so the LLM knows to fall back to search-result snippets.
+                                    if (rawLen < 500 && isBotBlockPage(bodyText)) {
+                                        LOG.warn("WebContentSkill",
+                                                "Bot-blocking page detected for: " + url);
+                                        Map<String, String> botErr = new HashMap<>();
+                                        botErr.put("status",     SkillStatus.ERROR.value());
+                                        botErr.put("url",        url);
+                                        botErr.put("error_type", "BOT_DETECTED");
+                                        botErr.put("message",
+                                                "The site is blocking automated access. "
+                                                + "Use search result snippets instead of fetching this URL directly.");
+                                        return botErr;
+                                    }
 
                                     if (bodyText.length() > AppConfig.FETCH_PAGE_MAX_CHARS) {
                                         bodyText = bodyText.substring(0, AppConfig.FETCH_PAGE_MAX_CHARS)
@@ -125,7 +154,9 @@ public class WebContentSkill {
                             return err;
                         }
                     },
-                    result -> SkillStatus.ERROR.value().equals(result.get("status")));
+                    // Do NOT retry bot-blocking pages — no amount of retries will bypass them.
+                    result -> SkillStatus.ERROR.value().equals(result.get("status"))
+                            && !"BOT_DETECTED".equals(result.get("error_type")));
         } catch (Throwable t) {
             // Defense: catch absolutely anything that escapes — RetryUtils, reflection,
             // etc.
@@ -137,6 +168,28 @@ public class WebContentSkill {
             error.put("message", "Failed to fetch page: " + t.getMessage());
             return error;
         }
+    }
+
+    /**
+     * Returns {@code true} if the page body looks like a bot-blocking interstitial
+     * (Cloudflare challenge, Amazon CAPTCHA, generic "access denied" pages, etc.).
+     * Only called when {@code rawLen < 500} to avoid false positives on thin pages.
+     */
+    private static boolean isBotBlockPage(String text) {
+        if (text == null) return false;
+        String lower = text.toLowerCase();
+        return lower.contains("continuar comprando")
+                || lower.contains("clique no botão abaixo")
+                || lower.contains("verify you are human")
+                || lower.contains("enable javascript and cookies")
+                || lower.contains("enable javascript")
+                || lower.contains("access denied")
+                || lower.contains("acesso negado")
+                || lower.contains("robot check")
+                || lower.contains("checking your browser")
+                || lower.contains("captcha")
+                || lower.contains("just a moment")
+                || lower.contains("before you continue");
     }
 
     @Schema(description = "Take a screenshot of a web page and save it locally. Returns the saved file path.")

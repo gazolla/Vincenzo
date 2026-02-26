@@ -66,7 +66,7 @@ public class ResearchSkill {
             """)
     public static Map<String, String> deepResearch(
             @Schema(name = "query", description = "The research topic or question to investigate in depth") String query,
-            ToolContext toolContext) {
+            @Schema(name = "toolContext") ToolContext toolContext) {
 
         LOG.section("TOOL CALL: deepResearch");
         LOG.info("ResearchSkill", "Query: \"" + query + "\"");
