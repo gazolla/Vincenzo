@@ -3,6 +3,7 @@ package com.gazapps.agent;
 import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.google.adk.agents.BaseAgent;
+import com.google.adk.agents.Instruction;
 import com.google.adk.agents.LlmAgent;
 import com.google.adk.agents.RunConfig;
 import com.google.adk.events.Event;
@@ -11,6 +12,7 @@ import com.google.adk.sessions.Session;
 import com.google.genai.types.Content;
 import com.google.genai.types.Part;
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Single;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -63,7 +65,7 @@ public class SearchAgent {
                                 .name("vincenzo")
                                 .description("Vincenzo — AI assistant with internet access, memory and monitoring capabilities.")
                                 .model(AppConfig.LLM_MODEL)
-                                .instruction(
+                                .instruction(new Instruction.Provider(ctx -> Single.just(
                                                 """
                                                                 You are Vincenzo, a helpful AI assistant with internet access.
                                                                 Today's date and time: %s
@@ -92,10 +94,9 @@ public class SearchAgent {
                                                                    first to WebAgent for search, then to MemoryAgent to save the result.
                                                                 4. Only answer directly (without delegating) for: pure math, simple definitions,
                                                                    or factual questions that cannot possibly change (e.g. "what is 2+2").
-                                                                """
-                                                                .formatted(java.time.LocalDateTime.now()
+                                                                """.formatted(java.time.LocalDateTime.now()
                                                                                 .format(java.time.format.DateTimeFormatter
-                                                                                                .ofPattern("dd/MM/yyyy HH:mm"))))
+                                                                                                .ofPattern("dd/MM/yyyy HH:mm"))))))
                                 .subAgents(
                                                 SubAgents.webAgent(),
                                                 SubAgents.contentAgent(),

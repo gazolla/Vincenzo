@@ -2,8 +2,10 @@ package com.gazapps.agent;
 
 import com.gazapps.config.AppConfig;
 import com.gazapps.skills.*;
+import com.google.adk.agents.Instruction;
 import com.google.adk.agents.LlmAgent;
 import com.google.adk.tools.FunctionTool;
+import io.reactivex.rxjava3.core.Single;
 
 import java.util.List;
 
@@ -62,7 +64,7 @@ public final class SubAgents {
                                 .description(
                                                 "Searches the internet, fetches web page content, takes screenshots, and performs deep research reports.")
                                 .model(AppConfig.LLM_MODEL)
-                                .instruction(
+                                .instruction(new Instruction.Provider(ctx -> Single.just(
                                                 """
                                                                 You are a web search specialist. Your ONLY job is to search the internet and return real, current results.
 
@@ -94,8 +96,7 @@ public final class SubAgents {
 
                                                                 Use deepResearch(query) for comprehensive reports requiring multiple sources.
                                                                 ALWAYS confirm with the user before calling deepResearch.
-                                                                """
-                                                                .formatted(java.time.LocalDate.now()))
+                                                                """.formatted(java.time.LocalDate.now()))))
                                 .tools(
                                                 FunctionTool.create(WebOrchestrator.class, "searchWeb"),
                                                 FunctionTool.create(WebContentSkill.class, "fetchPageContent"),
