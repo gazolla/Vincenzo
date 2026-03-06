@@ -17,10 +17,25 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <google.adk.version>0.6.0</google.adk.version>
+        <google.adk.version>0.8.0</google.adk.version>
         <playwright.version>1.58.0</playwright.version>
         <junit.version>5.11.4</junit.version>
     </properties>
+
+    <!-- Force all Jackson artifacts to align with ADK 0.8's jackson-databind 2.20.2.
+         google-cloud-storage (transitive via ADK) pulls in jackson-annotations/core 2.18.2,
+         which lacks OptBoolean JsonProperty.isRequired() added in 2.20, causing NoSuchMethodError. -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>2.20.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <repositories>
         <repository>
