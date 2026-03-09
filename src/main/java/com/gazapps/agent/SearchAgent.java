@@ -9,6 +9,7 @@ import com.google.adk.agents.RunConfig;
 import com.google.adk.events.Event;
 import com.google.adk.runner.InMemoryRunner;
 import com.google.adk.sessions.Session;
+import com.google.adk.sessions.SessionKey;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.genai.types.Content;
@@ -32,11 +33,11 @@ public class SearchAgent {
         private final RunConfig runConfig;
 
         /**
-         * Maps userId → ADK session-id string.
+         * Maps userId → ADK {@link SessionKey} (appName + userId + sessionId bundle).
          * Bounded to 1 000 entries and evicted after 24 h of inactivity to prevent
          * unbounded growth in long-running Telegram deployments.
          */
-        private final Cache<String, String> sessionIds = CacheBuilder.newBuilder()
+        private final Cache<String, SessionKey> sessionKeys = CacheBuilder.newBuilder()
                         .maximumSize(1_000)
                         .expireAfterAccess(24, TimeUnit.HOURS)
                         .build();
@@ -54,18 +55,23 @@ public class SearchAgent {
                 LOG.info("SearchAgent", "Agent ready — multi-session mode (sessions created lazily per userId)");
         }
 
-        /** Returns (or lazily creates) the ADK session ID for the given userId. */
-        private String sessionIdFor(String userId) {
-                String cached = sessionIds.getIfPresent(userId);
+        /**
+         * Returns (or lazily creates) the type-safe {@link SessionKey} for the given
+         * userId. The key bundles appName, userId and sessionId together, preventing
+         * positional-argument mix-ups when calling {@code runAsync} or
+         * {@code deleteSession}.
+         */
+        private SessionKey sessionKeyFor(String userId) {
+                SessionKey cached = sessionKeys.getIfPresent(userId);
                 if (cached != null) return cached;
 
                 Session s = runner.sessionService()
                                 .createSession(runner.appName(), userId)
                                 .blockingGet();
-                LOG.info("SearchAgent", "Session created — id: " + s.id()
-                                + "  userId: " + userId);
-                sessionIds.put(userId, s.id());
-                return s.id();
+                SessionKey key = s.sessionKey();
+                LOG.info("SearchAgent", "Session created — key: " + key);
+                sessionKeys.put(userId, key);
+                return key;
         }
 
         private static BaseAgent buildAgent() {
@@ -134,14 +140,10 @@ public class SearchAgent {
                                 + ": \"" + userMessage + "\"");
 
                 long start = System.currentTimeMillis();
-                String sessionId = sessionIdFor(userId);
+                SessionKey key = sessionKeyFor(userId);
                 Content userContent = Content.fromParts(Part.fromText(userMessage));
 
-                Flowable<Event> events = runner.runAsync(
-                                userId,
-                                sessionId,
-                                userContent,
-                                runConfig);
+                Flowable<Event> events = runner.runAsync(key, userContent, runConfig);
 
                 StringBuilder response = new StringBuilder();
                 final int[] eventIdx = { 0 };
@@ -151,7 +153,7 @@ public class SearchAgent {
                                 int idx = ++eventIdx[0];
                                 boolean isFinal = event.finalResponse();
                                 String content = safeStringify(event);
-                                String typeHint = isFinal ? "FINAL_RESPONSE" : detectEventType(event, content);
+                                String typeHint = isFinal ? "FINAL_RESPONSE" : detectEventType(event);
 
                                 LOG.debug("SearchAgent", String.format(
                                                 "Event #%d  type=%-22s final=%-5b  content_preview=%s",
@@ -201,17 +203,40 @@ public class SearchAgent {
                 }
         }
 
-        /** Best-effort heuristic to label an intermediate event type for the log. */
-        private String detectEventType(Event event, String content) {
-                if (content == null)
-                        return "EMPTY";
-                String lower = content.toLowerCase();
-                if (lower.contains("functioncall") || lower.contains("function_call"))
+        /**
+         * Labels an intermediate ADK event using the structured fields exposed by
+         * {@link Event} in ADK 0.8 — no string serialisation or substring matching.
+         *
+         * <p>Priority order (an event can carry multiple signals simultaneously):
+         * <ol>
+         *   <li>Tool invocation — {@code functionCalls()} non-empty</li>
+         *   <li>Tool result — {@code functionResponses()} non-empty</li>
+         *   <li>Agent hand-off — {@code actions().transferToAgent()} present</li>
+         *   <li>Agent finished — {@code actions().endOfAgent()}</li>
+         *   <li>LLM error — {@code errorCode()} present</li>
+         *   <li>Streaming chunk — {@code partial()} is {@code true}</li>
+         *   <li>Model text — {@code content()} present (no tool payloads)</li>
+         *   <li>Turn boundary — {@code turnComplete()} is {@code true}</li>
+         *   <li>Unknown — none of the above</li>
+         * </ol>
+         */
+        private String detectEventType(Event event) {
+                if (!event.functionCalls().isEmpty())
                         return "TOOL_CALL";
-                if (lower.contains("functionresponse") || lower.contains("function_response"))
+                if (!event.functionResponses().isEmpty())
                         return "TOOL_RESPONSE";
-                if (lower.length() > 10)
+                if (event.actions().transferToAgent().isPresent())
+                        return "AGENT_TRANSFER";
+                if (event.actions().endOfAgent())
+                        return "END_OF_AGENT";
+                if (event.errorCode().isPresent())
+                        return "ERROR";
+                if (event.partial().orElse(false))
                         return "MODEL_CHUNK";
-                return "OTHER";
+                if (event.content().isPresent())
+                        return "MODEL_TEXT";
+                if (event.turnComplete().orElse(false))
+                        return "TURN_COMPLETE";
+                return "UNKNOWN";
         }
 }

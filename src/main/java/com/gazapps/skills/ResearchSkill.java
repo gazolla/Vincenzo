@@ -87,7 +87,7 @@ public class ResearchSkill {
 
             Content userContent = Content.fromParts(Part.fromText(query));
             Flowable<Event> events = Runner.INSTANCE.runAsync(
-                    session.userId(), session.id(), userContent, RUN_CONFIG);
+                    session.sessionKey(), userContent, RUN_CONFIG);
 
             // Collect all final-response events; last one = FactCheckerAgent output
             StringBuilder lastReport = new StringBuilder();
@@ -141,9 +141,9 @@ public class ResearchSkill {
             if (session != null) {
                 try {
                     Runner.INSTANCE.sessionService()
-                            .deleteSession(Runner.INSTANCE.appName(), session.userId(), session.id())
+                            .deleteSession(session.sessionKey())
                             .blockingAwait();
-                    LOG.debug("ResearchSkill", "Research session deleted — id: " + session.id());
+                    LOG.debug("ResearchSkill", "Research session deleted — key: " + session.sessionKey());
                 } catch (Exception ex) {
                     LOG.warn("ResearchSkill", "Failed to delete research session: " + ex.getMessage());
                 }
