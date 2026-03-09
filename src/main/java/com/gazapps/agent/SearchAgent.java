@@ -9,12 +9,14 @@ import com.google.adk.agents.RunConfig;
 import com.google.adk.events.Event;
 import com.google.adk.runner.InMemoryRunner;
 import com.google.adk.sessions.Session;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.genai.types.Content;
 import com.google.genai.types.Part;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * ADK-based agent that wraps all skill tools.
@@ -29,8 +31,15 @@ public class SearchAgent {
         private final InMemoryRunner runner;
         private final RunConfig runConfig;
 
-        /** One Session per userId — created lazily on first message. */
-        private final ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<>();
+        /**
+         * Maps userId → ADK session-id string.
+         * Bounded to 1 000 entries and evicted after 24 h of inactivity to prevent
+         * unbounded growth in long-running Telegram deployments.
+         */
+        private final Cache<String, String> sessionIds = CacheBuilder.newBuilder()
+                        .maximumSize(1_000)
+                        .expireAfterAccess(24, TimeUnit.HOURS)
+                        .build();
 
         public SearchAgent() {
                 LOG.section("AGENT INIT");
@@ -38,21 +47,25 @@ public class SearchAgent {
 
                 BaseAgent agent = buildAgent();
                 this.runner = new InMemoryRunner(agent);
-                this.runConfig = RunConfig.builder().build();
+                this.runConfig = RunConfig.builder()
+                                .maxLlmCalls(AppConfig.getInstance().LLM_MAX_CALLS_AGENT)
+                                .build();
 
                 LOG.info("SearchAgent", "Agent ready — multi-session mode (sessions created lazily per userId)");
         }
 
-        /** Returns (or lazily creates) the session for the given userId. */
-        private Session sessionFor(String userId) {
-                return sessions.computeIfAbsent(userId, id -> {
-                        Session s = runner.sessionService()
-                                        .createSession(runner.appName(), id)
-                                        .blockingGet();
-                        LOG.info("SearchAgent", "Session created — id: " + s.id()
-                                        + "  userId: " + s.userId());
-                        return s;
-                });
+        /** Returns (or lazily creates) the ADK session ID for the given userId. */
+        private String sessionIdFor(String userId) {
+                String cached = sessionIds.getIfPresent(userId);
+                if (cached != null) return cached;
+
+                Session s = runner.sessionService()
+                                .createSession(runner.appName(), userId)
+                                .blockingGet();
+                LOG.info("SearchAgent", "Session created — id: " + s.id()
+                                + "  userId: " + userId);
+                sessionIds.put(userId, s.id());
+                return s.id();
         }
 
         private static BaseAgent buildAgent() {
@@ -121,38 +134,42 @@ public class SearchAgent {
                                 + ": \"" + userMessage + "\"");
 
                 long start = System.currentTimeMillis();
-                Session session = sessionFor(userId);
+                String sessionId = sessionIdFor(userId);
                 Content userContent = Content.fromParts(Part.fromText(userMessage));
 
                 Flowable<Event> events = runner.runAsync(
-                                session.userId(),
-                                session.id(),
+                                userId,
+                                sessionId,
                                 userContent,
                                 runConfig);
 
                 StringBuilder response = new StringBuilder();
                 final int[] eventIdx = { 0 };
 
-                events.blockingForEach(event -> {
-                        int idx = ++eventIdx[0];
-                        boolean isFinal = event.finalResponse();
-                        String content = safeStringify(event);
-                        String typeHint = isFinal ? "FINAL_RESPONSE" : detectEventType(event, content);
+                try {
+                        events.blockingForEach(event -> {
+                                int idx = ++eventIdx[0];
+                                boolean isFinal = event.finalResponse();
+                                String content = safeStringify(event);
+                                String typeHint = isFinal ? "FINAL_RESPONSE" : detectEventType(event, content);
 
-                        LOG.debug("SearchAgent", String.format(
-                                        "Event #%d  type=%-22s final=%-5b  content_preview=%s",
-                                        idx, typeHint, isFinal,
-                                        content != null && content.length() > 120
-                                                        ? content.substring(0, 120) + "..."
-                                                        : content));
+                                LOG.debug("SearchAgent", String.format(
+                                                "Event #%d  type=%-22s final=%-5b  content_preview=%s",
+                                                idx, typeHint, isFinal,
+                                                content != null && content.length() > 120
+                                                                ? content.substring(0, 120) + "..."
+                                                                : content));
 
-                        if (isFinal) {
-                                LOG.divider("FINAL RESPONSE EVENT #" + idx);
-                                LOG.info("SearchAgent", "Response text length: "
-                                                + (content != null ? content.length() : 0) + " chars");
-                                response.append(content);
-                        }
-                });
+                                if (isFinal) {
+                                        LOG.divider("FINAL RESPONSE EVENT #" + idx);
+                                        LOG.info("SearchAgent", "Response text length: "
+                                                        + (content != null ? content.length() : 0) + " chars");
+                                        response.append(content);
+                                }
+                        });
+                } catch (Exception e) {
+                        LOG.error("SearchAgent", "Event stream failed for userId=" + userId, e);
+                }
 
                 LOG.timing("SearchAgent", "processQuery total", System.currentTimeMillis() - start);
                 LOG.info("SearchAgent", "Total ADK events received: " + eventIdx[0]);

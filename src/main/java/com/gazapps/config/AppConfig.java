@@ -171,6 +171,20 @@ public final class AppConfig {
     /** Gemini model name passed to LlmAgent. Override via {@code llm.model} property. */
     public final String LLM_MODEL = str("llm.model", "gemini-2.5-flash");
 
+    /**
+     * Max LLM calls per user turn for the conversational SearchAgent (RunConfig).
+     * Prevents infinite loops from ambiguous instructions or model drift.
+     */
+    public final int LLM_MAX_CALLS_AGENT =
+            intVal("llm.max.calls.agent", 20);
+
+    /**
+     * Max LLM calls for a single deepResearch pipeline (RunConfig).
+     * The research pipeline has 3 sub-agents; each may invoke tools multiple times.
+     */
+    public final int LLM_MAX_CALLS_RESEARCH =
+            intVal("llm.max.calls.research", 30);
+
     // ── Retry ──────────────────────────────────────────────────────────────────
     /** Total number of attempts for retry operations (1 = no retry). */
     public final int RETRY_MAX_ATTEMPTS =

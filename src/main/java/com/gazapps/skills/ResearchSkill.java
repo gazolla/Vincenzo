@@ -1,6 +1,7 @@
 package com.gazapps.skills;
 
 import com.gazapps.agent.ResearchAgent;
+import com.gazapps.config.AppConfig;
 import com.gazapps.logging.LogService;
 import com.gazapps.util.SessionState;
 import com.gazapps.util.SkillStatus;
@@ -35,7 +36,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ResearchSkill {
 
     private static final LogService LOG = LogService.getInstance();
-    private static final RunConfig RUN_CONFIG = RunConfig.builder().build();
+    private static final RunConfig RUN_CONFIG = RunConfig.builder()
+            .maxLlmCalls(AppConfig.getInstance().LLM_MAX_CALLS_RESEARCH)
+            .build();
 
     /**
      * Lazily-built singleton research runner shared across calls to avoid
@@ -72,10 +75,11 @@ public class ResearchSkill {
         LOG.info("ResearchSkill", "Query: \"" + query + "\"");
         long start = System.currentTimeMillis();
 
+        Session session = null;
         try {
             // Each deepResearch call gets its own isolated session
             String sessionUserId = "research-" + SESSION_COUNTER.incrementAndGet();
-            Session session = Runner.INSTANCE.sessionService()
+            session = Runner.INSTANCE.sessionService()
                     .createSession(Runner.INSTANCE.appName(), sessionUserId)
                     .blockingGet();
 
@@ -133,6 +137,17 @@ public class ResearchSkill {
             error.put("query", query);
             error.put("message", "Deep research failed: " + e.getMessage());
             return error;
+        } finally {
+            if (session != null) {
+                try {
+                    Runner.INSTANCE.sessionService()
+                            .deleteSession(Runner.INSTANCE.appName(), session.userId(), session.id())
+                            .blockingAwait();
+                    LOG.debug("ResearchSkill", "Research session deleted — id: " + session.id());
+                } catch (Exception ex) {
+                    LOG.warn("ResearchSkill", "Failed to delete research session: " + ex.getMessage());
+                }
+            }
         }
     }
 }
