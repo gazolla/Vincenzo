@@ -122,6 +122,14 @@ public class SearchAgent {
                                                 SubAgents.feedAgent(),
                                                 SubAgents.monitorAgent(),
                                                 SubAgents.memoryAgent())
+                                // ADK 0.8 structured lifecycle callbacks — observe
+                                // transferToAgent calls and LLM usage on the root agent.
+                                .beforeToolCallbackSync(AgentObserver.beforeTool())
+                                .afterToolCallbackSync(AgentObserver.afterTool())
+                                .onToolErrorCallbackSync(AgentObserver.onToolError())
+                                .beforeModelCallbackSync(AgentObserver.beforeModel())
+                                .afterModelCallbackSync(AgentObserver.afterModel())
+                                .onModelErrorCallbackSync(AgentObserver.onModelError())
                                 .build();
         }
 

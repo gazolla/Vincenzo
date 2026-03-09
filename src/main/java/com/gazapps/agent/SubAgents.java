@@ -102,6 +102,12 @@ public final class SubAgents {
                                                 FunctionTool.create(WebContentSkill.class, "fetchPageContent"),
                                                 FunctionTool.create(WebContentSkill.class, "screenshotPage"),
                                                 FunctionTool.create(ResearchSkill.class, "deepResearch"))
+                                .beforeToolCallbackSync(AgentObserver.beforeTool())
+                                .afterToolCallbackSync(AgentObserver.afterTool())
+                                .onToolErrorCallbackSync(AgentObserver.onToolError())
+                                .beforeModelCallbackSync(AgentObserver.beforeModel())
+                                .afterModelCallbackSync(AgentObserver.afterModel())
+                                .onModelErrorCallbackSync(AgentObserver.onModelError())
                                 .disallowTransferToParent(true)
                                 .disallowTransferToPeers(true)
                                 .build();
@@ -145,6 +151,12 @@ public final class SubAgents {
                                                 FunctionTool.create(ExtractSkill.class, "extractStructuredData"),
                                                 FunctionTool.create(FormSkill.class, "fillFormAndSubmit"),
                                                 FunctionTool.create(PdfSkill.class, "readPdf"))
+                                .beforeToolCallbackSync(AgentObserver.beforeTool())
+                                .afterToolCallbackSync(AgentObserver.afterTool())
+                                .onToolErrorCallbackSync(AgentObserver.onToolError())
+                                .beforeModelCallbackSync(AgentObserver.beforeModel())
+                                .afterModelCallbackSync(AgentObserver.afterModel())
+                                .onModelErrorCallbackSync(AgentObserver.onModelError())
                                 .disallowTransferToParent(true)
                                 .disallowTransferToPeers(true)
                                 .build();
@@ -176,6 +188,12 @@ public final class SubAgents {
                                                 FunctionTool.create(RssSkill.class, "discoverFeed"),
                                                 FunctionTool.create(RssSkill.class, "readFeed"),
                                                 FunctionTool.create(RssSkill.class, "searchInFeed"))
+                                .beforeToolCallbackSync(AgentObserver.beforeTool())
+                                .afterToolCallbackSync(AgentObserver.afterTool())
+                                .onToolErrorCallbackSync(AgentObserver.onToolError())
+                                .beforeModelCallbackSync(AgentObserver.beforeModel())
+                                .afterModelCallbackSync(AgentObserver.afterModel())
+                                .onModelErrorCallbackSync(AgentObserver.onModelError())
                                 .disallowTransferToParent(true)
                                 .disallowTransferToPeers(true)
                                 .build();
@@ -215,6 +233,12 @@ public final class SubAgents {
                                                 FunctionTool.create(NotificationSkill.class,
                                                                 "listPendingNotifications"),
                                                 FunctionTool.create(NotificationSkill.class, "markAsRead"))
+                                .beforeToolCallbackSync(AgentObserver.beforeTool())
+                                .afterToolCallbackSync(AgentObserver.afterTool())
+                                .onToolErrorCallbackSync(AgentObserver.onToolError())
+                                .beforeModelCallbackSync(AgentObserver.beforeModel())
+                                .afterModelCallbackSync(AgentObserver.afterModel())
+                                .onModelErrorCallbackSync(AgentObserver.onModelError())
                                 .disallowTransferToParent(true)
                                 .disallowTransferToPeers(true)
                                 .build();
@@ -255,6 +279,12 @@ public final class SubAgents {
                                                 FunctionTool.create(MemorySkill.class, "listMemories"),
                                                 FunctionTool.create(MemorySkill.class, "deleteMemory"),
                                                 FunctionTool.create(MemorySkill.class, "updateMemory"))
+                                .beforeToolCallbackSync(AgentObserver.beforeTool())
+                                .afterToolCallbackSync(AgentObserver.afterTool())
+                                .onToolErrorCallbackSync(AgentObserver.onToolError())
+                                .beforeModelCallbackSync(AgentObserver.beforeModel())
+                                .afterModelCallbackSync(AgentObserver.afterModel())
+                                .onModelErrorCallbackSync(AgentObserver.onModelError())
                                 .disallowTransferToParent(true)
                                 .disallowTransferToPeers(true)
                                 .build();
