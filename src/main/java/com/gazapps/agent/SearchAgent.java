@@ -48,7 +48,7 @@ public class SearchAgent {
                 BaseAgent agent = buildAgent();
                 this.runner = new InMemoryRunner(agent);
                 this.runConfig = RunConfig.builder()
-                                .maxLlmCalls(AppConfig.getInstance().LLM_MAX_CALLS_AGENT)
+                                .setMaxLlmCalls(AppConfig.getInstance().LLM_MAX_CALLS_AGENT)
                                 .build();
 
                 LOG.info("SearchAgent", "Agent ready — multi-session mode (sessions created lazily per userId)");

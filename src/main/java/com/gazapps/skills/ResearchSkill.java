@@ -37,7 +37,7 @@ public class ResearchSkill {
 
     private static final LogService LOG = LogService.getInstance();
     private static final RunConfig RUN_CONFIG = RunConfig.builder()
-            .maxLlmCalls(AppConfig.getInstance().LLM_MAX_CALLS_RESEARCH)
+            .setMaxLlmCalls(AppConfig.getInstance().LLM_MAX_CALLS_RESEARCH)
             .build();
 
     /**
