@@ -44,7 +44,7 @@ public class NotificationService {
     }
 
     private NotificationService() {
-        LOG.info("NotificationService", "Initialized (queue max=" + AppConfig.NOTIFICATION_QUEUE_MAX_SIZE + ")");
+        LOG.info("NotificationService", "Initialized (queue max=" + AppConfig.getInstance().NOTIFICATION_QUEUE_MAX_SIZE + ")");
     }
 
     // ── State ─────────────────────────────────────────────────────────────────
@@ -94,7 +94,7 @@ public class NotificationService {
      * @return {@code "sent_telegram"} on Telegram delivery, or {@code "notif-N"} on queue
      */
     public String send(String message) {
-        String chatId = AppConfig.NOTIFICATION_TELEGRAM_CHAT_ID;
+        String chatId = AppConfig.getInstance().NOTIFICATION_TELEGRAM_CHAT_ID;
 
         if (bot != null && !chatId.isBlank()) {
             try {
@@ -137,7 +137,7 @@ public class NotificationService {
     // ── Internals ─────────────────────────────────────────────────────────────
 
     private String enqueue(String message) {
-        int maxSize = AppConfig.NOTIFICATION_QUEUE_MAX_SIZE;
+        int maxSize = AppConfig.getInstance().NOTIFICATION_QUEUE_MAX_SIZE;
         // Evict oldest if at capacity
         while (pendingQueue.size() >= maxSize) {
             Notification evicted = pendingQueue.poll();

@@ -21,7 +21,7 @@ public class DuckDuckGoService {
     private static final LogService LOG = LogService.getInstance();
 
     private static final HttpClient HTTP = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(AppConfig.HTTP_CONNECT_TIMEOUT_SECONDS))
+            .connectTimeout(Duration.ofSeconds(AppConfig.getInstance().HTTP_CONNECT_TIMEOUT_SECONDS))
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
 
@@ -34,15 +34,15 @@ public class DuckDuckGoService {
         // retries
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .header("User-Agent", AppConfig.USER_AGENT)
+                .header("User-Agent", AppConfig.getInstance().USER_AGENT)
                 .header("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8")
                 .GET()
                 .build();
         try {
             return RetryUtils.withRetry(
                     "DuckDuckGo.fetchInstantAnswer",
-                    AppConfig.RETRY_MAX_ATTEMPTS,
-                    AppConfig.RETRY_INITIAL_DELAY_MS,
+                    AppConfig.getInstance().RETRY_MAX_ATTEMPTS,
+                    AppConfig.getInstance().RETRY_INITIAL_DELAY_MS,
                     () -> {
                         long t0 = System.currentTimeMillis();
                         HttpResponse<String> resp = HTTP.send(req, HttpResponse.BodyHandlers.ofString());
@@ -63,14 +63,14 @@ public class DuckDuckGoService {
     public static Map<String, String> searchHtml(String query) {
         String searchUrl = "https://html.duckduckgo.com/html/?q="
                 + URLEncoder.encode(query, StandardCharsets.UTF_8)
-                + "&kl=" + AppConfig.DDG_REGION;
+                + "&kl=" + AppConfig.getInstance().DDG_REGION;
         LOG.debug("DuckDuckGoService", "HTML URL: " + searchUrl);
 
         try {
             return RetryUtils.withRetry(
                     "DuckDuckGo.searchHtml",
-                    AppConfig.RETRY_MAX_ATTEMPTS,
-                    AppConfig.RETRY_INITIAL_DELAY_MS,
+                    AppConfig.getInstance().RETRY_MAX_ATTEMPTS,
+                    AppConfig.getInstance().RETRY_INITIAL_DELAY_MS,
                     () -> BrowserService.execute(page -> {
                         try {
                             long navStart = System.currentTimeMillis();
@@ -102,8 +102,8 @@ public class DuckDuckGoService {
 
                             String pageText = page.innerText("body");
                             LOG.info("DuckDuckGoService", "HTML page_text length: " + pageText.length() + " chars");
-                            if (pageText.length() > AppConfig.DDG_PAGE_TEXT_MAX_CHARS)
-                                pageText = pageText.substring(0, AppConfig.DDG_PAGE_TEXT_MAX_CHARS) + "... [truncated]";
+                            if (pageText.length() > AppConfig.getInstance().DDG_PAGE_TEXT_MAX_CHARS)
+                                pageText = pageText.substring(0, AppConfig.getInstance().DDG_PAGE_TEXT_MAX_CHARS) + "... [truncated]";
 
                             Map<String, String> result = new HashMap<>();
                             result.put("query", query);

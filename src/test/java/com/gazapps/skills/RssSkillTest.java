@@ -180,7 +180,7 @@ class RssSkillTest {
     byte[] xml = RSS_WITH_LONG_DESC.getBytes(java.nio.charset.StandardCharsets.UTF_8);
     List<FeedItem> items = FeedParser.parseItems(xml, 10);
 
-    int maxChars = com.gazapps.config.AppConfig.RSS_MAX_DESCRIPTION_CHARS;
+    int maxChars = com.gazapps.config.AppConfig.getInstance().RSS_MAX_DESCRIPTION_CHARS;
     assertTrue(items.get(0).description.length() <= maxChars + 3,
         "Description should be truncated to RSS_MAX_DESCRIPTION_CHARS (plus '...')");
   }

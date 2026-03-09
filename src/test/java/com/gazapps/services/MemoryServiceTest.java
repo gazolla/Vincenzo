@@ -98,9 +98,9 @@ class MemoryServiceTest {
     @Test
     void save_maxItemsReached_returnsEmpty() throws Exception {
         // Override limit to 2 for this test
-        Field propsField = AppConfig.class.getDeclaredField("PROPS");
+        Field propsField = AppConfig.class.getDeclaredField("props");
         propsField.setAccessible(true);
-        java.util.Properties props = (java.util.Properties) propsField.get(null);
+        java.util.Properties props = (java.util.Properties) propsField.get(AppConfig.getInstance());
         String original = props.getProperty("memory.max.items", "500");
         props.setProperty("memory.max.items", "2");
 
@@ -380,16 +380,16 @@ class MemoryServiceTest {
     }
 
     private static void overrideFilePath(String path) throws Exception {
-        Field propsField = AppConfig.class.getDeclaredField("PROPS");
+        Field propsField = AppConfig.class.getDeclaredField("props");
         propsField.setAccessible(true);
-        java.util.Properties props = (java.util.Properties) propsField.get(null);
+        java.util.Properties props = (java.util.Properties) propsField.get(AppConfig.getInstance());
         props.setProperty("memory.storage.file", path);
     }
 
     private static String getFileProp() throws Exception {
-        Field propsField = AppConfig.class.getDeclaredField("PROPS");
+        Field propsField = AppConfig.class.getDeclaredField("props");
         propsField.setAccessible(true);
-        java.util.Properties props = (java.util.Properties) propsField.get(null);
+        java.util.Properties props = (java.util.Properties) propsField.get(AppConfig.getInstance());
         return props.getProperty("memory.storage.file", "work/memory-store.json");
     }
 }

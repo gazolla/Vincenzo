@@ -27,7 +27,7 @@ public class PdfSkill {
     private static final LogService LOG = LogService.getInstance();
 
     private static final HttpClient HTTP = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(AppConfig.PDF_HTTP_TIMEOUT_SECONDS))
+            .connectTimeout(Duration.ofSeconds(AppConfig.getInstance().PDF_HTTP_TIMEOUT_SECONDS))
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
 
@@ -60,7 +60,7 @@ public class PdfSkill {
             // Build request once — HttpRequest is immutable and safe to reuse across retries
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
-                    .header("User-Agent", AppConfig.USER_AGENT)
+                    .header("User-Agent", AppConfig.getInstance().USER_AGENT)
                     .header("Accept", "application/pdf,*/*")
                     .GET()
                     .build();
@@ -68,8 +68,8 @@ public class PdfSkill {
             // Retry the HTTP download step only (PDFBox extraction is CPU-local, no retry needed)
             byte[] pdfBytes = RetryUtils.withRetry(
                     "PdfSkill.download",
-                    AppConfig.RETRY_MAX_ATTEMPTS,
-                    AppConfig.RETRY_INITIAL_DELAY_MS,
+                    AppConfig.getInstance().RETRY_MAX_ATTEMPTS,
+                    AppConfig.getInstance().RETRY_INITIAL_DELAY_MS,
                     () -> {
                         HttpResponse<byte[]> response = HTTP.send(request, HttpResponse.BodyHandlers.ofByteArray());
                         LOG.timing("PdfSkill", "HTTP download", System.currentTimeMillis() - start);
@@ -93,9 +93,9 @@ public class PdfSkill {
                 int rawLen = text.length();
                 LOG.info("PdfSkill", "Extracted text length: " + rawLen + " chars");
 
-                if (text.length() > AppConfig.PDF_MAX_CHARS) {
-                    text = text.substring(0, AppConfig.PDF_MAX_CHARS) + "... [content truncated]";
-                    LOG.debug("PdfSkill", "Text truncated to " + AppConfig.PDF_MAX_CHARS + " chars");
+                if (text.length() > AppConfig.getInstance().PDF_MAX_CHARS) {
+                    text = text.substring(0, AppConfig.getInstance().PDF_MAX_CHARS) + "... [content truncated]";
+                    LOG.debug("PdfSkill", "Text truncated to " + AppConfig.getInstance().PDF_MAX_CHARS + " chars");
                 }
 
                 Map<String, String> result = new HashMap<>();

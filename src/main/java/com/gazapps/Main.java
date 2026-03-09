@@ -24,10 +24,10 @@ public class Main {
     public static void main(String[] args) {
         // Apply SLF4J SimpleLogger settings from application.properties BEFORE
         // the first LogService call triggers SLF4J initialization.
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", AppConfig.SLF4J_DEFAULT_LOG_LEVEL);
-        System.setProperty("org.slf4j.simpleLogger.showDateTime",    AppConfig.SLF4J_SHOW_DATE_TIME);
-        System.setProperty("org.slf4j.simpleLogger.showThreadName",  AppConfig.SLF4J_SHOW_THREAD_NAME);
-        System.setProperty("org.slf4j.simpleLogger.showLogName",     AppConfig.SLF4J_SHOW_LOG_NAME);
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", AppConfig.getInstance().SLF4J_DEFAULT_LOG_LEVEL);
+        System.setProperty("org.slf4j.simpleLogger.showDateTime",    AppConfig.getInstance().SLF4J_SHOW_DATE_TIME);
+        System.setProperty("org.slf4j.simpleLogger.showThreadName",  AppConfig.getInstance().SLF4J_SHOW_THREAD_NAME);
+        System.setProperty("org.slf4j.simpleLogger.showLogName",     AppConfig.getInstance().SLF4J_SHOW_LOG_NAME);
 
         // Initialize logger — creates the session log file
         LogService log = LogService.getInstance();
@@ -48,7 +48,7 @@ public class Main {
         SchedulerService.getInstance();
         log.info("Main", "SchedulerService initialized");
 
-        if ("telegram".equalsIgnoreCase(AppConfig.INTERFACE_MODE)) {
+        if ("telegram".equalsIgnoreCase(AppConfig.getInstance().INTERFACE_MODE)) {
             validateTelegramConfig(log);
             TelegramInterface telegram = new TelegramInterface(agent);
             // Inject TelegramBot into NotificationService for proactive message delivery
@@ -78,7 +78,7 @@ public class Main {
     }
 
     private static void validateTelegramConfig(LogService log) {
-        if (AppConfig.TELEGRAM_BOT_TOKEN.isBlank()) {
+        if (AppConfig.getInstance().TELEGRAM_BOT_TOKEN.isBlank()) {
             log.error("Main", "TELEGRAM_BOT_TOKEN not set — aborting");
             System.err.println("""
                     ERROR: Telegram bot token is not configured.
@@ -88,7 +88,7 @@ public class Main {
                     """);
             System.exit(1);
         }
-        log.info("Main", "TELEGRAM_BOT_TOKEN is set (length: " + AppConfig.TELEGRAM_BOT_TOKEN.length() + ")");
-        log.info("Main", "Telegram mode: " + AppConfig.TELEGRAM_MODE);
+        log.info("Main", "TELEGRAM_BOT_TOKEN is set (length: " + AppConfig.getInstance().TELEGRAM_BOT_TOKEN.length() + ")");
+        log.info("Main", "Telegram mode: " + AppConfig.getInstance().TELEGRAM_MODE);
     }
 }

@@ -78,10 +78,10 @@ public class BrowserService {
      * that UA is returned unchanged (no rotation).
      */
     static UaProfile nextUaProfile() {
-        if (!AppConfig.USER_AGENT.equals(DEFAULT_USER_AGENT)) {
+        if (!AppConfig.getInstance().USER_AGENT.equals(DEFAULT_USER_AGENT)) {
             // Custom UA configured — use it as-is with generic hint headers
             return new UaProfile(
-                AppConfig.USER_AGENT,
+                AppConfig.getInstance().USER_AGENT,
                 "\"Not(A:Brand\";v=\"99\"",
                 "\"Windows\""
             );
@@ -130,7 +130,7 @@ public class BrowserService {
     }
 
     private static BrowserContext launchStealthContext(Playwright playwright) {
-        Path downloadsDir = ensureDir(AppConfig.DOWNLOADS_DIR);
+        Path downloadsDir = ensureDir(AppConfig.getInstance().DOWNLOADS_DIR);
 
         BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions()
                 .setHeadless(true)
@@ -147,7 +147,7 @@ public class BrowserService {
 
         Browser.NewContextOptions contextOptions = new Browser.NewContextOptions()
                 .setUserAgent(ua.userAgent())
-                .setLocale(AppConfig.LOCALE)
+                .setLocale(AppConfig.getInstance().LOCALE)
                 .setAcceptDownloads(true)
                 .setExtraHTTPHeaders(Map.of(
                         "Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8",

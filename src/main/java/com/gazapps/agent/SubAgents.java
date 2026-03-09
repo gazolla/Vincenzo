@@ -63,7 +63,7 @@ public final class SubAgents {
                                 .name("WebAgent")
                                 .description(
                                                 "Searches the internet, fetches web page content, takes screenshots, and performs deep research reports.")
-                                .model(AppConfig.LLM_MODEL)
+                                .model(AppConfig.getInstance().LLM_MODEL)
                                 .instruction(new Instruction.Provider(ctx -> Single.just(
                                                 """
                                                                 You are a web search specialist. Your ONLY job is to search the internet and return real, current results.
@@ -120,7 +120,7 @@ public final class SubAgents {
                                 .name("ContentAgent")
                                 .description(
                                                 "Summarizes web pages, extracts structured data, fills HTML forms, and reads PDF documents.")
-                                .model(AppConfig.LLM_MODEL)
+                                .model(AppConfig.getInstance().LLM_MODEL)
                                 .instruction(
                                                 """
                                                                 You are a content extraction and processing specialist.
@@ -159,7 +159,7 @@ public final class SubAgents {
                 return LlmAgent.builder()
                                 .name("FeedAgent")
                                 .description("Discovers, reads and searches RSS and Atom news feeds.")
-                                .model(AppConfig.LLM_MODEL)
+                                .model(AppConfig.getInstance().LLM_MODEL)
                                 .instruction("""
                                                 You are an RSS/Atom feed specialist.
 
@@ -191,7 +191,7 @@ public final class SubAgents {
                                 .name("MonitorAgent")
                                 .description(
                                                 "Sets up and manages recurring keyword monitors on web pages or feeds, and handles notifications.")
-                                .model(AppConfig.LLM_MODEL)
+                                .model(AppConfig.getInstance().LLM_MODEL)
                                 .instruction(
                                                 """
                                                                 You are a monitoring and notification specialist.
@@ -230,7 +230,7 @@ public final class SubAgents {
                                 .name("MemoryAgent")
                                 .description(
                                                 "Saves, retrieves, updates and deletes persistent memories, preferences, notes and task context.")
-                                .model(AppConfig.LLM_MODEL)
+                                .model(AppConfig.getInstance().LLM_MODEL)
                                 .instruction("""
                                                 You are a persistent memory specialist.
 

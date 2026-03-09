@@ -62,7 +62,7 @@ public final class ResearchAgent {
         return LlmAgent.builder()
                 .name("searcher")
                 .description("Searches the web and reads relevant pages for the research query.")
-                .model(AppConfig.LLM_MODEL)
+                .model(AppConfig.getInstance().LLM_MODEL)
                 .instruction("""
                         You are a web research assistant.
                         Your task:
@@ -89,7 +89,7 @@ public final class ResearchAgent {
         return LlmAgent.builder()
                 .name("synthesizer")
                 .description("Synthesizes raw research findings into a structured report.")
-                .model(AppConfig.LLM_MODEL)
+                .model(AppConfig.getInstance().LLM_MODEL)
                 .instruction("""
                         You are a research synthesizer.
                         Review the research findings provided by the searcher agent in the conversation history.
@@ -121,7 +121,7 @@ public final class ResearchAgent {
         return LlmAgent.builder()
                 .name("fact-checker")
                 .description("Verifies factual claims in the report and finalizes with source attribution.")
-                .model(AppConfig.LLM_MODEL)
+                .model(AppConfig.getInstance().LLM_MODEL)
                 .instruction("""
                         You are a fact-checker and editor.
                         Review the structured report from the synthesizer (visible in the conversation history).

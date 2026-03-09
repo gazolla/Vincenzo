@@ -26,13 +26,13 @@ public final class FeedTextUtils {
     }
 
     /**
-     * Truncate text to {@code AppConfig.RSS_MAX_DESCRIPTION_CHARS}, appending "…"
+     * Truncate text to {@code AppConfig.getInstance().RSS_MAX_DESCRIPTION_CHARS}, appending "…"
      * if cut.
      */
     public static String truncate(String text) {
         if (text == null)
             return "";
-        int max = AppConfig.RSS_MAX_DESCRIPTION_CHARS;
+        int max = AppConfig.getInstance().RSS_MAX_DESCRIPTION_CHARS;
         return text.length() > max ? text.substring(0, max) + "..." : text;
     }
 

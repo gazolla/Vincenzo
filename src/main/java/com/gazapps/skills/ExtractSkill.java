@@ -50,12 +50,12 @@ public class ExtractSkill {
         try {
             return RetryUtils.withRetry(
                     "ExtractSkill.extractStructuredData",
-                    AppConfig.RETRY_MAX_ATTEMPTS,
-                    AppConfig.RETRY_INITIAL_DELAY_MS,
+                    AppConfig.getInstance().RETRY_MAX_ATTEMPTS,
+                    AppConfig.getInstance().RETRY_INITIAL_DELAY_MS,
                     () -> BrowserService.execute(page -> {
                         try {
                             page.navigate(url, new Page.NavigateOptions()
-                                    .setTimeout(AppConfig.EXTRACT_NAVIGATE_TIMEOUT_MS));
+                                    .setTimeout(AppConfig.getInstance().EXTRACT_NAVIGATE_TIMEOUT_MS));
                             page.waitForLoadState(LoadState.DOMCONTENTLOADED);
                             LOG.timing("ExtractSkill", "Navigation", System.currentTimeMillis() - start);
 
@@ -117,7 +117,7 @@ public class ExtractSkill {
                                         }
                                     }
                                     """
-                                    .formatted(AppConfig.EXTRACT_MAX_ITEMS);
+                                    .formatted(AppConfig.getInstance().EXTRACT_MAX_ITEMS);
 
                             // Pass only the selectors Map as arg — Playwright serializes Maps safely
                             java.util.Map<String, String> selectorsMap = FormSkill.parseJsonFields(selectors);

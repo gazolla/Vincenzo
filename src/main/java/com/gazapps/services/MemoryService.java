@@ -90,7 +90,7 @@ public class MemoryService {
      *         or {@link Optional#empty()} if the {@code memory.max.items} limit has been reached
      */
     public Optional<String> save(String content, List<String> tags, String category) {
-        int maxItems = AppConfig.memoryMaxItems();
+        int maxItems = AppConfig.getInstance().memoryMaxItems();
         if (entries.size() >= maxItems) {
             LOG.warn("MemoryService", "Max items limit reached (" + maxItems + ")");
             return Optional.empty();
@@ -199,7 +199,7 @@ public class MemoryService {
 
     /** Returns the storage file path — reads dynamically so tests can override via PROPS. */
     private static Path dataFilePath() {
-        return Paths.get(AppConfig.memoryStorageFile());
+        return Paths.get(AppConfig.getInstance().memoryStorageFile());
     }
 
     private void loadEntries() {

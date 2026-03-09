@@ -131,7 +131,7 @@ public class RssSkill {
         }
 
         try {
-            int effectiveMax = Math.min(maxItems, AppConfig.RSS_MAX_ITEMS);
+            int effectiveMax = Math.min(maxItems, AppConfig.getInstance().RSS_MAX_ITEMS);
             byte[] bytes = FeedHttpClient.fetchBytes(feedUrl);
             List<FeedItem> items = FeedParser.parseItems(bytes, effectiveMax);
             String feedTitle = FeedParser.parseFeedTitle(bytes);
@@ -177,7 +177,7 @@ public class RssSkill {
 
         try {
             byte[] bytes = FeedHttpClient.fetchBytes(feedUrl);
-            List<FeedItem> all = FeedParser.parseItems(bytes, AppConfig.RSS_MAX_ITEMS);
+            List<FeedItem> all = FeedParser.parseItems(bytes, AppConfig.getInstance().RSS_MAX_ITEMS);
 
             String kw = keyword.toLowerCase();
             List<FeedItem> matches = new ArrayList<>();

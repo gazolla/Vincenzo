@@ -61,17 +61,17 @@ public class SchedulerSkill {
         }
 
         // Validate interval
-        if (intervalMinutes < AppConfig.SCHEDULER_MIN_INTERVAL_MINUTES) {
+        if (intervalMinutes < AppConfig.getInstance().SCHEDULER_MIN_INTERVAL_MINUTES) {
             String msg = "intervalMinutes (" + intervalMinutes + ") is below the minimum allowed ("
-                    + AppConfig.SCHEDULER_MIN_INTERVAL_MINUTES + " min)";
+                    + AppConfig.getInstance().SCHEDULER_MIN_INTERVAL_MINUTES + " min)";
             LOG.warn("SchedulerSkill", msg);
             return errorMap(feedUrlOrWebUrl, msg);
         }
 
         // Validate job count
         int currentCount = SchedulerService.getInstance().listMonitors().size();
-        if (currentCount >= AppConfig.SCHEDULER_MAX_JOBS) {
-            String msg = "Maximum number of monitor jobs reached (" + AppConfig.SCHEDULER_MAX_JOBS + ")."
+        if (currentCount >= AppConfig.getInstance().SCHEDULER_MAX_JOBS) {
+            String msg = "Maximum number of monitor jobs reached (" + AppConfig.getInstance().SCHEDULER_MAX_JOBS + ")."
                     + " Cancel an existing job before adding a new one.";
             LOG.warn("SchedulerSkill", msg);
             return errorMap(feedUrlOrWebUrl, msg);

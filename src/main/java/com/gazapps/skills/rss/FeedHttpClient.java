@@ -20,7 +20,7 @@ import java.time.Duration;
 public final class FeedHttpClient {
 
     private static final HttpClient HTTP = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(AppConfig.RSS_FETCH_TIMEOUT_SECONDS))
+            .connectTimeout(Duration.ofSeconds(AppConfig.getInstance().RSS_FETCH_TIMEOUT_SECONDS))
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
 
@@ -35,15 +35,15 @@ public final class FeedHttpClient {
     public static String fetchHtml(String url) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .header("User-Agent", AppConfig.USER_AGENT)
+                .header("User-Agent", AppConfig.getInstance().USER_AGENT)
                 .header("Accept", "text/html,application/xhtml+xml,*/*")
                 .GET()
                 .build();
 
         return RetryUtils.withRetry(
                 "FeedHttpClient.fetchHtml",
-                AppConfig.RETRY_MAX_ATTEMPTS,
-                AppConfig.RETRY_INITIAL_DELAY_MS,
+                AppConfig.getInstance().RETRY_MAX_ATTEMPTS,
+                AppConfig.getInstance().RETRY_INITIAL_DELAY_MS,
                 () -> {
                     HttpResponse<String> resp = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
                     if (resp.statusCode() < 200 || resp.statusCode() >= 300) {
@@ -62,15 +62,15 @@ public final class FeedHttpClient {
     public static byte[] fetchBytes(String url) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .header("User-Agent", AppConfig.USER_AGENT)
+                .header("User-Agent", AppConfig.getInstance().USER_AGENT)
                 .header("Accept", "application/rss+xml,application/atom+xml,application/xml,text/xml,*/*")
                 .GET()
                 .build();
 
         return RetryUtils.withRetry(
                 "FeedHttpClient.fetchBytes",
-                AppConfig.RETRY_MAX_ATTEMPTS,
-                AppConfig.RETRY_INITIAL_DELAY_MS,
+                AppConfig.getInstance().RETRY_MAX_ATTEMPTS,
+                AppConfig.getInstance().RETRY_INITIAL_DELAY_MS,
                 () -> {
                     HttpResponse<byte[]> resp = HTTP.send(request, HttpResponse.BodyHandlers.ofByteArray());
                     if (resp.statusCode() < 200 || resp.statusCode() >= 300) {
@@ -89,7 +89,7 @@ public final class FeedHttpClient {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
-                    .header("User-Agent", AppConfig.USER_AGENT)
+                    .header("User-Agent", AppConfig.getInstance().USER_AGENT)
                     .method("HEAD", HttpRequest.BodyPublishers.noBody())
                     .build();
             HttpResponse<Void> resp = HTTP.send(request, HttpResponse.BodyHandlers.discarding());

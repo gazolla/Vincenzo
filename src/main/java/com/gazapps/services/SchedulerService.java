@@ -265,7 +265,7 @@ public class SchedulerService {
      * PROPS.
      */
     private static Path jobsFilePath() {
-        return Paths.get(AppConfig.schedulerJobsFile());
+        return Paths.get(AppConfig.getInstance().schedulerJobsFile());
     }
 
     private void loadJobs() {

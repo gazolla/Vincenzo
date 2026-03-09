@@ -242,17 +242,17 @@ class SchedulerServiceTest {
      * This avoids touching real job files during tests.
      */
     private static void overrideJobsFilePath(String path) throws Exception {
-        Field propsField = AppConfig.class.getDeclaredField("PROPS");
+        Field propsField = AppConfig.class.getDeclaredField("props");
         propsField.setAccessible(true);
-        java.util.Properties props = (java.util.Properties) propsField.get(null);
+        java.util.Properties props = (java.util.Properties) propsField.get(AppConfig.getInstance());
         props.setProperty("scheduler.jobs.file", path);
     }
 
     /** Read current value of scheduler.jobs.file from AppConfig's PROPS. */
     private static String getJobsFileProp() throws Exception {
-        Field propsField = AppConfig.class.getDeclaredField("PROPS");
+        Field propsField = AppConfig.class.getDeclaredField("props");
         propsField.setAccessible(true);
-        java.util.Properties props = (java.util.Properties) propsField.get(null);
+        java.util.Properties props = (java.util.Properties) propsField.get(AppConfig.getInstance());
         return props.getProperty("scheduler.jobs.file", "work/scheduler-jobs.json");
     }
 }

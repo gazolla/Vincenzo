@@ -34,7 +34,7 @@ public class SearchAgent {
 
         public SearchAgent() {
                 LOG.section("AGENT INIT");
-                LOG.info("SearchAgent", "Building LlmAgent with model: " + AppConfig.LLM_MODEL);
+                LOG.info("SearchAgent", "Building LlmAgent with model: " + AppConfig.getInstance().LLM_MODEL);
 
                 BaseAgent agent = buildAgent();
                 this.runner = new InMemoryRunner(agent);
@@ -64,7 +64,7 @@ public class SearchAgent {
                 return LlmAgent.builder()
                                 .name("vincenzo")
                                 .description("Vincenzo — AI assistant with internet access, memory and monitoring capabilities.")
-                                .model(AppConfig.LLM_MODEL)
+                                .model(AppConfig.getInstance().LLM_MODEL)
                                 .instruction(new Instruction.Provider(ctx -> Single.just(
                                                 """
                                                                 You are Vincenzo, a helpful AI assistant with internet access.

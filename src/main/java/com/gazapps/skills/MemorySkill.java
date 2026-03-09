@@ -72,7 +72,7 @@ public final class MemorySkill {
 
         Optional<String> savedId = MemoryService.getInstance().save(content, tagList, safeCategory);
         if (savedId.isEmpty()) {
-            return errorMap("Memory limit reached (" + AppConfig.memoryMaxItems()
+            return errorMap("Memory limit reached (" + AppConfig.getInstance().memoryMaxItems()
                     + "). Delete some entries first using deleteMemory(id).");
         }
         String id = savedId.get();

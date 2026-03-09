@@ -46,8 +46,8 @@ public class WebOrchestrator {
     // ── Circuit breaker protecting the DDG HTML path ──────────────────────────
     static final CircuitBreaker DDG_CIRCUIT_BREAKER = new CircuitBreaker(
             "DDG-HTML",
-            AppConfig.SEARCH_CIRCUIT_DDG_FAILURE_THRESHOLD,
-            AppConfig.SEARCH_CIRCUIT_DDG_RESET_MS);
+            AppConfig.getInstance().SEARCH_CIRCUIT_DDG_FAILURE_THRESHOLD,
+            AppConfig.getInstance().SEARCH_CIRCUIT_DDG_RESET_MS);
 
     // ─────────────────────────────────────────────────────────────────────────
     // searchWeb (DDG JSON + DDG HTML → Bing fallback)
@@ -69,7 +69,7 @@ public class WebOrchestrator {
         long start = System.currentTimeMillis();
 
         // ── Cache lookup ────────────────────────────────────────────────────
-        if (AppConfig.SEARCH_CACHE_ENABLED) {
+        if (AppConfig.getInstance().SEARCH_CACHE_ENABLED) {
             String cacheKey = SearchCache.normalize(query);
             Optional<Map<String, String>> cached = SearchCache.get(cacheKey);
             if (cached.isPresent()) {
@@ -86,12 +86,12 @@ public class WebOrchestrator {
         LOG.debug("WebOrchestrator", "DDG instant answer: " + StringUtils.truncate(instantJson, 300));
 
         // ── Steps 2+3: parallel or sequential ─────────────────────────────
-        Map<String, String> webResults = AppConfig.SEARCH_PARALLEL_ENABLED
+        Map<String, String> webResults = AppConfig.getInstance().SEARCH_PARALLEL_ENABLED
                 ? executeParallel(query, instantJson)
                 : executeSequential(query, instantJson);
 
         // ── Store in cache (successes only) ────────────────────────────────
-        if (AppConfig.SEARCH_CACHE_ENABLED && SkillStatus.SUCCESS.value().equals(webResults.get("status"))) {
+        if (AppConfig.getInstance().SEARCH_CACHE_ENABLED && SkillStatus.SUCCESS.value().equals(webResults.get("status"))) {
             SearchCache.put(SearchCache.normalize(query), webResults);
             LOG.debug("WebOrchestrator", "Result cached. Stats: " + SearchCache.stats());
         }
@@ -149,12 +149,12 @@ public class WebOrchestrator {
 
         try {
             CompletableFuture.allOf(ddgFuture, bingFuture)
-                    .get(AppConfig.SEARCH_PARALLEL_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+                    .get(AppConfig.getInstance().SEARCH_PARALLEL_TIMEOUT_MS, TimeUnit.MILLISECONDS);
             ddgResult = ddgFuture.getNow(Map.of("status", SkillStatus.ERROR.value()));
             bingResult = bingFuture.getNow(Map.of("status", SkillStatus.ERROR.value()));
         } catch (TimeoutException e) {
             LOG.warn("WebOrchestrator", "Parallel search timed out after "
-                    + AppConfig.SEARCH_PARALLEL_TIMEOUT_MS + "ms — using available results");
+                    + AppConfig.getInstance().SEARCH_PARALLEL_TIMEOUT_MS + "ms — using available results");
             ddgResult = ddgFuture.isDone() ? ddgFuture.getNow(Map.of("status", SkillStatus.ERROR.value()))
                     : Map.of("status", SkillStatus.ERROR.value());
             bingResult = bingFuture.isDone() ? bingFuture.getNow(Map.of("status", SkillStatus.ERROR.value()))

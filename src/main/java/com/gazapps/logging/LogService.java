@@ -175,7 +175,7 @@ public class LogService {
      * Silently skips files that cannot be deleted.
      */
     private void enforceRetention() {
-        int maxFiles = AppConfig.LOG_MAX_FILES;
+        int maxFiles = AppConfig.getInstance().LOG_MAX_FILES;
         if (maxFiles <= 0) return;
         try (Stream<Path> stream = Files.list(logsDir)) {
             List<Path> files = stream
@@ -229,7 +229,7 @@ public class LogService {
     private synchronized void writeRaw(String text) {
         try {
             // Check size limit before writing (0 = disabled)
-            int maxKb = AppConfig.LOG_MAX_SIZE_KB;
+            int maxKb = AppConfig.getInstance().LOG_MAX_SIZE_KB;
             if (maxKb > 0 && Files.exists(logFile)) {
                 long currentBytes = Files.size(logFile);
                 if (currentBytes >= (long) maxKb * 1024) {

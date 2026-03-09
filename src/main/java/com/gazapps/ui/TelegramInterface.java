@@ -57,7 +57,7 @@ public class TelegramInterface {
 
     public TelegramInterface(SearchAgent agent) {
         this.agent = agent;
-        this.bot = new TelegramBot(AppConfig.TELEGRAM_BOT_TOKEN);
+        this.bot = new TelegramBot(AppConfig.getInstance().TELEGRAM_BOT_TOKEN);
 
         RetryUtils.setRetryListener(msg -> LOG.info("TelegramInterface", "Retry: " + msg));
 
@@ -74,9 +74,9 @@ public class TelegramInterface {
         Runtime.getRuntime().addShutdownHook(new Thread(this::cleanup, "telegram-shutdown"));
 
         LOG.section("TELEGRAM SESSION START");
-        LOG.info("TelegramInterface", "Update mode: " + AppConfig.TELEGRAM_MODE);
+        LOG.info("TelegramInterface", "Update mode: " + AppConfig.getInstance().TELEGRAM_MODE);
 
-        if ("webhook".equalsIgnoreCase(AppConfig.TELEGRAM_MODE)) {
+        if ("webhook".equalsIgnoreCase(AppConfig.getInstance().TELEGRAM_MODE)) {
             startWebhook();
         } else {
             startPolling();
@@ -139,8 +139,8 @@ public class TelegramInterface {
     // ── Webhook ───────────────────────────────────────────────────────────────
 
     private void startWebhook() {
-        String webhookUrl = AppConfig.TELEGRAM_WEBHOOK_URL;
-        int port = AppConfig.TELEGRAM_WEBHOOK_PORT;
+        String webhookUrl = AppConfig.getInstance().TELEGRAM_WEBHOOK_URL;
+        int port = AppConfig.getInstance().TELEGRAM_WEBHOOK_PORT;
 
         if (webhookUrl.isBlank()) {
             LOG.error("TelegramInterface", "telegram.webhook.url is empty — aborting webhook mode");

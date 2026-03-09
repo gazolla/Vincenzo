@@ -58,12 +58,12 @@ public class SummarizeSkill {
         try {
             return RetryUtils.withRetry(
                     "SummarizeSkill.summarizeUrl",
-                    AppConfig.RETRY_MAX_ATTEMPTS,
-                    AppConfig.RETRY_INITIAL_DELAY_MS,
+                    AppConfig.getInstance().RETRY_MAX_ATTEMPTS,
+                    AppConfig.getInstance().RETRY_INITIAL_DELAY_MS,
                     () -> BrowserService.execute(page -> {
                         try {
                             page.navigate(url, new Page.NavigateOptions()
-                                    .setTimeout(AppConfig.SUMMARIZE_NAVIGATE_TIMEOUT_MS));
+                                    .setTimeout(AppConfig.getInstance().SUMMARIZE_NAVIGATE_TIMEOUT_MS));
                             page.waitForLoadState(LoadState.DOMCONTENTLOADED);
                             LOG.timing("SummarizeSkill", "Navigation", System.currentTimeMillis() - start);
 
@@ -83,11 +83,11 @@ public class SummarizeSkill {
                             LOG.info("SummarizeSkill", "Page title: \"" + title + "\"");
                             LOG.info("SummarizeSkill", "Raw body text length: " + rawLen + " chars");
 
-                            if (bodyText.length() > AppConfig.SUMMARIZE_MAX_CHARS) {
-                                bodyText = bodyText.substring(0, AppConfig.SUMMARIZE_MAX_CHARS)
+                            if (bodyText.length() > AppConfig.getInstance().SUMMARIZE_MAX_CHARS) {
+                                bodyText = bodyText.substring(0, AppConfig.getInstance().SUMMARIZE_MAX_CHARS)
                                         + "... [content truncated]";
                                 LOG.debug("SummarizeSkill", "Body text truncated to "
-                                        + AppConfig.SUMMARIZE_MAX_CHARS + " chars");
+                                        + AppConfig.getInstance().SUMMARIZE_MAX_CHARS + " chars");
                             }
 
                             Map<String, String> result = new HashMap<>();

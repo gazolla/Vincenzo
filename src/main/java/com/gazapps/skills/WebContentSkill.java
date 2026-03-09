@@ -43,8 +43,8 @@ public class WebContentSkill {
         try {
             return RetryUtils.withRetry(
                     "WebContentSkill.fetchPageContent",
-                    AppConfig.RETRY_MAX_ATTEMPTS,
-                    AppConfig.RETRY_INITIAL_DELAY_MS,
+                    AppConfig.getInstance().RETRY_MAX_ATTEMPTS,
+                    AppConfig.getInstance().RETRY_INITIAL_DELAY_MS,
                     () -> {
                         // BrowserService.execute wraps any internal exception in RuntimeException.
                         // We catch it here (before RetryUtils sees it as an unhandled throw) so
@@ -54,7 +54,7 @@ public class WebContentSkill {
                                 try {
                                     page.navigate(url,
                                             new Page.NavigateOptions()
-                                                    .setTimeout(AppConfig.FETCH_PAGE_NAVIGATE_TIMEOUT_MS));
+                                                    .setTimeout(AppConfig.getInstance().FETCH_PAGE_NAVIGATE_TIMEOUT_MS));
                                     // Wait for NETWORKIDLE so JS-rendered content (prices, dynamic
                                     // data) is fully loaded before extraction.
                                     // Gracefully degrade if the site keeps long-polling and never
@@ -62,11 +62,11 @@ public class WebContentSkill {
                                     try {
                                         page.waitForLoadState(LoadState.NETWORKIDLE,
                                                 new Page.WaitForLoadStateOptions()
-                                                        .setTimeout(AppConfig.FETCH_PAGE_NETWORKIDLE_TIMEOUT_MS));
+                                                        .setTimeout(AppConfig.getInstance().FETCH_PAGE_NETWORKIDLE_TIMEOUT_MS));
                                     } catch (Exception networkIdleEx) {
                                         LOG.debug("WebContentSkill",
                                                 "NETWORKIDLE not reached within "
-                                                + AppConfig.FETCH_PAGE_NETWORKIDLE_TIMEOUT_MS
+                                                + AppConfig.getInstance().FETCH_PAGE_NETWORKIDLE_TIMEOUT_MS
                                                 + " ms — proceeding with available content");
                                     }
                                     LOG.timing("WebContentSkill", "Navigation",
@@ -105,11 +105,11 @@ public class WebContentSkill {
                                         return botErr;
                                     }
 
-                                    if (bodyText.length() > AppConfig.FETCH_PAGE_MAX_CHARS) {
-                                        bodyText = bodyText.substring(0, AppConfig.FETCH_PAGE_MAX_CHARS)
+                                    if (bodyText.length() > AppConfig.getInstance().FETCH_PAGE_MAX_CHARS) {
+                                        bodyText = bodyText.substring(0, AppConfig.getInstance().FETCH_PAGE_MAX_CHARS)
                                                 + "... [content truncated]";
                                         LOG.debug("WebContentSkill",
-                                                "Body text truncated to " + AppConfig.FETCH_PAGE_MAX_CHARS
+                                                "Body text truncated to " + AppConfig.getInstance().FETCH_PAGE_MAX_CHARS
                                                         + " chars");
                                     }
 
@@ -215,7 +215,7 @@ public class WebContentSkill {
         return BrowserService.execute(page -> {
             try {
                 page.setViewportSize(1280, 800);
-                page.navigate(url, new Page.NavigateOptions().setTimeout(AppConfig.SCREENSHOT_NAVIGATE_TIMEOUT_MS));
+                page.navigate(url, new Page.NavigateOptions().setTimeout(AppConfig.getInstance().SCREENSHOT_NAVIGATE_TIMEOUT_MS));
                 page.waitForLoadState(LoadState.NETWORKIDLE);
                 LOG.timing("WebContentSkill", "Navigation", System.currentTimeMillis() - start);
 
@@ -223,7 +223,7 @@ public class WebContentSkill {
                 if (!safeFile.endsWith(".png"))
                     safeFile += ".png";
 
-                java.nio.file.Path outputPath = com.gazapps.services.BrowserService.ensureDir(AppConfig.SCREENSHOTS_DIR)
+                java.nio.file.Path outputPath = com.gazapps.services.BrowserService.ensureDir(AppConfig.getInstance().SCREENSHOTS_DIR)
                         .resolve(safeFile);
                 page.screenshot(new Page.ScreenshotOptions().setPath(outputPath).setFullPage(false));
 

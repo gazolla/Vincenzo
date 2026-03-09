@@ -91,9 +91,9 @@ class MemorySkillTest {
 
     @Test
     void saveMemory_maxLimitReached_returnsError() throws Exception {
-        Field propsField = AppConfig.class.getDeclaredField("PROPS");
+        Field propsField = AppConfig.class.getDeclaredField("props");
         propsField.setAccessible(true);
-        java.util.Properties props = (java.util.Properties) propsField.get(null);
+        java.util.Properties props = (java.util.Properties) propsField.get(AppConfig.getInstance());
         String original = props.getProperty("memory.max.items", "500");
         props.setProperty("memory.max.items", "1");
         resetSingleton();
@@ -321,9 +321,9 @@ class MemorySkillTest {
     }
 
     private static void overrideFilePath(String path) throws Exception {
-        Field propsField = AppConfig.class.getDeclaredField("PROPS");
+        Field propsField = AppConfig.class.getDeclaredField("props");
         propsField.setAccessible(true);
-        java.util.Properties props = (java.util.Properties) propsField.get(null);
+        java.util.Properties props = (java.util.Properties) propsField.get(AppConfig.getInstance());
         props.setProperty("memory.storage.file", path);
     }
 }

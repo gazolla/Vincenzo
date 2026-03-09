@@ -170,7 +170,7 @@ class NotificationServiceTest {
     @Test
     void send_queueAtCapacity_evictsOldest() {
         // Fill the queue to its configured capacity (default 100) then add one more
-        int maxSize = AppConfig.NOTIFICATION_QUEUE_MAX_SIZE;
+        int maxSize = AppConfig.getInstance().NOTIFICATION_QUEUE_MAX_SIZE;
         NotificationService svc = NotificationService.getInstance();
 
         String firstId = svc.send("First message — should be evicted");

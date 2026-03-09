@@ -31,8 +31,8 @@ public final class SearchCache {
      */
     static Cache<String, Map<String, String>> buildCache() {
         return CacheBuilder.newBuilder()
-                .maximumSize(AppConfig.SEARCH_CACHE_MAX_SIZE)
-                .expireAfterWrite(AppConfig.SEARCH_CACHE_TTL_MINUTES, TimeUnit.MINUTES)
+                .maximumSize(AppConfig.getInstance().SEARCH_CACHE_MAX_SIZE)
+                .expireAfterWrite(AppConfig.getInstance().SEARCH_CACHE_TTL_MINUTES, TimeUnit.MINUTES)
                 .recordStats()
                 .build();
     }

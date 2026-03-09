@@ -69,7 +69,7 @@ public class FormSkill {
         return BrowserService.execute(page -> {
             try {
                 page.navigate(url, new Page.NavigateOptions()
-                        .setTimeout(AppConfig.FORM_NAVIGATE_TIMEOUT_MS));
+                        .setTimeout(AppConfig.getInstance().FORM_NAVIGATE_TIMEOUT_MS));
                 page.waitForLoadState(LoadState.DOMCONTENTLOADED);
                 LOG.timing("FormSkill", "Navigation", System.currentTimeMillis() - start);
 
@@ -121,7 +121,7 @@ public class FormSkill {
 
                 // Wait for result page to load
                 page.waitForLoadState(LoadState.DOMCONTENTLOADED);
-                page.waitForTimeout(AppConfig.FORM_AFTER_SUBMIT_WAIT_MS);
+                page.waitForTimeout(AppConfig.getInstance().FORM_AFTER_SUBMIT_WAIT_MS);
                 LOG.timing("FormSkill", "Post-submit wait", System.currentTimeMillis() - start);
 
                 String responseUrl = page.url();
@@ -139,8 +139,8 @@ public class FormSkill {
                 int rawLen = resultText.length();
                 LOG.info("FormSkill", "Result page text length: " + rawLen + " chars");
 
-                if (resultText.length() > AppConfig.FORM_RESULT_MAX_CHARS) {
-                    resultText = resultText.substring(0, AppConfig.FORM_RESULT_MAX_CHARS)
+                if (resultText.length() > AppConfig.getInstance().FORM_RESULT_MAX_CHARS) {
+                    resultText = resultText.substring(0, AppConfig.getInstance().FORM_RESULT_MAX_CHARS)
                             + "... [content truncated]";
                 }
 

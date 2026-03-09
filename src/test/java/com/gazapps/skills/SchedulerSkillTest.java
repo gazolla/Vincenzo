@@ -73,7 +73,7 @@ class SchedulerSkillTest {
 
     @Test
     void scheduleMonitor_intervalBelowMinimum_returnsErrorMap() {
-        int belowMin = AppConfig.SCHEDULER_MIN_INTERVAL_MINUTES - 1;
+        int belowMin = AppConfig.getInstance().SCHEDULER_MIN_INTERVAL_MINUTES - 1;
         Map<String, String> result = SchedulerSkill.scheduleMonitor(
                 "https://example.com/rss", "java", belowMin, "Test");
         assertEquals("error", result.get("status"));
@@ -91,7 +91,7 @@ class SchedulerSkillTest {
 
     @Test
     void scheduleMonitor_intervalAtMinimum_returnsSuccess() {
-        int minInterval = AppConfig.SCHEDULER_MIN_INTERVAL_MINUTES;
+        int minInterval = AppConfig.getInstance().SCHEDULER_MIN_INTERVAL_MINUTES;
         Map<String, String> result = SchedulerSkill.scheduleMonitor(
                 "https://example.com/rss", "java", minInterval, "Test");
         assertEquals("success", result.get("status"));
@@ -231,9 +231,9 @@ class SchedulerSkillTest {
     }
 
     private static void overrideJobsFilePath(String path) throws Exception {
-        Field propsField = AppConfig.class.getDeclaredField("PROPS");
+        Field propsField = AppConfig.class.getDeclaredField("props");
         propsField.setAccessible(true);
-        java.util.Properties props = (java.util.Properties) propsField.get(null);
+        java.util.Properties props = (java.util.Properties) propsField.get(AppConfig.getInstance());
         props.setProperty("scheduler.jobs.file", path);
     }
 }

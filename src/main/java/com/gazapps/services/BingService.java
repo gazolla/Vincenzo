@@ -24,8 +24,8 @@ public class BingService {
         try {
             return RetryUtils.withRetry(
                     "BingService.search",
-                    AppConfig.RETRY_MAX_ATTEMPTS,
-                    AppConfig.RETRY_INITIAL_DELAY_MS,
+                    AppConfig.getInstance().RETRY_MAX_ATTEMPTS,
+                    AppConfig.getInstance().RETRY_INITIAL_DELAY_MS,
                     () -> BrowserService.execute(page -> {
                         try {
                             long navStart = System.currentTimeMillis();
@@ -59,8 +59,8 @@ public class BingService {
 
                             String pageText = page.innerText("body");
                             LOG.info("BingService", "Page_text length: " + pageText.length() + " chars");
-                            if (pageText.length() > AppConfig.BING_PAGE_TEXT_MAX_CHARS)
-                                pageText = pageText.substring(0, AppConfig.BING_PAGE_TEXT_MAX_CHARS) + "... [truncated]";
+                            if (pageText.length() > AppConfig.getInstance().BING_PAGE_TEXT_MAX_CHARS)
+                                pageText = pageText.substring(0, AppConfig.getInstance().BING_PAGE_TEXT_MAX_CHARS) + "... [truncated]";
 
                             Map<String, String> result = new HashMap<>();
                             result.put("query", query);
